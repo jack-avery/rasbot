@@ -77,7 +77,7 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
         raise CommandIsBuiltInError(f"command {name} is built in")
 
     # You cannot have a negative cooldown
-    if cooldown < 0:
+    if int(cooldown) < 0:
         raise ValueError(f"command provided invalid cooldown length {cooldown}")
 
     commands[name] = Command(name,cooldown,response,requires_mod)

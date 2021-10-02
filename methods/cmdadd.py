@@ -9,7 +9,7 @@ MODONLY_ARG = "-modonly"
 def main(bot):
     cmd = bot.cmdargs
     
-    if MODONLY_ARG in cmd:
+    if MODONLY_ARG in cmd[:3]:
         modonly=True
         cmd.remove(MODONLY_ARG)
     else:
@@ -28,4 +28,4 @@ def main(bot):
         return 'Command must have a positive cooldown.'
 
     except IndexError:
-        return f'Please specify the name, cooldown in seconds, and response. Add {MODONLY_ARG} in the command if you wish for the command to be mod-only.'
+        return f'Please specify the name, cooldown in seconds, and response. Add {MODONLY_ARG} before the response if you wish for the command to be mod-only.'
