@@ -54,15 +54,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 self.commands.method_add(method[:-3])
 
         # Resolve channel name
-        url = f"https://api.twitch.tv/helix/users?id={self.channel_id}"
-        r = requests.get(url, headers=self.auth.get_headers()).json()
-        self.channel=f"#{r['data'][0]['login']}"
+        self.channel = self.authkeys['user_id']
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
         port = 80
         print('Connecting to ' + server + ' on port ' + str(port) + '...')
-        irc.bot.SingleServerIRCBot.__init__(self, [(server, port, f"oauth:{self.authkeys['irc_oauth']}")], self.authkeys["user_id"], self.authkeys["user_id"])
+        irc.bot.SingleServerIRCBot.__init__(self, [(server, port, f"oauth:{self.authkeys['irc_oauth']}")], self.channel, self.channel)
 
     def on_welcome(self, c, e):
         print(f'Joined {self.channel}! ({self.channel_id})')

@@ -51,16 +51,19 @@ class Authorization:
         return {'Client-ID': self.auth["client_id"],
                 'Authorization': f'Bearer {self.auth["oauth"]}',
                 'Accept': 'application/vnd.twitchtv.v5+json'}
-
-    def refresh_oauth(self):
+    
+    def request_oauth(self):
         # Request new oauth token from Twitch
         r=requests.post(f"https://id.twitch.tv/oauth2/token?"
                     +f'client_id={self.auth["client_id"]}'
                     +f'&client_secret={self.auth["client_secret"]}'
                      +'&grant_type=client_credentials').json()
 
-        # Update our auth
-        self.auth['oauth'] = r['access_token']
+        # Return the new oauth key
+        return r['access_token']
+
+    def refresh_oauth(self):
+        self.auth['oauth'] = self.request_oauth()
 
         # Update the _AUTH file
         # Generate the lines
@@ -71,3 +74,8 @@ class Authorization:
         # Write lines to the file
         with open(self.store,'w') as authfile:
             authfile.writelines(authlines)
+
+if __name__ == "__main__":
+    auth = Authorization()
+    if input("type 'refresh' to refresh Twitch OAuth key, anything else will exit: ").lower() == "refresh":
+        input(f"Your new OAuth key is: {auth.request_oauth()}")
