@@ -24,5 +24,8 @@ def main(bot):
     except CommandIsBuiltInError:
         return 'You cannot modify built-in commands.'
 
+    except ValueError:
+        return 'Command must have a positive cooldown.'
+
     except IndexError:
         return f'Please specify the name, cooldown in seconds, and response. Add {MODONLY_ARG} in the command if you wish for the command to be mod-only.'
