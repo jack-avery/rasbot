@@ -1,7 +1,8 @@
 # rasbot
 Modular Python-based Twitch bot optimized for customizability.
 
-Contact me at `raspy#0292` on Discord about bugs and glitches.
+Contact me at `raspy#0292` on Discord about bugs and glitches,
+or join our [official Discord server!](https://discord.gg/qpyT4zx)
 
 Installing:
 1. Download [Python version 3.6.5+](https://www.python.org/downloads/)
