@@ -46,12 +46,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         for command in cfg["commands"]:
             self.commands.command_modify(command[0],command[1],command[3],command[2])
 
-        # Import custommethods
-        custommethods = os.listdir('custommethods')
-        custommethods.remove('__pycache__')
-        for custommethod in custommethods:
-            if custommethod[-3:] == '.py':
-                self.commands.custommethod_add(custommethod[:-3])
+        # Import methods
+        methods = os.listdir('methods')
+        methods.remove('__pycache__')
+        for method in methods:
+            if method[-3:] == '.py':
+                self.commands.method_add(method[:-3])
 
         # Resolve channel name
         url = f"https://api.twitch.tv/helix/users?id={self.channel_id}"

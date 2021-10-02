@@ -44,16 +44,16 @@ class Command:
         self.__last_used = time.time()
         return returned_response
 
-class CustomMethod:
+class Method:
     def __init__(self, name:str):
         '''Creates a new custom method.
 
-        :param name: The name of the custom method. File must be visible in the custommethods folder.
+        :param name: The name of the custom method. File must be visible in the methods folder.
         '''
         self.name = name
 
-        # Importing the method and setting this CustomMethod's main method
-        spec = importlib.util.spec_from_file_location(f"{name}",f"custommethods/{name}.py")
+        # Importing the method and setting this Method's main method
+        spec = importlib.util.spec_from_file_location(f"{name}",f"methods/{name}.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         self.main = module.main
@@ -92,22 +92,22 @@ def command_del(name:str):
     except KeyError:
         raise ValueError(f'command {name} does not exist')
 
-def custommethod_add(name:str):
-    '''Creates a new custommethod and appends it to the commands dict.
+def method_add(name:str):
+    '''Creates a new method and appends it to the commands dict.
 
-    :param name: The name of the custom method. File must be visible in the custommethods folder.
+    :param name: The name of the custom method. File must be visible in the methods folder.
     '''
-    methods[name] = CustomMethod(name)
+    methods[name] = Method(name)
 
-def custommethod_del(name:str):
-    '''Deletes a custommethod and removes it from the dict.
+def method_del(name:str):
+    '''Deletes a method and removes it from the dict.
 
-    :param name: The name of the custommethod.
+    :param name: The name of the method.
     '''
     try:
         del(methods[name])
     except KeyError:
-        raise ValueError(f'custommethod {name} does not exist')
+        raise ValueError(f'method {name} does not exist')
 
 commands = dict()
 methods = dict()
