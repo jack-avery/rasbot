@@ -5,20 +5,30 @@ from authorization import Authorization
 
 @click.command()
 @click.option(
-    "--auth",
-    default="_AUTH",
-    help="The path to the auth file to parse. _AUTH by default."
+    "--channel",
+    help="The twitch channel to target."
 )
-def run(auth=None):
+@click.option(
+    "--auth",
+    help="The path to the auth file to parse."
+)
+@click.option(
+    "--cfg",
+    help="The channel ID to pull config information from."
+)
+def run(channel=None,auth=None,cfg=None):
     auth = Authorization(auth)
+    
+    if channel is None:
+        channel = auth.get_auth()['user_id']
 
     # Resolve ID from channel name
-    url = f"https://api.twitch.tv/helix/users?login={auth.get_auth()['user_id']}"
+    url = f"https://api.twitch.tv/helix/users?login={channel}"
     r = requests.get(url, headers=auth.get_headers()).json()
-    channel_id=f"{r['data'][0]['id']}"
+    channel_id=int(f"{r['data'][0]['id']}")
 
     # Start the bot
-    tb = TwitchBot(auth,channel_id)
+    tb = TwitchBot(auth,channel_id,channel,cfg)
     tb.start()
 
 if __name__ == "__main__":

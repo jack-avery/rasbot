@@ -6,7 +6,7 @@
 import requests
 
 class Authorization:
-    def __init__(self,store:str="_AUTH"):
+    def __init__(self,store:str):
         """Create a new authorization identity.
         Automatically pulls and parses from the _AUTH file.
 
@@ -24,7 +24,10 @@ class Authorization:
 
         oauth:<twitch_oauth>
         """
-        self.store = store
+        if store is None:
+            self.store = "_AUTH"
+        else:
+            self.store = store
 
         # Reading the auth file
         with open(self.store,'r') as authfile:

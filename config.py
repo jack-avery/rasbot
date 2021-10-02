@@ -3,14 +3,14 @@
 #   raspy#0292 - raspy_on_osu
 ###
 
-def read(id:int) -> dict:
+def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
 
     :param id: The channel to read the config for.
     """
     # Attempt to read config
     try:
-        with open("_"+str(id),'r') as cfg:
+        with open("_"+str(cfgid),'r') as cfg:
             lines = cfg.readlines()
     
     # If no config file is found, write the default,
@@ -59,10 +59,10 @@ def write(bot):
         lines[i] = line+"\n"
 
     # Writing config
-    with open("_"+str(bot.channel_id),'w') as cfg:
+    with open("_"+str(bot.cfgid),'w') as cfg:
         cfg.writelines(lines)
 
-def create_default(id:int):
+def create_default(id):
     """Creates the default config for a new user.
 
     :param id: The channel to write the config for.

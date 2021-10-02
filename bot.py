@@ -12,7 +12,7 @@ import config
 from errors import CommandIsModOnlyError, CommandStillOnCooldownError
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, auth, channel_id:int, cfgfile:str=None):
+    def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None):
         """Create a new instance of a Twitch bot.
 
         :param auth: The Authorization object to use.
@@ -31,10 +31,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Import channel info
         #info = self.db.get_channel_info_for_id(channel_id)
 
-        if cfgfile:
-            cfg = config.read(cfgfile)
+        if cfgid is None:
+            self.cfgid = self.channel_id
         else:
-            cfg = config.read(self.channel_id)
+            self.cfgid = cfgid
+
+        cfg = config.read(self.cfgid)
         
         self.prefix = cfg["prefix"]
 
@@ -54,22 +56,25 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 self.commands.method_add(method[:-3])
 
         # Resolve channel name
-        self.channel = self.authkeys['user_id']
+        if channel is None:
+            self.channel = "#"+self.authkeys['user_id']
+        else:
+            self.channel = "#"+channel
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
         port = 80
         print('Connecting to ' + server + ' on port ' + str(port) + '...')
-        irc.bot.SingleServerIRCBot.__init__(self, [(server, port, f"oauth:{self.authkeys['irc_oauth']}")], self.channel, self.channel)
+        irc.bot.SingleServerIRCBot.__init__(self, [(server, port, f"oauth:{self.authkeys['irc_oauth']}")], self.authkeys['user_id'], self.authkeys['user_id'])
 
     def on_welcome(self, c, e):
-        print(f'Joined {self.channel}! ({self.channel_id})')
-        
         # You must request specific capabilities before you can use them
         c.cap('REQ', ':twitch.tv/membership')
         c.cap('REQ', ':twitch.tv/tags')
         c.cap('REQ', ':twitch.tv/commands')
         c.join(self.channel)
+
+        print(f'Joined {self.channel}! ({self.channel_id})')
 
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent.
