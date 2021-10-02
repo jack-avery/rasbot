@@ -18,7 +18,7 @@ def main(bot):
     try:
         bot.commands.command_modify(cmd[0],cmd[1]," ".join(cmd[2:]),modonly)
         config.write(bot)
-        #bot.db.create_or_update_command(cmd[0],cmd[1]," ".join(cmd[2:]))
+        
         return f'Command {cmd[0]} added successfully.'
 
     except CommandIsBuiltInError:

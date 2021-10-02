@@ -19,32 +19,27 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         :param channel_id: The channel ID.
 
-        :param dbfile: The dbfile to read information from.
+        :param channel: The channel name.
+
+        :param cfginfo: The bot config file to read configuration from.
         """
         self.auth = auth
         self.authkeys = self.auth.get_auth()
         self.channel_id = channel_id
 
-        # Create DB handler
-        #self.db = DBHandler(dbfile)
-
         # Import channel info
-        #info = self.db.get_channel_info_for_id(channel_id)
-
         if cfgid is None:
             self.cfgid = self.channel_id
         else:
             self.cfgid = cfgid
 
         cfg = config.read(self.cfgid)
-        
         self.prefix = cfg["prefix"]
 
         # Instantiate commands module
         self.commands = commands
 
         # Import commands
-        #db_commands = self.db.get_commands_for_id(channel_id)
         for command in cfg["commands"]:
             self.commands.command_modify(command[0],command[1],command[3],command[2])
 

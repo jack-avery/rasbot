@@ -6,7 +6,7 @@
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
 
-    :param id: The channel to read the config for.
+    :param cfgid: The channel to read the config for.
     """
     # Attempt to read config
     try:

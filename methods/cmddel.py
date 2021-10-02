@@ -10,7 +10,7 @@ def main(bot):
     try:
         bot.commands.command_del(cmd[0])
         config.write(bot)
-        #bot.db.delete_command(bot.channel_id,cmd[0])
+        
         return f'Command {cmd[0]} removed successfully.'
 
     except CommandIsBuiltInError:
