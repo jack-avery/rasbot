@@ -1,0 +1,5 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Other files we don't want publicized. Auth, configs, etc.
+_*
