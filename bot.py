@@ -5,7 +5,6 @@
 
 import os
 import traceback
-import requests
 import irc.bot
 import commands
 import config
