@@ -67,23 +67,6 @@ class Authorization:
         # Return the new oauth key
         return r['access_token']
 
-    # Unused since the user configures the _AUTH file manually
-    """
-    def refresh_oauth(self):
-        Updates the auth file with your new OAuth key.
-        
-        self.auth['oauth'] = self.request_oauth()
-
-        # Update the _AUTH file
-        # Generate the lines
-        authlines = list()
-        for key,value in self.auth:
-            authlines.append(f"{key}:{value}\n")
-
-        # Write lines to the file
-        with open(self.store,'w') as authfile:
-            authfile.writelines(authlines)
-    """
 if __name__ == "__main__":
     auth = Authorization()
     if input("type 'refresh' to refresh Twitch OAuth key, anything else will exit: ").lower() == "refresh":
