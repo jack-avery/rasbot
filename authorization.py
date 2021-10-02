@@ -41,7 +41,7 @@ class Authorization:
             self.auth[line[0]] = line[1]
 
     def get_auth(self):
-        """Returns the auth dict with keys.
+        """Returns the auth dict.
         """
         return self.auth
 
@@ -53,6 +53,8 @@ class Authorization:
                 'Accept': 'application/vnd.twitchtv.v5+json'}
     
     def request_oauth(self):
+        """Returns a new OAuth key requested from twitch.
+        """
         # Request new oauth token from Twitch
         r=requests.post(f"https://id.twitch.tv/oauth2/token?"
                     +f'client_id={self.auth["client_id"]}'
@@ -62,7 +64,11 @@ class Authorization:
         # Return the new oauth key
         return r['access_token']
 
+    # Unused since the user configures the _AUTH file manually
+    """
     def refresh_oauth(self):
+        Updates the auth file with your new OAuth key.
+        
         self.auth['oauth'] = self.request_oauth()
 
         # Update the _AUTH file
@@ -74,7 +80,7 @@ class Authorization:
         # Write lines to the file
         with open(self.store,'w') as authfile:
             authfile.writelines(authlines)
-
+    """
 if __name__ == "__main__":
     auth = Authorization()
     if input("type 'refresh' to refresh Twitch OAuth key, anything else will exit: ").lower() == "refresh":
