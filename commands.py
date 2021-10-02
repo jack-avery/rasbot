@@ -1,6 +1,11 @@
 import importlib.util
 import time
-from errors import CommandIsBuiltInError, CommandIsModOnlyError, CommandStillOnCooldownError
+from errors import CommandDoesNotExistError,\
+    CommandIsBuiltInError,\
+    CommandIsModOnlyError,\
+    CommandMustHavePositiveCooldownError,\
+    CommandStillOnCooldownError,\
+    MethodDoesNotExistError
 
 ###
 #   rasbot commands module
@@ -72,13 +77,14 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
 
     :param response: The text response of the command. Encapsulate custom commands in &&.
     '''
-    # You cannot modify built-ins
+    # You cannot modify built-in commands
     if name in builtins:
         raise CommandIsBuiltInError(f"command {name} is built in")
 
-    # You cannot have a negative cooldown
+    # Command cannot have a negative cooldown
     if int(cooldown) < 0:
-        raise ValueError(f"command provided invalid cooldown length {cooldown}")
+        raise CommandMustHavePositiveCooldownError(
+            f"command provided invalid cooldown length {cooldown}")
 
     commands[name] = Command(name,cooldown,response,requires_mod)
 
@@ -94,7 +100,7 @@ def command_del(name:str):
     try:
         del(commands[name])
     except KeyError:
-        raise ValueError(f'command {name} does not exist')
+        raise CommandDoesNotExistError(f'command {name} does not exist')
 
 def method_add(name:str):
     '''Creates a new method and appends it to the commands dict.
@@ -111,7 +117,7 @@ def method_del(name:str):
     try:
         del(methods[name])
     except KeyError:
-        raise ValueError(f'method {name} does not exist')
+        raise MethodDoesNotExistError(f'method {name} does not exist')
 
 commands = dict()
 methods = dict()

@@ -1,4 +1,4 @@
-from errors import CommandIsBuiltInError
+from errors import CommandIsBuiltInError, CommandMustHavePositiveCooldownError
 import config
 
 # This is a built-in function.
@@ -24,7 +24,7 @@ def main(bot):
     except CommandIsBuiltInError:
         return 'You cannot modify built-in commands.'
 
-    except ValueError:
+    except CommandMustHavePositiveCooldownError:
         return 'Command must have a positive cooldown.'
 
     except IndexError:

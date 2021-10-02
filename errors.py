@@ -3,11 +3,12 @@
 #   raspy#0292 - raspy_on_osu
 ###
 
-class CommandStillOnCooldownError(Exception):
-    pass
+# Command-related errors
+class CommandStillOnCooldownError(Exception):pass
+class CommandIsBuiltInError(Exception):pass
+class CommandDoesNotExistError(Exception):pass
+class CommandIsModOnlyError(Exception):pass
+class CommandMustHavePositiveCooldownError(Exception):pass
 
-class CommandIsBuiltInError(Exception):
-    pass
-
-class CommandIsModOnlyError(Exception):
-    pass
+# Method-related errors
+class MethodDoesNotExistError(Exception):pass

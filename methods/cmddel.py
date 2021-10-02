@@ -1,4 +1,4 @@
-from errors import CommandIsBuiltInError
+from errors import CommandDoesNotExistError, CommandIsBuiltInError
 import config
 
 # This is a built-in function.
@@ -16,5 +16,5 @@ def main(bot):
     except CommandIsBuiltInError:
         return 'You cannot modify built-in commands.'
 
-    except ValueError:
+    except CommandDoesNotExistError:
         return f'Command {cmd[0]} does not exist.'
