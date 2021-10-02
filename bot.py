@@ -27,14 +27,20 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.authkeys = self.auth.get_auth()
         self.channel_id = channel_id
 
+        print(f"Starting as {self.authkeys['user_id']}...\n")
+
         # Import channel info
         if cfgid is None:
             self.cfgid = self.channel_id
         else:
             self.cfgid = cfgid
+        
+        print(f"Reading config from _{self.cfgid}...")
 
         cfg = config.read(self.cfgid)
         self.prefix = cfg["prefix"]
+
+        print(f"Prefix set as '{self.prefix}'")
 
         # Instantiate commands module
         self.commands = commands
@@ -42,6 +48,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Import commands
         for command in cfg["commands"]:
             self.commands.command_modify(command[0],command[1],command[3],command[2])
+
+        print(f"Imported {len(cfg['commands'])} custom command(s)\n")
 
         # Import methods
         methods = os.listdir('methods')
