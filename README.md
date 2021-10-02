@@ -16,12 +16,12 @@ pip install -r requirements.txt
       > see "Setting up your Authorization".
 2. Launch run.py. That's it.
 
-To create commands, type `r!cmdadd <command_name> <cooldown_in_seconds> <response>`.
-To delete commands, type `r!cmddel <command_name>`.
+- To create commands, type `r!cmdadd <command_name> <cooldown_in_seconds> <response>`.
+- To delete commands, type `r!cmddel <command_name>`.
 You can make a command mod-only by adding `-modonly` to the `cmdadd` message.
 
 To use a method, encase the method name in `&` symbols:
-For example, to use the provided `np` method: `r!cmdadd np 5 &np&`
+- For example, to use the provided `np` method: `r!cmdadd np 5 &np&`
 
 Happy chatbotting!
 
