@@ -16,7 +16,7 @@ def read(cfgid) -> dict:
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
-        create_default(id)
+        create_default(cfgid)
         config = {
             "prefix": "r!",
             "commands": []
@@ -62,10 +62,10 @@ def write(bot):
     with open("_"+str(bot.cfgid),'w') as cfg:
         cfg.writelines(lines)
 
-def create_default(id):
+def create_default(cfgid):
     """Creates the default config for a new user.
 
     :param id: The channel to write the config for.
     """
-    with open("_"+str(id),'w') as cfg:
+    with open("_"+str(cfgid),'w') as cfg:
         cfg.writelines(['r!\n'])
