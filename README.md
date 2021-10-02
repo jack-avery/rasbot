@@ -14,8 +14,7 @@ pip install -r requirements.txt
 # Usage
 1. Set up your authorization in a file called \_AUTH (configurable through clargs).
       > see "Setting up your Authorization".
-3. Launch run.py either manually or through a command specifying your Twitch login.
-4. Enjoy.
+2. Launch run.py. That's it.
 
 # Setting up your Authorization
 **Ensure you have Twitch.tv two-factor authentication enabled on your account:**
@@ -49,6 +48,6 @@ oauth:gfa8u9gihjon48ui
 (make sure that there is an empty line at the bottom of the file.)
 ```
 
-# You should now be able to run the bot. Happy chatbotting!
+**You should now be able to run the bot. Happy chatbotting!**
 
 
