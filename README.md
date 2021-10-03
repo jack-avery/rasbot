@@ -59,13 +59,12 @@ Scroll to Security and click "Set Up Two-Factor Authentication" and follow the s
 If you've configured your \_AUTH file correctly, you should be able to run authorization.py and it will print your oauth key out to you.
 Note that this oauth key needs to be refreshed once every two months.
 
-# Here's a sample of how your \_AUTH file should look:
+**Here's a sample of how your \_AUTH file should look BEFORE running the above:**
 ```
 user_id:taeyang_square_jumps
 client_id:agd9fga84tijaer
 client_secret:4gijoa48u9adfg
 irc_oauth:gafd89ugi34j5aer
-oauth:gfa8u9gihjon48ui
 (make sure that there is an empty line at the bottom of the file.)
 ```
 
