@@ -1,10 +1,20 @@
 # rasbot
-Modular Python-based Twitch bot optimized for customizability.
+**Modular Python-based Twitch bot optimized for customizability.**
+
+rasbot is a Python-based Twitch bot that runs on *your* Twitch account, 
+and comes with a short list of methods to facilitate the creation of simple chat commands, 
+such as a simple `keyboard` command that shows your keyboard.
+
+rasbot also comes set up to allow users to easily create their own custom methods, 
+where if you know how to code it in Python, it can run as a command for your Twitch bot, 
+for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/master/methods/np.py) 
+method that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion) 
+and outputs 'now playing' information into the chat.
 
 Contact me at `raspy#0292` on Discord about bugs and glitches,
 or join our [official Discord server!](https://discord.gg/qpyT4zx)
 
-Installing:
+# Installing
 1. Download [Python version 3.6.5+](https://www.python.org/downloads/)
 2. Download the Source Code (using [git](https://git-scm.com/downloads) or otherwise)
 3. Run this command in a console in the installation folder to install requirements:
