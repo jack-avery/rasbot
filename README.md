@@ -47,7 +47,7 @@ Scroll to Security and click "Set Up Two-Factor Authentication" and follow the s
 1. Log in to https://dev.twitch.tv/.
 2. Go to "Your Console" in the top right.
 3. On the right side pane, click Register Your Application.
-4. Name it rasbot, set the OAuth redirect to http://localhost, set the Category to Chat Bot
+4. Give it a name (doesn't matter), set the OAuth redirect to http://localhost, set the Category to Chat Bot
 5. Click on Manage. This will show you your Client ID.
 6. On the same page is the "New Secret" button to create the Client Secret.
 
