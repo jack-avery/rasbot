@@ -1,10 +1,10 @@
-from errors import CommandIsBuiltInError, CommandMustHavePositiveCooldownError
-import config
-
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-MODONLY_ARG = "-modonly"
+import config
+from definitions import CommandIsBuiltInError,\
+    CommandMustHavePositiveCooldownError,\
+    MODONLY_ARG
 
 def main(bot):
     cmd = bot.cmdargs

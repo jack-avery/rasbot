@@ -9,7 +9,8 @@ import traceback
 import irc.bot
 import commands
 import config
-from errors import CommandIsModOnlyError, CommandStillOnCooldownError
+from definitions import CommandIsModOnlyError,\
+    CommandStillOnCooldownError
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None):

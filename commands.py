@@ -1,6 +1,6 @@
 import importlib.util
 import time
-from errors import CommandDoesNotExistError,\
+from definitions import CommandDoesNotExistError,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
@@ -39,7 +39,7 @@ class Command:
         if not bot.caller_ismod and self.requires_mod:
             raise CommandIsModOnlyError(f"mod-only command {self.name} called by non-mod {bot.caller_name}")
 
-        # Apply any custom methods encased in &&
+        # Apply any methods encased in &&
         returned_response = self.response
         for method_name, method in methods.items():
             if f'&{method_name}&' in returned_response:
@@ -47,15 +47,15 @@ class Command:
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
-        
+
         print(f"{time.asctime()} | command {self.name} invoked with arg(s): {bot.cmdargs}")
         return returned_response
 
 class Method:
     def __init__(self, name:str):
-        '''Creates a new custom method.
+        '''Creates a new method.
 
-        :param name: The name of the custom method. File must be visible in the methods folder.
+        :param name: The name of the method. File must be visible in the methods folder.
         '''
         self.name = name
 
@@ -107,7 +107,7 @@ def command_del(name:str):
 def method_add(name:str):
     '''Creates a new method and appends it to the commands dict.
 
-    :param name: The name of the custom method. File must be visible in the methods folder.
+    :param name: The name of the method. File must be visible in the methods folder.
     '''
     methods[name] = Method(name)
 

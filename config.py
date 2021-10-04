@@ -3,6 +3,9 @@
 #   raspy#0292 - raspy_on_osu
 ###
 
+from definitions import DEFAULT_PREFIX
+
+
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
 
@@ -18,7 +21,7 @@ def read(cfgid) -> dict:
     except FileNotFoundError:
         create_default(cfgid)
         config = {
-            "prefix": "r!",
+            "prefix": DEFAULT_PREFIX,
             "commands": []
         }
         return config
@@ -68,4 +71,4 @@ def create_default(cfgid):
     :param id: The channel to write the config for.
     """
     with open("_"+str(cfgid),'w') as cfg:
-        cfg.writelines(['r!\n'])
+        cfg.writelines([f'{DEFAULT_PREFIX}\n'])

@@ -2,9 +2,9 @@
 # Install osu!StreamCompanion in the default directory (or modify the directory below to fit your NP file).
 # Create a command using cmdadd with &np& as the response.
 
-def main(bot):
-    PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
+from definitions import PATH_TO_STREAMCOMPANION_NP_FILE
 
+def main(bot):
     try:
         with open(PATH_TO_STREAMCOMPANION_NP_FILE,'r') as file:
             return f'{file.readlines()[0]}'

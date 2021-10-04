@@ -1,7 +1,7 @@
-import config
-
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
+
+import config
 
 def main(bot):
     if len(bot.cmdargs) == 0:

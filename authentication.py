@@ -4,6 +4,7 @@
 ###
 
 import requests
+from definitions import DEFAULT_AUTHFILE
 
 class Authentication:
     def __init__(self,store:str):
@@ -25,7 +26,7 @@ class Authentication:
         oauth:<twitch_oauth>
         """
         if store is None:
-            self.store = "_AUTH"
+            self.store = DEFAULT_AUTHFILE
         else:
             self.store = store
 

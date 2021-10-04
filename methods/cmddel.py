@@ -1,8 +1,9 @@
-from errors import CommandDoesNotExistError, CommandIsBuiltInError
-import config
-
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
+
+from definitions import CommandDoesNotExistError,\
+    CommandIsBuiltInError
+import config
 
 def main(bot):
     cmd = bot.cmdargs
