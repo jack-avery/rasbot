@@ -26,6 +26,9 @@ PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/
 # Errors
 ##
 
+# Authentication-related errors
+class AuthenticationDeniedError(Exception):pass
+
 # Command-related errors
 class CommandStillOnCooldownError(Exception):pass
 class CommandIsBuiltInError(Exception):pass

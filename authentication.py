@@ -5,7 +5,7 @@
 
 import requests
 import click
-from definitions import DEFAULT_AUTHFILE
+from definitions import DEFAULT_AUTHFILE, AuthenticationDeniedError
 
 class Authentication:
     def __init__(self,file:str=None):
@@ -83,5 +83,10 @@ class Authentication:
                     +f'&client_secret={self.auth["client_secret"]}'
                      +'&grant_type=client_credentials').json()
 
-        # Return the new oauth key
-        return r['access_token']
+        # Return the new OAuth key
+        try:
+            return r['access_token']
+        
+        # If it can't find the key...
+        except KeyError:
+            raise AuthenticationDeniedError(f"got error response status {r['status']}, message '{r['message']}'")
