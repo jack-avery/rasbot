@@ -1,5 +1,6 @@
 # 'np' code for a Now Playing function. To get this to work:
-# Install osu!StreamCompanion in the default directory (or modify the directory below to fit your NP file).
+# Create an output pattern in osu!StreamCompanion with the info you want
+# Point the path in definitions.py to the file
 # Create a command using cmdadd with &np& as the response.
 
 from definitions import PATH_TO_STREAMCOMPANION_NP_FILE
