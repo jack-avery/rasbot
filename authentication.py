@@ -4,8 +4,8 @@
 ###
 
 import requests
-import click
-from definitions import DEFAULT_AUTHFILE, AuthenticationDeniedError
+from definitions import DEFAULT_AUTHFILE,\
+    AuthenticationDeniedError
 
 class Authentication:
     def __init__(self,file:str=None):

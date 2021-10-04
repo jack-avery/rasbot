@@ -1,6 +1,6 @@
 import click
 from authentication import Authentication
-from definitions import DEFAULT_AUTHFILE, AuthenticationDeniedError
+from definitions import AuthenticationDeniedError
 
 @click.command()
 @click.option(
@@ -17,11 +17,8 @@ def refresh_oauth(auth):
         input("Please ensure that your credentials are valid.")
         exit()
 
-    if auth is None:
-        auth = DEFAULT_AUTHFILE
-
     a.write_authfile()
-    input(f"Your new OAuth token has been written to {auth}. You may close this window.")
+    input(f"Your new OAuth token has been written to {a.file}. You may close this window.")
 
 if __name__ == "__main__":
     refresh_oauth()
