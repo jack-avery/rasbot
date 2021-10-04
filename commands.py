@@ -1,6 +1,7 @@
 import importlib.util
 import time
-from definitions import CommandDoesNotExistError,\
+from definitions import BUILTIN_COMMANDS,\
+    CommandDoesNotExistError,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
@@ -80,7 +81,7 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     :param response: The text response of the command. Encapsulate custom commands in &&.
     '''
     # You cannot modify built-in commands
-    if name in builtins:
+    if name in BUILTIN_COMMANDS:
         raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
 
     # Command cannot have a negative cooldown
@@ -96,7 +97,7 @@ def command_del(name:str):
     :param name: The name of the command.
     '''
     # You cannot modify built-ins
-    if name in builtins:
+    if name in BUILTIN_COMMANDS:
         raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
     
     try:
@@ -121,11 +122,9 @@ def method_del(name:str):
     except KeyError:
         raise MethodDoesNotExistError(f'method {name} does not exist')
 
+# Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
 methods = dict()
-
-# Do not modify this! These are built-in commands.
-builtins = ['help','uptime','cmdadd','cmddel','prefix']
 commands["help"] = Command("help",5,"&help&")
 commands["uptime"] = Command("uptime",5,"&uptime&")
 commands["cmdadd"] = Command("cmdadd",0,"&cmdadd&",True)

@@ -7,17 +7,20 @@
 # Definitions
 ##
 
-# Default prefix for a new channel config
+BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix']
+"""Built-in commands."""
+
 DEFAULT_PREFIX = "r!"
+"""Default prefix for a new channel config."""
 
-# Default authfile to use if none is provided as a clarg
 DEFAULT_AUTHFILE = "_AUTH"
+"""Default authfile to use if none is provided as a commandline arg."""
 
-# Mod-only option for command creation
 MODONLY_ARG = "-modonly"
+"""Mod-only option for command creation"""
 
-# Path to osu!StreamCompanion NP info file, for use in methods/np.py
 PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
+"""Path to osu!StreamCompanion NP info file, for use in `methods/np.py`."""
 
 ##
 # Errors

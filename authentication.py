@@ -8,7 +8,7 @@ import click
 from definitions import DEFAULT_AUTHFILE
 
 class Authentication:
-    def __init__(self,store:str=None):
+    def __init__(self,file:str=None):
         """Create a new authentication identity.
         Automatically pulls and parses from the _AUTH file.
 
@@ -26,16 +26,18 @@ class Authentication:
 
         oauth:<twitch_oauth>
         """
-        if store is None:
-            self.store = DEFAULT_AUTHFILE
+        if file is None:
+            self.file = DEFAULT_AUTHFILE
         else:
-            self.store = store
+            self.file = file
 
         self.read_authfile()
 
     def read_authfile(self):
+        """Reads from the authfile set by self.file.
+        """
         # Reading the auth file
-        with open(self.store,'r') as authfile:
+        with open(self.file,'r') as authfile:
             authlines = authfile.readlines()
 
         # Parsing the auth file into the auth dict
@@ -49,13 +51,15 @@ class Authentication:
             self.auth[line[0]] = line[1]
 
     def write_authfile(self):
+        """Writes to the authfile set by self.file.
+        """
         # Parsing the auth dict into lines for writing
         authlines = list()
         for key,value in self.auth.items():
             authlines.append(f"{key}:{value}\n")
 
         # Writing the auth file
-        with open(self.store,'w') as authfile:
+        with open(self.file,'w') as authfile:
             authfile.writelines(authlines)
 
     def get_auth(self):
@@ -92,7 +96,7 @@ def getnewoauth(auth):
     if input("Type 'refresh' to refresh your Twitch OAuth key, anything else will exit: ").lower() == "refresh":
         a.auth['oauth'] = a.request_oauth()
         a.write_authfile()
-        input("Your new OAuth token has been written to the file.")
+        input("Your new OAuth token has been written to the file. You may now close this window.")
 
 if __name__ == "__main__":
     getnewoauth()

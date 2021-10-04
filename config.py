@@ -5,7 +5,6 @@
 
 from definitions import DEFAULT_PREFIX
 
-
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
 
