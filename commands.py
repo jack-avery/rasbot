@@ -47,6 +47,8 @@ class Command:
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
+        
+        print(f"{time.asctime()} | command {self.name} invoked with arg(s): {bot.cmdargs}")
         return returned_response
 
 class Method:
@@ -79,12 +81,12 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     '''
     # You cannot modify built-in commands
     if name in builtins:
-        raise CommandIsBuiltInError(f"command {name} is built in")
+        raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
 
     # Command cannot have a negative cooldown
     if int(cooldown) < 0:
         raise CommandMustHavePositiveCooldownError(
-            f"command provided invalid cooldown length {cooldown}")
+            f"command {name} provided invalid cooldown length {cooldown}")
 
     commands[name] = Command(name,cooldown,response,requires_mod)
 
@@ -95,7 +97,7 @@ def command_del(name:str):
     '''
     # You cannot modify built-ins
     if name in builtins:
-        raise CommandIsBuiltInError(f"command {name} is built in")
+        raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
     
     try:
         del(commands[name])

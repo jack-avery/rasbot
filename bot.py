@@ -4,6 +4,7 @@
 ###
 
 import os
+import time
 import traceback
 import irc.bot
 import commands
@@ -39,7 +40,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         cfg = config.read(self.cfgid)
         self.prefix = cfg["prefix"]
 
-        print(f"Prefix set as '{self.prefix}'")
+        print(f"Prefix set as '{self.prefix}'\n")
 
         # Instantiate commands module
         self.commands = commands
@@ -48,7 +49,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         for command in cfg["commands"]:
             self.commands.command_modify(command[0],command[1],command[3],command[2])
 
-        print(f"Imported {len(cfg['commands'])} custom command(s)\n")
+        print(f"Imported {len(cfg['commands'])} custom command(s)")
 
         # Import methods
         methods = os.listdir('methods')
@@ -56,6 +57,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         for method in methods:
             if method[-3:] == '.py':
                 self.commands.method_add(method[:-3])
+
+        print(f"Imported {len(methods)} method(s)\n")
 
         # Resolve channel name
         if channel is None:
@@ -76,7 +79,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.cap('REQ', ':twitch.tv/commands')
         c.join(self.channel)
 
-        print(f'Joined {self.channel}! ({self.channel_id})')
+        print(f'Joined {self.channel}! ({self.channel_id})\n')
 
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent.
@@ -127,8 +130,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 
                 # If the command is still on cooldown, do nothing.
                 # If the command is mod-only and a non-mod calls it, do nothing.
-                except (CommandStillOnCooldownError,CommandIsModOnlyError):
-                    return
+                except (CommandStillOnCooldownError,CommandIsModOnlyError) as err:
+                    print(f"{time.asctime()} | {err}")
 
         except Exception as err:
             self.connection.privmsg(self.channel, f'An error occurred in the processing of your request: {str(err)}'
