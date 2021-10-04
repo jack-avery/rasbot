@@ -7,7 +7,7 @@ import requests
 from definitions import DEFAULT_AUTHFILE
 
 class Authentication:
-    def __init__(self,store:str=None):
+    def __init__(self,store:str=DEFAULT_AUTHFILE):
         """Create a new authentication identity.
         Automatically pulls and parses from the _AUTH file.
 
@@ -25,11 +25,7 @@ class Authentication:
 
         oauth:<twitch_oauth>
         """
-        if store is None:
-            self.store = DEFAULT_AUTHFILE
-        else:
-            self.store = store
-
+        self.store = store
         self.read_authfile()
 
     def read_authfile(self):
