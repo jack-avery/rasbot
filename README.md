@@ -12,7 +12,7 @@ method that reads from a file created by [osu!StreamCompanion](https://github.co
 and outputs 'now playing' information into the chat.
 
 Contact me at `raspy#0292` on Discord about bugs and glitches,
-or join our [official Discord server!](https://discord.gg/qpyT4zx)
+or join our [official Discord server](https://discord.gg/qpyT4zx)!
 
 # Installing
 1. Download [Python version 3.6.5+](https://www.python.org/downloads/)
@@ -56,7 +56,7 @@ Scroll to Security and click "Set Up Two-Factor Authentication" and follow the s
 2. Add the key given to irc_oauth, exclude "oauth:".
 
 **To get your Twitch OAuth:**
-If you've configured your \_AUTH file correctly, you should be able to run authentication.py and it will print your oauth key out to you.
+If you've configured your \_AUTH file correctly, you should be able to run refresh_oauth.py and it will configure your OAuth for you.
 Note that this oauth key needs to be refreshed once every two months.
 
 **Here's a sample of how your \_AUTH file should look BEFORE running the above:**
