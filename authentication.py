@@ -4,6 +4,7 @@
 ###
 
 import requests
+import click
 from definitions import DEFAULT_AUTHFILE
 
 class Authentication:
@@ -81,9 +82,17 @@ class Authentication:
         # Return the new oauth key
         return r['access_token']
 
-if __name__ == "__main__":
-    auth = Authentication()
+@click.command()
+@click.option(
+    "--auth",
+    help="The auth file to modify."
+)
+def getnewoauth(auth):
+    a = Authentication(auth)
     if input("Type 'refresh' to refresh your Twitch OAuth key, anything else will exit: ").lower() == "refresh":
-        auth.auth['oauth'] = auth.request_oauth()
-        auth.write_authfile()
+        a.auth['oauth'] = a.request_oauth()
+        a.write_authfile()
         input("Your new OAuth token has been written to the file.")
+
+if __name__ == "__main__":
+    getnewoauth()
