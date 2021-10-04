@@ -23,8 +23,8 @@ pip install -r requirements.txt
 ```
 
 # Usage
-1. Set up your authorization in a file called \_AUTH (configurable through clargs).
-      > see "Setting up your Authorization".
+1. Set up your authentication in a file called \_AUTH (configurable through clargs).
+      > see "Setting up your Authentication".
 2. Launch run.py. That's it.
 
 Managing commands:
@@ -37,7 +37,7 @@ To use a method, encase the method name in `&` symbols:
 
 Happy chatbotting!
 
-# Setting up your Authorization
+# Setting up your Authentication
 **Ensure you have Twitch.tv two-factor authentication enabled on your account:**
 
 Go to your Twitch account settings, Security and Privacy.
@@ -56,7 +56,7 @@ Scroll to Security and click "Set Up Two-Factor Authentication" and follow the s
 2. Add the key given to irc_oauth, exclude "oauth:".
 
 **To get your Twitch OAuth:**
-If you've configured your \_AUTH file correctly, you should be able to run authorization.py and it will print your oauth key out to you.
+If you've configured your \_AUTH file correctly, you should be able to run authentication.py and it will print your oauth key out to you.
 Note that this oauth key needs to be refreshed once every two months.
 
 **Here's a sample of how your \_AUTH file should look BEFORE running the above:**

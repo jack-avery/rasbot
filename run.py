@@ -1,7 +1,7 @@
 import requests
 import click
 from bot import TwitchBot
-from authorization import Authorization
+from authentication import Authentication
 
 @click.command()
 @click.option(
@@ -17,7 +17,7 @@ from authorization import Authorization
     help="The channel ID to pull config information from."
 )
 def run(channel=None,auth=None,cfg=None):
-    auth = Authorization(auth)
+    auth = Authentication(auth)
     
     if channel is None:
         channel = auth.get_auth()['user_id']

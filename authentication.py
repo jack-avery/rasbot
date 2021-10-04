@@ -1,13 +1,13 @@
 ###
-#   rasbot authorization module
+#   rasbot authentication module
 #   raspy#0292 - raspy_on_osu
 ###
 
 import requests
 
-class Authorization:
+class Authentication:
     def __init__(self,store:str):
-        """Create a new authorization identity.
+        """Create a new authentication identity.
         Automatically pulls and parses from the _AUTH file.
 
         :param file: The file to pull auth from. See format.
@@ -68,6 +68,6 @@ class Authorization:
         return r['access_token']
 
 if __name__ == "__main__":
-    auth = Authorization()
+    auth = Authentication()
     if input("type 'refresh' to refresh Twitch OAuth key, anything else will exit: ").lower() == "refresh":
         input(f"Your new OAuth key is: {auth.request_oauth()}")

@@ -14,7 +14,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None):
         """Create a new instance of a Twitch bot.
 
-        :param auth: The Authorization object to use.
+        :param auth: The Authentication object to use.
 
         :param channel_id: The channel ID.
 
