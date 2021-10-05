@@ -54,7 +54,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import methods
         methods = os.listdir('methods')
-        methods.remove('__pycache__')
         for method in methods:
             if method[-3:] == '.py':
                 self.commands.method_add(method[:-3])
