@@ -3,7 +3,7 @@
 #   raspy#0292 - raspy_on_osu
 ###
 
-from definitions import DEFAULT_PREFIX
+from definitions import BUILTIN_COMMANDS, DEFAULT_PREFIX
 
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
@@ -53,7 +53,7 @@ def write(bot):
     # Adding commands
     for name,command in bot.commands.commands.items():
         # The builtins are already added each init, don't add them to the config.
-        if name not in bot.commands.builtins:
+        if name not in BUILTIN_COMMANDS:
             lines.append(f"{name} {command.cooldown} {command.requires_mod} {command.response}")
 
     # Adding newlines
