@@ -38,6 +38,16 @@ To use a method, encase the method name in `&` symbols:
 Happy chatbotting!
 
 # Setting up your Authentication
+
+To have rasbot run properly, you need 5 things:
+1. `user_id:` Your Twitch username.
+2. `client_id:` The Client ID for the Twitch app, set-up below.
+3. `client_secret:` The Client Secret for the Twitch app, set-up below
+4. `irc_oauth:` The Twitch IRC OAuth, used for connecting to Twitch chat.
+5. `oauth:` The Twitch API OAuth, used for making calls to the Twitch API.
+
+`user_id` and `oauth` are the easiest as you already know your `user_id`, and `oauth` is configured automatically by the `refresh_oauth.py` program.
+
 **Ensure you have Twitch.tv two-factor authentication enabled on your account:**
 
 Go to your Twitch account settings, Security and Privacy.
@@ -65,7 +75,7 @@ user_id:taeyang_square_jumps
 client_id:agd9fga84tijaer
 client_secret:4gijoa48u9adfg
 irc_oauth:gafd89ugi34j5aer
-(make sure that there is an empty line at the bottom of the file.)
-```
 
+```
+Make sure that there is an empty line at the bottom of the file.
 
