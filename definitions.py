@@ -10,6 +10,9 @@
 BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix']
 """Built-in commands."""
 
+BUILTIN_MODULES = ['authentication','bot','commands','config','definitions','refresh_oauth','run','update']
+"""Built-in modules. Used for the autoupdate function."""
+
 VALID_COMMAND_REGEX = "[a-z0-9_]+"
 """Regex to compare given command names to for validation."""
 
