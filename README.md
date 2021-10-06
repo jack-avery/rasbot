@@ -1,14 +1,14 @@
 # rasbot
 **Modular Python-based Twitch bot optimized for customizability.**
 
-rasbot is a Python-based Twitch bot that runs on *your* Twitch account, 
-and comes with a short list of methods to facilitate the creation of simple chat commands, 
+rasbot is a Python-based Twitch bot that runs on *your* Twitch account,
+and comes with a short list of methods to facilitate the creation of simple chat commands,
 such as a simple `keyboard` command that shows your keyboard.
 
-rasbot also comes set up to allow users to easily create their own custom methods, 
-where if you know how to code it in Python, it can run as a command for your Twitch bot, 
-for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/master/methods/np.py) 
-method that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion) 
+rasbot also comes set up to allow users to easily create their own custom methods,
+where if you know how to code it in Python, it can run as a command for your Twitch bot,
+for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/master/methods/np.py)
+method that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion)
 and outputs 'now playing' information into the chat.
 
 Contact me at `raspy#0292` on Discord about bugs and glitches,
@@ -58,7 +58,8 @@ Scroll to Security and click "Set Up Two-Factor Authentication" and follow the s
 1. Log in to https://dev.twitch.tv/.
 2. Go to "Your Console" in the top right.
 3. On the right side pane, click Register Your Application.
-4. Give it a name (doesn't matter), set the OAuth redirect to http://localhost, set the Category to Chat Bot
+4. Give it a name (doesn't matter), add an OAuth redirect to http://localhost, set the Category to Chat Bot
+> Make sure to click "Add" to add the OAuth redirect.
 5. Click on Manage. This will show you your Client ID.
 6. On the same page is the "New Secret" button to create the Client Secret.
 
@@ -79,4 +80,3 @@ irc_oauth:gafd89ugi34j5aer
 
 ```
 Make sure that there is an empty line at the bottom of the file.
-
