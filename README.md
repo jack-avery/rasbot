@@ -19,7 +19,7 @@ or join our [official Discord server](https://discord.gg/qpyT4zx)!
 2. Download the Source Code (using [git](https://git-scm.com/downloads) or otherwise)
 3. Run this command in a console in the installation folder to install requirements:
 ```
-pip install -r requirements.txt
+py -m pip install -r requirements.txt
 ```
 
 # Usage
