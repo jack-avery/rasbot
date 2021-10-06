@@ -89,6 +89,7 @@ def update():
         versionfile.write(version)
 
     input(f"Finished! rasbot is now up to date on version {version}.\nPress enter to continue.")
+    sys.exit()
     
 def pip_install(package:str):
     """Attempts to install a package.
