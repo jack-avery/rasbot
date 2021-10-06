@@ -24,7 +24,7 @@ pip install -r requirements.txt
 
 # Usage
 1. Set up your authentication in a file called \_AUTH (configurable through clargs).
-      > see "Setting up your Authentication".
+> see "Setting up your Authentication".
 2. Launch run.py. That's it.
 
 Managing commands:
@@ -39,7 +39,7 @@ Happy chatbotting!
 
 # Setting up your Authentication
 
-To have rasbot run properly, you need 5 things:
+**To have rasbot run properly, you need 5 things:**
 1. `user_id:` Your Twitch username.
 2. `client_id:` The Client ID for the Twitch app, set-up below.
 3. `client_secret:` The Client Secret for the Twitch app, set-up below
@@ -52,6 +52,7 @@ To have rasbot run properly, you need 5 things:
 
 Go to your Twitch account settings, Security and Privacy.
 Scroll to Security and click "Set Up Two-Factor Authentication" and follow the steps.
+> This is required to register an application to get your Client ID and Secret.
 
 **To get the Client ID and Client Secret:**
 1. Log in to https://dev.twitch.tv/.
