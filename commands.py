@@ -25,7 +25,7 @@ class Command:
 
         :param requires_mod: Whether the command requires the user to be a mod.
         '''
-        self.name = name
+        self.name = name.lower()
         self.cooldown = int(cooldown)
         self.response = response
         self.requires_mod = requires_mod

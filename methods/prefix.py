@@ -8,7 +8,7 @@ def main(bot):
     if len(bot.cmdargs) == 0:
         newprefix = DEFAULT_PREFIX
     else:
-        newprefix = bot.cmdargs[0]
+        newprefix = bot.cmdargs[0].lower()
     
     bot.prefix = newprefix
     config.write(bot)

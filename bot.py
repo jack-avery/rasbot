@@ -103,17 +103,17 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Reading the message
         msg = str(e.arguments)
-        msg = msg[2:-2].lower().split(' ')
+        msg = msg[2:-2].split(' ')
 
         # If you want anything to be run per-message,
         # Right here is probably where you want to put it.
 
         try:
             # If the message starts with the command prefix...
-            if msg[0][:len(self.prefix)]==self.prefix:
+            if msg[0][:len(self.prefix)].lower()==self.prefix:
                 # Isolating command and command arguments
                 # Verify that it's actually a command before continuing.
-                cmd = msg[0][len(self.prefix):]
+                cmd = msg[0][len(self.prefix):].lower()
                 if cmd not in self.commands.commands:
                     return
 

@@ -9,7 +9,7 @@ def main(bot):
     cmd = bot.cmdargs
 
     try:
-        bot.commands.command_del(cmd[0])
+        bot.commands.command_del(cmd[0].lower())
         config.write(bot)
         
         return f'Command {cmd[0]} removed successfully.'
