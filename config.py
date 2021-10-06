@@ -8,11 +8,11 @@ from definitions import BUILTIN_COMMANDS, DEFAULT_PREFIX
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
 
-    :param cfgid: The channel to read the config for.
+    :param cfgid: The path to the channels' config.
     """
     # Attempt to read config
     try:
-        with open("_"+str(cfgid),'r') as cfg:
+        with open(cfgid,'r') as cfg:
             lines = cfg.readlines()
     
     # If no config file is found, write the default,
@@ -61,13 +61,13 @@ def write(bot):
         lines[i] = line+"\n"
 
     # Writing config
-    with open("_"+str(bot.cfgid),'w') as cfg:
+    with open(bot.cfgid,'w') as cfg:
         cfg.writelines(lines)
 
 def create_default(cfgid):
     """Creates the default config for a new user.
 
-    :param id: The channel to write the config for.
+    :param cfgid: The path to the channel's config.
     """
-    with open("_"+str(cfgid),'w') as cfg:
+    with open(cfgid,'w') as cfg:
         cfg.writelines([f'{DEFAULT_PREFIX}\n'])

@@ -16,7 +16,7 @@ VALID_COMMAND_REGEX = "[a-z0-9_]+"
 DEFAULT_PREFIX = "r!"
 """Default prefix for a new channel config."""
 
-DEFAULT_AUTHFILE = "_AUTH"
+DEFAULT_AUTHFILE = "_AUTH.txt"
 """Default authfile to use if none is provided as a commandline arg."""
 
 MODONLY_ARG = "-modonly"

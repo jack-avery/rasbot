@@ -32,11 +32,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import channel info
         if cfgid is None:
-            self.cfgid = self.channel_id
+            self.cfgid = f"_{self.channel_id}.txt"
         else:
             self.cfgid = cfgid
         
-        print(f"Reading config from _{self.cfgid}...")
+        print(f"Reading config from {self.cfgid}...")
 
         cfg = config.read(self.cfgid)
         self.prefix = cfg["prefix"]
