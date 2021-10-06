@@ -15,7 +15,7 @@ Contact me at `raspy#0292` on Discord about bugs and glitches,
 or join our [official Discord server](https://discord.gg/qpyT4zx)!
 
 # Installing
-1. Download [Python version 3.6.5+](https://www.python.org/downloads/)
+1. Download [Python version 3.10.0+](https://www.python.org/downloads/)
 2. Download the Source Code (using [git](https://git-scm.com/downloads) or otherwise)
 3. Run this command in a console in the installation folder to install requirements:
 ```
