@@ -9,6 +9,7 @@ import traceback
 import irc.bot
 import commands
 import config
+import update
 from definitions import CommandIsModOnlyError,\
     CommandStillOnCooldownError
 
@@ -24,6 +25,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         :param cfginfo: The bot config file to read configuration from.
         """
+        # Check for updates first!
+        update.check(True)
+
         self.auth = auth
         self.authkeys = self.auth.get_auth()
         self.channel_id = channel_id

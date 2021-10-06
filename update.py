@@ -12,8 +12,11 @@ from definitions import BUILTIN_COMMANDS,\
 )
 @click.option(
     "--force",
-    help="Whether or not to force an update. Useful if your installation is broken."
+    help="Whether or not to force an update. Use if your installation is broken."
 )
+def check_cli(silent=False,force=False):
+    check(silent,force)
+
 def check(silent=False,force=False):
     """Checks for updates.
 
@@ -93,4 +96,4 @@ def pip_install(package:str):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 if __name__ == "__main__":
-    check()
+    check_cli()
