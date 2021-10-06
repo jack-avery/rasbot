@@ -33,7 +33,7 @@ def check(silent=False,force=False):
         try:
             version = int(verfile.read())
         except ValueError:
-            if not silent: input("Your version file is invalid.")
+            if not silent: input("Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
             exit()
     
     if not silent: print(f"You are running on rasbot version: {version}")
@@ -61,34 +61,39 @@ def prompt(ood:int):
 def update():
     """Updates rasbot.
     """
+    # Update commands
     for command in BUILTIN_COMMANDS:
         print(f"Updating built-in method {command}...")
         text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/methods/{command}.py").text
         
         with open(f"methods/{command}.py",'w') as commandfile:
             commandfile.write(text)
-    print("Finished updating commands.")
+    print("Finished updating methods.\n")
 
+    # Update modules
     for module in BUILTIN_MODULES:
         print(f"Updating built-in module {module}...")
         text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{module}.py").text
         
         with open(f"{module}.py",'w') as modulefile:
             modulefile.write(text)
-    print("Finished updating modules.")
+    print("Finished updating modules.\n")
 
+    # Check for new requirements
     print("Running requirements.txt...")
     requirements = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/requirements.txt").text.split("\n")
     for requirement in requirements:
         pip_install(requirement)
-    print("All requirements checked.")
+    print("All requirements checked.\n")
 
+    # Increment version
     print("Incrementing version...")
     version = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text
     with open("version",'w') as versionfile:
         versionfile.write(version)
 
-    input(f"Finished! rasbot is now up to date on version {version}.\nPress enter to continue.")
+    # Notify user and exit.
+    input(f"\nFinished! rasbot is now up to date on version {version}.")
     sys.exit()
     
 def pip_install(package:str):
