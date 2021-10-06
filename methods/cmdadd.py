@@ -2,9 +2,11 @@
 # Please do not modify this unless you really know what you're doing.
 
 import config
-from definitions import CommandIsBuiltInError,\
-    CommandMustHavePositiveCooldownError,\
-    MODONLY_ARG
+from definitions import VALID_COMMAND_REGEX,\
+    MODONLY_ARG,\
+    CommandGivenInvalidNameError,\
+    CommandIsBuiltInError,\
+    CommandMustHavePositiveCooldownError
 
 def main(bot):
     try:
@@ -32,6 +34,9 @@ def main(bot):
 
     except CommandMustHavePositiveCooldownError:
         return 'Command must have a positive cooldown.'
+
+    except CommandGivenInvalidNameError:
+        return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
 
     except IndexError:
         return f'Please specify the name, cooldown in seconds, and response. Add {MODONLY_ARG} after the cooldown if you wish for the command to be mod-only.'

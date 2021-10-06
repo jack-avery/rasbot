@@ -10,6 +10,9 @@
 BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix']
 """Built-in commands."""
 
+VALID_COMMAND_REGEX = "[a-z0-9_]+"
+"""Regex to compare given command names to for validation."""
+
 DEFAULT_PREFIX = "r!"
 """Default prefix for a new channel config."""
 
@@ -35,6 +38,7 @@ class CommandIsBuiltInError(Exception):pass
 class CommandDoesNotExistError(Exception):pass
 class CommandIsModOnlyError(Exception):pass
 class CommandMustHavePositiveCooldownError(Exception):pass
+class CommandGivenInvalidNameError(Exception):pass
 
 # Method-related errors
 class MethodDoesNotExistError(Exception):pass

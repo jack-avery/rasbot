@@ -1,7 +1,9 @@
 import importlib.util
+import re
 import time
 from definitions import BUILTIN_COMMANDS,\
-    CommandDoesNotExistError,\
+    VALID_COMMAND_REGEX,\
+    CommandDoesNotExistError, CommandGivenInvalidNameError,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
@@ -37,6 +39,7 @@ class Command:
         if not time.time()-self.__last_used > self.cooldown:
             raise CommandStillOnCooldownError(f"command {self.name} called while still on cooldown")
         
+        # Do not allow non-moderators to use mod-only commands
         if not bot.caller_ismod and self.requires_mod:
             raise CommandIsModOnlyError(f"mod-only command {self.name} called by non-mod {bot.caller_name}")
 
@@ -86,8 +89,11 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
 
     # Command cannot have a negative cooldown
     if int(cooldown) < 0:
-        raise CommandMustHavePositiveCooldownError(
-            f"command {name} provided invalid cooldown length {cooldown}")
+        raise CommandMustHavePositiveCooldownError(f"command {name} provided invalid cooldown length {cooldown}")
+
+    # Command must match the regex defined by VALID_COMMAND_REGEX
+    if not command_re.match(name):
+        raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
 
     commands[name] = Command(name,cooldown,response,requires_mod)
 
@@ -125,6 +131,7 @@ def method_del(name:str):
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
 methods = dict()
+command_re = re.compile(VALID_COMMAND_REGEX)
 commands["help"] = Command("help",5,"&help&")
 commands["uptime"] = Command("uptime",5,"&uptime&")
 commands["cmdadd"] = Command("cmdadd",0,"&cmdadd&",True)
