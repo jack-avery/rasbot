@@ -11,8 +11,9 @@ from definitions import BUILTIN_COMMANDS,\
     help="Whether the update check should be silent."
 )
 @click.option(
-    "--force",
-    help="Whether or not to force an update. Use if your installation is broken."
+    "--force/--no-force",
+    help="Whether or not to force an update. Use if your installation is broken.",
+    default=False
 )
 def check_cli(silent=False,force=False):
     check(silent,force)
@@ -91,7 +92,7 @@ def update():
     readme = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/README.md").text
     with open("README.md",'w') as readmemd:
         readmemd.write(readme)
-    print("Finished updating README.md.")
+    print("Finished updating README.md.\n")
 
     # Increment version
     print("Incrementing version...")
