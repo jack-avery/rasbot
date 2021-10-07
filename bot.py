@@ -59,7 +59,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Import methods
         methods = os.listdir('methods')
         for method in methods:
-            if method[-3:] == '.py':
+            if method.endswith('.py'):
                 self.commands.method_add(method[:-3])
 
         print(f"Imported {len(methods)} method(s)\n")
