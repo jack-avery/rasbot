@@ -22,6 +22,13 @@ or join our [official Discord server](https://discord.gg/qpyT4zx)!
 py -m pip install -r requirements.txt
 ```
 
+# Updating
+rasbot will automatically check for updates every time you run `run.py`.
+You can check for updates manually by running update.py, and force an update using the command:
+```
+update.py --force
+```
+
 # Usage
 1. Set up your authentication in a file called \_AUTH (configurable through clargs).
 > see "Setting up your Authentication".
