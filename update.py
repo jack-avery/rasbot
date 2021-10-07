@@ -86,6 +86,13 @@ def update():
         pip_install(requirement)
     print("All requirements checked.\n")
 
+    # Update readme
+    print("Updating README.md...")
+    readme = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/README.md").text
+    with open("README.md",'w') as readmemd:
+        readmemd.write(readme)
+    print("Finished updating README.md.")
+
     # Increment version
     print("Incrementing version...")
     version = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text
@@ -99,7 +106,7 @@ def update():
 def pip_install(package:str):
     """Attempts to install a package.
     """
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--quiet"])
 
 if __name__ == "__main__":
     check_cli()
