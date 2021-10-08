@@ -11,13 +11,12 @@ for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/maste
 method that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion)
 and outputs 'now playing' information into the chat.
 
-Contact me at `raspy#0292` on Discord about bugs and glitches,
-or join our [official Discord server](https://discord.gg/qpyT4zx)!
+Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share methods.
 
 # Installing
 1. Download [Python version 3.10.0+](https://www.python.org/downloads/)
 2. Download the Source Code (using [git](https://git-scm.com/downloads) or otherwise)
-3. Run this command in a console in the installation folder to install requirements:
+3. Run this command in the installation folder to install requirements:
 ```
 py -m pip install -r requirements.txt
 ```
@@ -31,18 +30,36 @@ update.py --force
 
 # Usage
 1. Set up your authentication in a file called \_AUTH (configurable through clargs).
-> see "Setting up your Authentication".
-2. Launch run.py. That's it.
+> See "Setting up your Authentication".
+2. Launch run.py. **That's it.**
+> You will know the bot connected when it prints something along the lines of:
+>`Joined #raspy_on_osu! (57511738)`
 
-Managing commands:
-- To create commands, type `r!cmdadd <command_name> <cooldown_in_seconds> <response>`.
-- To delete commands, type `r!cmddel <command_name>`.
-- You can make a command mod-only by adding `-modonly` to the `cmdadd` message.
+# Managing Commands
+**Creating a command:**
+```
+r!cmdadd <name> <cooldown> <mod-only?> <response>
+```
+**Removing a command:**
+```
+r!cmddel <name>
+```
 
-To use a method, encase the method name in `&` symbols:
-- For example, to use the provided `np` method: `r!cmdadd np 5 &np&`
+**To use a method, encase the method name in `&` symbols, such as: `&help&`**
+>For information about creating your own method, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/methods/README.md).
 
-Happy chatbotting!
+**A command's name must comply to a Regex.**
+>By default, this is alphanumeric, with underscores: `[a-z0-9_]+`
+
+**Example:**
+>To add the provided `np` method as a command:
+>`r!cmdadd np 5 &np&`
+>
+>... and as mod-only:
+>`r!cmdadd np 5 -modonly &np&`
+>
+>... and to remove it:
+>`r!cmddel np`
 
 # Setting up your Authentication
 
@@ -75,8 +92,8 @@ Scroll to Security and click "Set Up Two-Factor Authentication" and follow the s
 2. Add the key given to irc_oauth, exclude "oauth:".
 
 **To get your Twitch OAuth:**
-If you've configured your \_AUTH file correctly, you should be able to run refresh_oauth.py and it will configure your OAuth for you.
-Note that this oauth key needs to be refreshed once every two months.
+If you've configured your \_AUTH file correctly, you should be able to run refresh_oauth.py and it will configure your Twitch OAuth for you.
+> Note that this oauth key needs to be refreshed once every two months.
 
 **Here's a sample of how your \_AUTH file should look BEFORE running the above:**
 ```
@@ -86,4 +103,4 @@ client_secret:4gijoa48u9adfg
 irc_oauth:gafd89ugi34j5aer
 
 ```
-Make sure that there is an empty line at the bottom of the file.
+>Make sure that there is an empty line at the bottom of the file.
