@@ -1,8 +1,10 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from definitions import CommandDoesNotExistError,\
-    CommandIsBuiltInError
+from definitions import VALID_COMMAND_REGEX,\
+    CommandDoesNotExistError,\
+    CommandIsBuiltInError,\
+    CommandGivenInvalidNameError
 import config
 
 def main(bot):
@@ -19,3 +21,6 @@ def main(bot):
 
     except CommandDoesNotExistError:
         return f'Command {cmd[0]} does not exist.'
+
+    except CommandGivenInvalidNameError:
+        return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'

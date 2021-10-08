@@ -106,6 +106,10 @@ def command_del(name:str):
     if name in BUILTIN_COMMANDS:
         raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
     
+    # Command must match the regex defined by VALID_COMMAND_REGEX
+    if not command_re.match(name):
+        raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
+
     try:
         del(commands[name])
     except KeyError:

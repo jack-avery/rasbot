@@ -16,10 +16,9 @@ def main(bot):
         cmd_cooldown = int(cmd.pop(0))
         if(cmd[0].lower() == MODONLY_ARG):
             modonly = True
+            cmd.pop(0)
         else:
             modonly = False
-
-        cmd.pop(0)
 
         bot.commands.command_modify(cmd_name,
                                     cmd_cooldown,
