@@ -1,5 +1,5 @@
 # rasbot
-**Modular Python-based Twitch bot optimized for customizability.**
+**Modular Python-based Twitch bot optimized for customizability and ease of use.**
 
 rasbot is a Python-based Twitch bot that runs on *your* Twitch account,
 and comes with a short list of methods to facilitate the creation of simple chat commands,
