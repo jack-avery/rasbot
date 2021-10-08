@@ -36,9 +36,15 @@ class Authentication:
     def read_authfile(self):
         """Reads from the authfile set by self.file.
         """
-        # Reading the auth file
-        with open(self.file,'r') as authfile:
-            authlines = authfile.readlines()
+        # Attempting to read the auth file
+        try:
+            with open(self.file,'r') as authfile:
+                authlines = authfile.readlines()
+        
+        # If not found, write the default and return
+        except FileNotFoundError:
+            self.create_default()
+            return
 
         # Parsing the auth file into the auth dict
         self.auth = dict()
@@ -61,6 +67,17 @@ class Authentication:
         # Writing the auth file
         with open(self.file,'w') as authfile:
             authfile.writelines(authlines)
+    
+    def create_default(self):
+        """Writes the default authfile.
+        """
+        self.auth = dict()
+        self.auth['user_id'] = "twitch username"
+        self.auth['client_id'] = "client id"
+        self.auth['client_secret'] = "client secret"
+        self.auth['irc_oauth'] = "irc oauth"
+
+        self.write_authfile()
 
     def get_auth(self):
         """Returns the auth dict.
