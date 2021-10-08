@@ -63,6 +63,10 @@ r!cmddel <name>
 
 # Setting up your Authentication
 
+**Run `setup.py`. It will guide you through these steps and generate the file for you!**
+
+If that doesn't work, here's how to do it manually...
+
 **To have rasbot run properly, you need 5 things:**
 1. `user_id:` Your Twitch username.
 2. `client_id:` The Client ID for the Twitch app, set-up below.
