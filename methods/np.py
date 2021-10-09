@@ -9,5 +9,5 @@ def main(bot):
     try:
         with open(PATH_TO_STREAMCOMPANION_NP_FILE,'r') as file:
             return f'{file.readlines()[0]}'
-    except FileNotFoundError:
+    except (FileNotFoundError, IndexError):
         return 'No NP data found.'
