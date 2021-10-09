@@ -20,9 +20,12 @@ Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot
 ```
 py -m pip install -r requirements.txt
 ```
-
 4. Run `setup.py` and follow the steps to set up your authentication.
-5. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to `Joined #raspy_on_osu! (57511738)`!
+5. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to: 
+```
+Joined #raspy_on_osu! (57511738)
+```
+
 > If `setup.py` fails, see "Setting up your Authentication".
 
 > You can modify environment variables in `definitions.py`, but be careful not to break your installation!
