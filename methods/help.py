@@ -8,13 +8,13 @@ def main(bot):
     
     # If a command is provided, run the help for it.
     else:
-        cmd = bot.cmdargs[0].lower()
+        method = bot.cmdargs[0].lower()
 
-        if cmd in bot.commands.methods.keys():
-            return str(bot.commands.methods[cmd].help())
+        if method in bot.commands.methods.keys():
+            return str(bot.commands.methods[method].help())
         
         else:
-            return f'Command {cmd} not found.'
+            return f'Method {method} not found.'
 
 def help():
-    return 'Prints all available commands, or, if provided a command, prints the help message for that command. Usage: help <command?>'
+    return 'Prints all available commands, or, if provided a method, prints the help message for that method. Usage: help <method?>'
