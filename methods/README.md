@@ -6,7 +6,11 @@ You can then add `&&` code for your method to the response of a command, for exa
 
 Your method must be called `main`, and accept **one** argument.
 The argument being passed is the `TwitchBot` object, including all variables attached.
-Whatever it returns will be sent to chat. It doesn't *need* to return anything, but if it does, it **must** be a string.
+>Whatever it returns will be sent to chat.
+
+Your method can have a help message, returned from the `help` method.
+Whatever it returns will be returned if the method is provided as an argument for the `help` command.
+>Example: `r!help thing` would print the help message for `thing.py`, if it exists.
 
 Otherwise, you're free to add whatever you want to the method, as long as you know how to code it.
 
