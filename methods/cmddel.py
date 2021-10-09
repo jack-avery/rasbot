@@ -24,3 +24,6 @@ def main(bot):
 
     except CommandGivenInvalidNameError:
         return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
+
+def help():
+    return 'Deletes an existing command. Usage: cmddel <name>.'

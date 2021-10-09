@@ -42,3 +42,6 @@ def main(bot):
 
     except ValueError:
         return 'Cooldown must be a positive integer.'
+
+def help():
+    return 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown> <mod-only?> <response>.'

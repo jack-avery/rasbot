@@ -13,3 +13,6 @@ def main(bot):
     bot.prefix = newprefix
     config.write(bot)
     return f'Prefix updated to {newprefix}.'
+
+def help():
+    return f'Sets a new prefix for the bot. Default is {DEFAULT_PREFIX}. Usage: prefix <prefix?>'

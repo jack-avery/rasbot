@@ -11,3 +11,6 @@ def main(bot):
             return f'{file.readlines()[0]}'
     except (FileNotFoundError, IndexError):
         return 'No NP data found.'
+
+def help():
+    return 'Prints "Now Playing" information from a configured file. Usage: np'

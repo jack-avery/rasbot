@@ -27,3 +27,6 @@ def main(bot):
     h=round((m-m%60)/60)
     
     return f'Uptime: {h} hours {m%60} minutes {round(s%60)} seconds.'
+
+def help():
+    return 'Returns the current stream uptime. Usage: uptime'

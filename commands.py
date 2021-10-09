@@ -47,7 +47,10 @@ class Command:
         returned_response = self.response
         for method_name, method in methods.items():
             if f'&{method_name}&' in returned_response:
-                returned_response = returned_response.replace(f'&{method_name}&',method.main(bot))
+                returned_response = returned_response.replace(
+                                                              f'&{method_name}&',
+                                                              str(method.main(bot))
+                                                             )
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
@@ -69,9 +72,20 @@ class Method:
         spec.loader.exec_module(module)
         self.main = module.main
 
+        # Try to import the 'help' method from the module
+        try:
+            self.help = module.help
+        # If it's not defined, do nothing.
+        except AttributeError:
+            pass
+
     # To be replaced with the new main method.
     def main():
         pass
+
+    # To be replaced with the new help method.
+    def help(self):
+        return f'No help message available for {self.name}.'
 
 def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False):
     '''Creates a new command (or modifies an existing one),
