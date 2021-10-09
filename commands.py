@@ -85,7 +85,7 @@ class Method:
 
     # To be replaced with the new help method.
     def help(self):
-        return f'No help message available for {self.name}.'
+        return f'No help message available for method {self.name}.'
 
 def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False):
     '''Creates a new command (or modifies an existing one),
