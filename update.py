@@ -7,8 +7,9 @@ from definitions import BUILTIN_COMMANDS,\
 
 @click.command()
 @click.option(
-    "--silent",
-    help="Whether the update check should be silent."
+    "--silent/--loud",
+    help="Whether the update check should be silent.",
+    default=False
 )
 @click.option(
     "--force/--no-force",

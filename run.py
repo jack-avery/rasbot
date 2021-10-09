@@ -10,11 +10,11 @@ from authentication import Authentication
 )
 @click.option(
     "--auth",
-    help="The path to the auth file to parse."
+    help="The path to the auth file."
 )
 @click.option(
     "--cfg",
-    help="The channel ID to pull config information from."
+    help="The path to the channel config file."
 )
 def run(channel=None,auth=None,cfg=None):
     auth = Authentication(auth)

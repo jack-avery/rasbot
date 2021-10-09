@@ -5,7 +5,7 @@ from definitions import AuthenticationDeniedError
 @click.command()
 @click.option(
     "--auth",
-    help="The auth file to modify."
+    help="The path to the auth file to modify."
 )
 def refresh_oauth(auth):
     a = Authentication(auth)
