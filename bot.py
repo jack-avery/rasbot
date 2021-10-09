@@ -52,7 +52,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import commands
         for command in cfg["commands"]:
-            self.commands.command_modify(command[0],command[1],command[3],command[2])
+            self.commands.command_modify(command[0],command[1]," ".join(command[3:]),command[2])
 
         print(f"Imported {len(cfg['commands'])} custom command(s)")
 
