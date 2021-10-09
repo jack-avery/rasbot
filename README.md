@@ -13,7 +13,7 @@ and outputs 'now playing' information into the chat.
 
 Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share methods.
 
-# Installing
+# How to Use
 1. Download [Python version 3.10.0+](https://www.python.org/downloads/)
 2. Download the Source Code (using [git](https://git-scm.com/downloads) or otherwise)
 3. Run this command in the installation folder to install requirements:
@@ -21,19 +21,18 @@ Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot
 py -m pip install -r requirements.txt
 ```
 
-# Updating
-rasbot will automatically check for updates every time you run `run.py`.
+4. Run `setup.py` and follow the steps to set up your authentication.
+5. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to `Joined #raspy_on_osu! (57511738)`!
+> If `setup.py` fails, see "Setting up your Authentication".
+
+> You can modify environment variables in `definitions.py`, but be careful not to break your installation!
+
+**rasbot will automatically check for updates every time you run `run.py`.**
 You can check for updates manually by running update.py, and force an update using the command:
 ```
 update.py --force
 ```
-
-# Usage
-1. Set up your authentication in a file called \_AUTH (configurable through clargs).
-> See "Setting up your Authentication".
-2. Launch run.py. **That's it.**
-> You will know the bot connected when it prints something along the lines of:
->`Joined #raspy_on_osu! (57511738)`
+This is useful if your installation is broken, as it reinstalls rasbot.
 
 # Managing Commands
 **Creating a command:**
@@ -48,8 +47,7 @@ r!cmddel <name>
 **To use a method, encase the method name in `&` symbols, such as: `&help&`**
 >For information about creating your own method, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/methods/README.md).
 
-**A command's name must comply to a Regex.**
->By default, this is alphanumeric, with underscores: `[a-z0-9_]+`
+**A command's name must comply to a Regex.** By default, the Regex is alphanumeric, allowing underscores: `[a-z0-9_]+`
 
 **Example:**
 >To add the provided `np` method as a command:
@@ -63,9 +61,7 @@ r!cmddel <name>
 
 # Setting up your Authentication
 
-**Run `setup.py`. It will guide you through these steps and generate the file for you!**
-
-If that doesn't work, here's how to do it manually...
+If `setup.py` doesn't work, here's how to do it manually...
 
 **To have rasbot run properly, you need 5 things:**
 1. `user_id:` Your Twitch username.
