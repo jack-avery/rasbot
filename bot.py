@@ -62,7 +62,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             if method.endswith('.py'):
                 self.commands.method_add(method[:-3])
 
-        print(f"Imported {len(methods)} method(s)\n")
+        print(f"Imported {len(self.commands.methods)} method(s)\n")
 
         # Resolve channel name
         if channel is None:
