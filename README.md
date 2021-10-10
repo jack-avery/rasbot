@@ -16,7 +16,7 @@ Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot
 # How to Use
 1. Download and install [Python version 3.10.0+](https://www.python.org/downloads/)
 2. Download the Source Code:
-> Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot`
+> Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot` <br/>
 > Or, click on **Code** and **Download ZIP**.
 3. Run this command in the installation folder to install requirements:
 ```
