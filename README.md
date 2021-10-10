@@ -14,8 +14,10 @@ and outputs 'now playing' information into the chat.
 Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share methods.
 
 # How to Use
-1. Download [Python version 3.10.0+](https://www.python.org/downloads/)
-2. Download the Source Code (using [git](https://git-scm.com/downloads) or otherwise)
+1. Download and install [Python version 3.10.0+](https://www.python.org/downloads/)
+2. Download the Source Code:
+> Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot`
+> Or, click on **Code** and **Download ZIP**.
 3. Run this command in the installation folder to install requirements:
 ```
 py -m pip install -r requirements.txt
