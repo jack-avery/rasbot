@@ -31,8 +31,8 @@ class Command:
         self.name = name.lower()
         self.cooldown = int(cooldown)
         self.response = response
-        self.requires_mod = requires_mod
-        self.hidden = hidden
+        self.requires_mod = bool(requires_mod)
+        self.hidden = bool(hidden)
 
         self.__last_used = 0
 

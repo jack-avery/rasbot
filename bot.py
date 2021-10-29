@@ -55,8 +55,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # For some reason "False" doesn't eval to False.
             if command[2] == "False":
                 command[2] = False
+
+            if command[3] == "False":
+                command[3] = False
             
-            self.commands.command_modify(command[0],command[1]," ".join(command[3:]),command[2])
+            self.commands.command_modify(command[0],command[1]," ".join(command[4:]),command[2],command[3])
 
         print(f"Imported {len(cfg['commands'])} custom command(s)")
 
