@@ -42,6 +42,3 @@ class CommandDoesNotExistError(Exception):pass
 class CommandIsModOnlyError(Exception):pass
 class CommandMustHavePositiveCooldownError(Exception):pass
 class CommandGivenInvalidNameError(Exception):pass
-
-# Method-related errors
-class MethodDoesNotExistError(Exception):pass

@@ -7,8 +7,7 @@ from definitions import BUILTIN_COMMANDS,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
-    CommandStillOnCooldownError,\
-    MethodDoesNotExistError
+    CommandStillOnCooldownError
 
 ###
 #   rasbot commands module
@@ -135,16 +134,6 @@ def method_add(name:str):
     :param name: The name of the method. File must be visible in the methods folder.
     '''
     methods[name] = Method(name)
-
-def method_del(name:str):
-    '''Deletes a method and removes it from the dict.
-
-    :param name: The name of the method.
-    '''
-    try:
-        del(methods[name])
-    except KeyError:
-        raise MethodDoesNotExistError(f'method {name} does not exist')
 
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
