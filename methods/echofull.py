@@ -1,4 +1,15 @@
-# This is a test function. Feel free to use it if you really find a use for it.
+# This is a test function. Feel free to use it as a template.
 
-def main(bot):
-    return " ".join(bot.cmdargs)
+from commands import BaseMethod
+
+class Method(BaseMethod):
+    def __init__(self):
+        self.count = 0
+
+    def main(self,bot):
+        self.increase_count()
+
+        return f"{self.count}, {' '.join(bot.cmdargs)}"
+
+    def increase_count(self):
+        self.count+=1

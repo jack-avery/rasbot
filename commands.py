@@ -58,34 +58,10 @@ class Command:
         
         return returned_response
 
-class Method:
-    def __init__(self, name:str):
-        '''Creates a new method.
-
-        :param name: The name of the method. File must be visible in the methods folder.
-        '''
-        self.name = name
-
-        # Importing the method and setting this Method's main method
-        spec = importlib.util.spec_from_file_location(f"{name}",f"methods/{name}.py")
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        self.main = module.main
-
-        # Try to import the 'help' method from the module
-        try:
-            self.help = module.help
-        # If it's not defined, do nothing.
-        except AttributeError:
-            pass
-
-    # To be replaced with the new main method.
-    def main():
-        pass
-
-    # To be replaced with the new help method.
+class BaseMethod:
+    # Default help message.
     def help(self):
-        return f'No help message available for method {self.name}.'
+        return f'No help message available for method.'
 
 def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False):
     '''Creates a new command (or modifies an existing one),
@@ -134,7 +110,11 @@ def method_add(name:str):
 
     :param name: The name of the method. File must be visible in the methods folder.
     '''
-    methods[name] = Method(name)
+    spec = importlib.util.spec_from_file_location(f"{name}",f"methods/{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    methods[name] = module.Method()
 
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()

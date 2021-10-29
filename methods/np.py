@@ -3,14 +3,16 @@
 # Point the path in definitions.py to the file
 # Create a command using cmdadd with &np& as the response.
 
+from commands import BaseMethod
 from definitions import PATH_TO_STREAMCOMPANION_NP_FILE
 
-def main(bot):
-    try:
-        with open(PATH_TO_STREAMCOMPANION_NP_FILE,'r') as file:
-            return f'{file.readlines()[0]}'
-    except (FileNotFoundError, IndexError):
-        return 'No NP data found.'
+class Method(BaseMethod):
+    def main(self,bot):
+        try:
+            with open(PATH_TO_STREAMCOMPANION_NP_FILE,'r') as file:
+                return f'{file.readlines()[0]}'
+        except (FileNotFoundError, IndexError):
+            return 'No NP data found.'
 
-def help():
-    return 'Prints "Now Playing" information from a configured file. Usage: np'
+    def help(self):
+        return 'Prints "Now Playing" information from a configured file. Usage: np'
