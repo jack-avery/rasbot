@@ -134,7 +134,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
                     # If there is a string result message, print it to chat
                     if cmdresult:
-                        self.connection.privmsg(self.channel, f"{name} > {cmdresult}")
+                        self.send_message(f"{name} > {cmdresult}")
                 
                 # If the command is still on cooldown, do nothing.
                 # If the command is mod-only and a non-mod calls it, do nothing.
@@ -145,3 +145,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             self.connection.privmsg(self.channel, f'An error occurred in the processing of your request: {str(err)}'
                                                 +'. A full stack trace has been output to the command window.')
             traceback.print_exc()
+
+    def send_message(self, message:str):
+        """Sends a message. For easy use within methods.
+
+        :param message: The message to send.
+        """
+        self.connection.privmsg(self.channel, message)
