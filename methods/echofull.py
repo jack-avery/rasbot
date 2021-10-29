@@ -6,10 +6,11 @@ class Method(BaseMethod):
     def __init__(self):
         self.count = 0
 
-    def main(self,bot):
-        self.increase_count()
-
+    # Show the amount of messages since the bot started
+    # and echo the user's message back to them
+    def main(self, bot):
         return f"{self.count}, {' '.join(bot.cmdargs)}"
 
-    def increase_count(self):
+    # Count messages since the bot started
+    def per_message(self, bot):
         self.count+=1

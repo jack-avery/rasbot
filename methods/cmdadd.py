@@ -5,6 +5,7 @@ from commands import BaseMethod
 import config
 from definitions import VALID_COMMAND_REGEX,\
     MODONLY_ARG,\
+    HIDDEN_ARG,\
     CommandGivenInvalidNameError,\
     CommandIsBuiltInError,\
     CommandMustHavePositiveCooldownError
@@ -16,16 +17,24 @@ class Method(BaseMethod):
 
             cmd_name = cmd.pop(0).lower()
             cmd_cooldown = int(cmd.pop(0))
+
             if(cmd[0].lower() == MODONLY_ARG):
                 modonly = True
                 cmd.pop(0)
             else:
                 modonly = False
+            
+            if(cmd[0].lower() == HIDDEN_ARG):
+                hidden = True
+                cmd.pop(0)
+            else:
+                hidden = False
 
             bot.commands.command_modify(cmd_name,
                                         cmd_cooldown,
                                         " ".join(cmd),
-                                        modonly)
+                                        modonly,
+                                        hidden)
             config.write(bot)
             
             return f'Command {cmd_name} added successfully.'

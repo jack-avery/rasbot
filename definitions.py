@@ -7,7 +7,7 @@
 # Definitions
 ##
 
-BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix']
+BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix','echofull']
 """Built-in commands."""
 
 BUILTIN_MODULES = ['authentication','bot','commands','config','definitions','refresh_oauth','run','update','setup']
@@ -24,6 +24,9 @@ DEFAULT_AUTHFILE = "_AUTH.txt"
 
 MODONLY_ARG = "-modonly"
 """Mod-only option for command creation"""
+
+HIDDEN_ARG = "-hidden"
+"""Hidden option for command creation"""
 
 PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
 """Path to osu!StreamCompanion NP info file, for use in `methods/np.py`."""

@@ -52,6 +52,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import commands
         for command in cfg["commands"]:
+            # For some reason "False" doesn't eval to False.
+            if command[2] == "False":
+                command[2] = False
+            
             self.commands.command_modify(command[0],command[1]," ".join(command[3:]),command[2])
 
         print(f"Imported {len(cfg['commands'])} custom command(s)")
@@ -109,10 +113,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         msg = str(e.arguments)
         msg = msg[2:-2].split(' ')
 
-        # If you want anything to be run per-message,
-        # Right here is probably where you want to put it.
-
         try:
+            # Do per-message methods
+            self.commands.do_per_message_methods(self)
+
             # If the message starts with the command prefix...
             if msg[0][:len(self.prefix)].lower()==self.prefix:
                 # Isolating command and command arguments

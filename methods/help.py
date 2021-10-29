@@ -7,7 +7,9 @@ class Method(BaseMethod):
     def main(self,bot):
         # If no command is provided, just run the base help message.
         if len(bot.cmdargs) == 0:
-            return f"Available commands are: {', '.join(bot.commands.commands)}"
+            user_commands_list = ', '.join( [n for n,c in bot.commands.commands.items() if not c.hidden and not c.requires_mod] )
+            mod_commands_list  = ', '.join( [n for n,c in bot.commands.commands.items() if not c.hidden and c.requires_mod] )
+            return f"Available commands are: {user_commands_list} (mod-only: {mod_commands_list})"
         
         # If a command is provided, run the help for it.
         else:

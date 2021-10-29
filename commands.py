@@ -15,7 +15,7 @@ from definitions import BUILTIN_COMMANDS,\
 ###
 
 class Command:
-    def __init__(self, name:str, cooldown:int = 5, response:str='', requires_mod:bool=False):
+    def __init__(self, name:str, cooldown:int = 5, response:str='', requires_mod:bool=False, hidden:bool=False):
         '''Creates a new command.
 
         :param name: The name of the command.
@@ -25,11 +25,14 @@ class Command:
         :param response: The text response of the command. Encapsulate custom commands in &&.
 
         :param requires_mod: Whether the command requires the user to be a mod.
+
+        :param hidden: Whether the command should be hidden from help.
         '''
         self.name = name.lower()
         self.cooldown = int(cooldown)
         self.response = response
         self.requires_mod = requires_mod
+        self.hidden = hidden
 
         self.__last_used = 0
 
@@ -58,12 +61,7 @@ class Command:
         
         return returned_response
 
-class BaseMethod:
-    # Default help message.
-    def help(self):
-        return f'No help message available for method.'
-
-def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False):
+def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False, hidden:bool = False):
     '''Creates a new command (or modifies an existing one),
     and appends it to the commands dict.
 
@@ -85,7 +83,7 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     if not command_re.match(name):
         raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
 
-    commands[name] = Command(name,cooldown,response,requires_mod)
+    commands[name] = Command(name,cooldown,response,requires_mod,hidden)
 
 def command_del(name:str):
     '''Deletes a command and removes it from the dict.
@@ -105,6 +103,19 @@ def command_del(name:str):
     except KeyError:
         raise CommandDoesNotExistError(f'command {name} does not exist')
 
+class BaseMethod:
+    # Default &-code main method.
+    def main(self, bot):
+        pass
+
+    # Default help message.
+    def help(self):
+        return f'No help message available for method.'
+
+    # Default per-message function.
+    def per_message(self, bot):
+        pass
+
 def method_add(name:str):
     '''Creates a new method and appends it to the commands dict.
 
@@ -116,6 +127,10 @@ def method_add(name:str):
 
     methods[name] = module.Method()
 
+def do_per_message_methods(bot):
+    for module in methods.values():
+        module.per_message(bot)
+
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
 methods = dict()
@@ -125,3 +140,4 @@ commands["uptime"] = Command("uptime",5,"&uptime&")
 commands["cmdadd"] = Command("cmdadd",0,"&cmdadd&",True)
 commands["cmddel"] = Command("cmddel",0,"&cmddel&",True)
 commands["prefix"] = Command("prefix",0,"&prefix&",True)
+commands["echofull"] = Command("echofull",0,"&echofull&",True,True)
