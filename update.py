@@ -52,7 +52,7 @@ def check(silent=False,force=False,l=False):
     if current < latest:
         prompt(latest-current)
     else:
-        if not silent: input("rasbot is up to date. You may close this window.")
+        if not silent: input("\nrasbot is up to date. You may close this window.")
 
 def prompt(diff: int):
     """Prompts the user to update rasbot.
@@ -85,10 +85,6 @@ def update_first():
 
     p = subprocess.Popen(["update.py", "-l"], shell = True)
     p.wait()
-
-    # Notify user and exit.
-    input(f"\nFinished! rasbot is now up to date.")
-    sys.exit()
 
 def update_inner():
     # Update commands
