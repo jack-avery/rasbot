@@ -60,8 +60,6 @@ class Command:
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
-
-        print(f"{time.asctime()} | command {self.name} invoked by {bot.caller_name} with arg(s): {bot.cmdargs}")
         
         return returned_response
 

@@ -3,7 +3,9 @@
 #   raspy#0292 - raspy_on_osu
 ###
 
+import logging
 import os
+import sys
 import time
 import traceback
 import irc.bot
@@ -14,7 +16,7 @@ from definitions import CommandIsModOnlyError,\
     CommandStillOnCooldownError
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None):
+    def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None, debug:bool=False):
         """Create a new instance of a Twitch bot.
 
         :param auth: The Authentication object to use.
@@ -24,15 +26,32 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         :param channel: The channel name.
 
         :param cfginfo: The bot config file to read configuration from.
+
+        :param debug: Whether the bot should be verbose about actions.
         """
         # Check for updates first!
         update.check(True)
+
+        # Set up logging
+        if debug:
+            logmode = logging.DEBUG
+        else:
+            logmode = logging.INFO
+        
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logmode)
+        
+        stdout_formatter = logging.Formatter("%(asctime)s %(levelname)s | %(message)s")
+        stdout_handler = logging.StreamHandler(sys.stdout)
+        stdout_handler.setLevel(logmode)
+        stdout_handler.setFormatter(stdout_formatter)
+        self.logger.addHandler(stdout_handler)
 
         self.auth = auth
         self.authkeys = self.auth.get_auth()
         self.channel_id = channel_id
 
-        print(f"Starting as {self.authkeys['user_id']}...\n")
+        self.logger.info(f"Starting as {self.authkeys['user_id']}...")
 
         # Import channel info
         if cfgid is None:
@@ -40,36 +59,40 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         else:
             self.cfgid = cfgid
         
-        print(f"Reading config from {self.cfgid}...")
+        self.logger.info(f"Reading config from {self.cfgid}...")
 
         cfg = config.read(self.cfgid)
         self.prefix = cfg["prefix"]
 
-        print(f"Prefix set as '{self.prefix}'\n")
+        self.logger.info(f"Prefix set as '{self.prefix}'")
 
         # Instantiate commands module
         self.commands = commands
 
         # Import commands
         for command in cfg["commands"]:
+            self.logger.debug(f'Importing command {" ".join(command)}')
+        
             # For some reason "False" doesn't eval to False.
             if command[2] == "False":
                 command[2] = False
 
             if command[3] == "False":
                 command[3] = False
-            
+
             self.commands.command_modify(command[0],command[1]," ".join(command[4:]),command[2],command[3])
 
-        print(f"Imported {len(cfg['commands'])} custom command(s)")
+        self.logger.info(f"Imported {len(cfg['commands'])} custom command(s)")
 
         # Import methods
         methods = os.listdir('methods')
         for method in methods:
             if method.endswith('.py'):
+                self.logger.debug(f"Importing method {method}")
+                
                 self.commands.method_add(method[:-3])
 
-        print(f"Imported {len(self.commands.methods)} method(s)\n")
+        self.logger.info(f"Imported {len(self.commands.methods)} method(s)")
 
         # Resolve channel name
         if channel is None:
@@ -80,7 +103,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Create IRC bot connection
         server = 'irc.twitch.tv'
         port = 80
-        print('Connecting to ' + server + ' on port ' + str(port) + '...')
+        self.logger.info('Connecting to ' + server + ' on port ' + str(port) + '...')
         irc.bot.SingleServerIRCBot.__init__(self, [(server, port, f"oauth:{self.authkeys['irc_oauth']}")], self.authkeys['user_id'], self.authkeys['user_id'])
 
     def on_welcome(self, c, e):
@@ -90,7 +113,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.cap('REQ', ':twitch.tv/commands')
         c.join(self.channel)
 
-        print(f'Joined {self.channel}! ({self.channel_id})\n')
+        self.logger.info(f'Joined {self.channel}! ({self.channel_id})\n')
 
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent.
@@ -114,25 +137,27 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Reading the message
         msg = str(e.arguments)
-        msg = msg[2:-2].split(' ')
+        self.msg = msg[2:-2].split(' ')
 
         try:
             # Do per-message methods
             self.commands.do_per_message_methods(self)
 
             # If the message starts with the command prefix...
-            if msg[0][:len(self.prefix)].lower()==self.prefix:
+            if self.msg[0][:len(self.prefix)].lower()==self.prefix:
                 # Isolating command and command arguments
                 # Verify that it's actually a command before continuing.
-                cmd = msg[0][len(self.prefix):].lower()
+                cmd = self.msg[0][len(self.prefix):].lower()
                 if cmd not in self.commands.commands:
+                    self.logger.debug(f"Ignoring invalid command call '{cmd}' from {self.caller_name} (mod:{self.caller_ismod})")
                     return
 
                 # Isolate command arguments from command
-                self.cmdargs = msg[1:]
+                self.cmdargs = self.msg[1:]
 
                 try:
                     # Run the command and string result message
+                    self.logger.info(f"Running command call '{cmd}' from {self.caller_name} (mod:{self.caller_ismod}) (args:{self.cmdargs})")
                     cmdresult = self.commands.commands[cmd].run(self)
 
                     # If there is a string result message, print it to chat
@@ -142,7 +167,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 # If the command is still on cooldown, do nothing.
                 # If the command is mod-only and a non-mod calls it, do nothing.
                 except (CommandStillOnCooldownError,CommandIsModOnlyError) as err:
-                    print(f"{time.asctime()} | {err}")
+                    self.logger.info(f"{err}")
 
         except Exception as err:
             self.connection.privmsg(self.channel, f'An error occurred in the processing of your request: {str(err)}'

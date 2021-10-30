@@ -16,7 +16,12 @@ from authentication import Authentication
     "--cfg",
     help="The path to the channel config file."
 )
-def run(channel=None,auth=None,cfg=None):
+@click.option(
+    "--debug/--normal",
+    help="Have this instance be verbose about actions.",
+    default=False
+)
+def run(channel=None,auth=None,cfg=None,debug=False):
     auth = Authentication(auth)
     
     if channel is None:
@@ -28,7 +33,7 @@ def run(channel=None,auth=None,cfg=None):
     channel_id=int(f"{r['data'][0]['id']}")
 
     # Start the bot
-    tb = TwitchBot(auth,channel_id,channel,cfg)
+    tb = TwitchBot(auth,channel_id,channel,cfg,debug)
     tb.start()
 
 if __name__ == "__main__":
