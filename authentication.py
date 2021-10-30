@@ -35,6 +35,8 @@ class Authentication:
 
     def read_authfile(self):
         """Reads from the authfile set by self.file.
+
+        Assigns the read values to this `Authentication` objects' `auth` field.
         """
         # Attempting to read the auth file
         try:
@@ -80,12 +82,12 @@ class Authentication:
         self.write_authfile()
 
     def get_auth(self):
-        """Returns the auth dict.
+        """Returns this `Authentication` objects' `auth` dict.
         """
         return self.auth
 
     def get_headers(self):
-        """Returns the headers. For use in some queries.
+        """Returns headers. For use in some queries, e.g. the `uptime` method.
         """
         return {'Client-ID': self.auth["client_id"],
                 'Authorization': f'Bearer {self.auth["oauth"]}',

@@ -24,7 +24,7 @@ def check(silent=False,force=False):
 
     :param silent: Whether the check should announce itself.
 
-    :param silent: Whether or not to force an update.
+    :param force: Whether or not to force an update.
     """
     if force:
         update()
@@ -33,27 +33,27 @@ def check(silent=False,force=False):
 
     with open('version','r') as verfile:
         try:
-            version = int(verfile.read())
+            current = int(verfile.read())
         except ValueError:
             if not silent: input("Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
             exit()
     
-    if not silent: print(f"You are running on rasbot version: {version}")
+    if not silent: print(f"You are running on rasbot version: {current}")
 
     latest = int(requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text)
 
-    if version < latest:
-        prompt(latest-version)
+    if current < latest:
+        prompt(latest-current)
     else:
         if not silent: input("rasbot is up to date. You may close this window.")
 
-def prompt(ood:int):
+def prompt(diff: int):
     """Prompts the user to update rasbot.
 
-    :param ood: How many versions the user is running out of date.
+    :param diff: How many versions the user is running out of date.
     """
     print("--")
-    print(f"HEY! Your version of rasbot is running {ood} version(s) out of date!")
+    print(f"HEY! Your version of rasbot is running {diff} version(s) out of date!")
     print("Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with.")
     print("--\n")
 
@@ -62,6 +62,9 @@ def prompt(ood:int):
 
 def update():
     """Updates rasbot.
+
+    Reads from `BUILTIN_COMMANDS` and `BUILTIN_MODULES`,
+    and updates all files located in each.
     """
     # Update commands
     for command in BUILTIN_COMMANDS:

@@ -37,6 +37,10 @@ class Command:
         self.__last_used = 0
 
     def run(self, bot):
+        """Code to be run when this command is called from chat.
+        
+        Runs all && codes found in the command and returns the result.
+        """
         # Make sure the command is not on cooldown before doing anything
         if not time.time()-self.__last_used > self.cooldown:
             raise CommandStillOnCooldownError(f"command {self.name} called while still on cooldown")
@@ -104,20 +108,31 @@ def command_del(name:str):
         raise CommandDoesNotExistError(f'command {name} does not exist')
 
 class BaseMethod:
-    # Default &-code main method.
+    """The base class for a Method, custom or not.
+
+    Facilitates defaults for a Method so as to prevent errors.
+    """
+
     def main(self, bot):
+        """Code to be run for the methods' && code.
+        """
         pass
 
-    # Default help message.
     def help(self):
+        """The help message when used with the `help` method.
+        """
         return f'No help message available for method.'
 
     # Default per-message function.
     def per_message(self, bot):
+        """Code to be run for every message received.
+
+        By default, does nothing.
+        """
         pass
 
 def method_add(name:str):
-    '''Creates a new method and appends it to the commands dict.
+    '''Creates a new method and appends it to the methods dict.
 
     :param name: The name of the method. File must be visible in the methods folder.
     '''
@@ -128,6 +143,8 @@ def method_add(name:str):
     methods[name] = module.Method()
 
 def do_per_message_methods(bot):
+    """Runs the per_message() of every Method imported from `./methods`.
+    """
     for module in methods.values():
         module.per_message(bot)
 
