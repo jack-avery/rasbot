@@ -66,25 +66,25 @@ def update():
     Reads from `BUILTIN_COMMANDS` and `BUILTIN_MODULES`,
     and updates all files located in each.
     """
-    # Update commands
-    for command in definitions.BUILTIN_COMMANDS:
-        print(f"Updating built-in method {command}...")
-        text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/methods/{command}.py").text
-        
-        with open(f"methods/{command}.py",'w') as commandfile:
-            commandfile.write(text)
-    print("Finished updating methods.\n")
-    
-    newdefinitions = importlib.reload(definitions)
-
     # Update modules
-    for module in newdefinitions.BUILTIN_COMMANDS:
+    for module in definitions.BUILTIN_COMMANDS:
         print(f"Updating built-in module {module}...")
         text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{module}.py").text
         
         with open(f"{module}.py",'w') as modulefile:
             modulefile.write(text)
     print("Finished updating modules.\n")
+    
+    newdefinitions = importlib.reload(definitions)
+
+    # Update commands
+    for command in newdefinitions.BUILTIN_COMMANDS:
+        print(f"Updating built-in method {command}...")
+        text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/methods/{command}.py").text
+        
+        with open(f"methods/{command}.py",'w') as commandfile:
+            commandfile.write(text)
+    print("Finished updating methods.\n")
 
     # Check for new requirements
     print("Running requirements.txt...")
