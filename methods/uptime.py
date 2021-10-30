@@ -18,7 +18,7 @@ class Method(BaseMethod):
         b=str(time.gmtime())
         b=b[b.find("("):]
         r=[]
-        for i in range(6):
+        for _ in range(6):
             b=b[b.find("=")+1:]
             r.append(b[:b.find(",")])
         b=datetime.datetime.strptime(f'{"-".join(r[:3])}T{":".join(r[3:])}', "%Y-%m-%dT%H:%M:%S")
