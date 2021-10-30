@@ -7,7 +7,7 @@
 # Definitions
 ##
 
-BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix','echofull']
+BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix','debugechofull','debugmsgcount']
 """Built-in commands."""
 
 BUILTIN_MODULES = ['authentication','bot','commands','config','definitions','refresh_oauth','run','update','setup']

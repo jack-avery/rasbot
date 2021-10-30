@@ -1,4 +1,4 @@
-# This is a test function. Feel free to use it as a template.
+# This is a test method. Feel free to use it as a template.
 
 from commands import BaseMethod
 
@@ -7,9 +7,8 @@ class Method(BaseMethod):
         self.count = 0
 
     # Show the amount of messages since the bot started
-    # and echo the user's message back to them
     def main(self, bot):
-        return f"{self.count}, {' '.join(bot.cmdargs)}"
+        return self.count
 
     # Count messages since the bot started
     def per_message(self, bot):
