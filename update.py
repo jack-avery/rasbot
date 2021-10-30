@@ -1,9 +1,9 @@
-import importlib
 import subprocess
 import sys
 import requests
 import click
-import definitions
+from definitions import BUILTIN_COMMANDS,\
+    BUILTIN_MODULES
 
 @click.command()
 @click.option(
@@ -16,10 +16,15 @@ import definitions
     help="Whether or not to force an update. Use if your installation is broken.",
     default=False
 )
-def check_cli(silent=False,force=False):
-    check(silent,force)
+@click.option(
+    "-l/-nl",
+    help="Used in updating, performs the rest of the update after updating itself and definitions.",
+    default=False
+)
+def check_cli(silent=False,force=False,l=False):
+    check(silent,force,l)
 
-def check(silent=False,force=False):
+def check(silent=False,force=False,l=False):
     """Checks for updates.
 
     :param silent: Whether the check should announce itself.
@@ -27,7 +32,9 @@ def check(silent=False,force=False):
     :param force: Whether or not to force an update.
     """
     if force:
-        update()
+        update_first()
+    if l:
+        update_inner()
 
     if not silent: print("Checking for updates...")
 
@@ -58,33 +65,50 @@ def prompt(diff: int):
     print("--\n")
 
     if input("Would you like to update? (y/Y for yes): ").lower() == 'y':
-        update()
+        update_first()
 
-def update():
+def update_first():
     """Updates rasbot.
 
     Reads from `BUILTIN_COMMANDS` and `BUILTIN_MODULES`,
     and updates all files located in each.
     """
-    # Update modules
-    for module in definitions.BUILTIN_COMMANDS:
-        print(f"Updating built-in module {module}...")
+    # Update definitions and updater first!
+    for module in ['definitions','update']:
+        print(f"Updating {module}.py...")
         text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{module}.py").text
-        
-        with open(f"{module}.py",'w') as modulefile:
-            modulefile.write(text)
-    print("Finished updating modules.\n")
-    
-    newdefinitions = importlib.reload(definitions)
 
+        with open(f"{module}.py",'w') as commandfile:
+            commandfile.write(text)
+
+    print("Finished updating important modules. Updating remainder...")
+
+    p = subprocess.Popen(["update.py", "-l"], shell = True)
+    p.wait()
+
+    # Notify user and exit.
+    input(f"\nFinished! rasbot is now up to date.")
+    sys.exit()
+
+def update_inner():
     # Update commands
-    for command in newdefinitions.BUILTIN_COMMANDS:
+    for command in BUILTIN_COMMANDS:
         print(f"Updating built-in method {command}...")
         text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/methods/{command}.py").text
         
         with open(f"methods/{command}.py",'w') as commandfile:
             commandfile.write(text)
     print("Finished updating methods.\n")
+
+    # Update modules
+    for module in BUILTIN_MODULES:
+        if module not in ['definitions','update']:
+            print(f"Updating built-in module {module}...")
+            text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{module}.py").text
+            
+            with open(f"{module}.py",'w') as modulefile:
+                modulefile.write(text)
+    print("Finished updating modules.\n")
 
     # Check for new requirements
     print("Running requirements.txt...")
@@ -105,10 +129,6 @@ def update():
     version = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text
     with open("version",'w') as versionfile:
         versionfile.write(version)
-
-    # Notify user and exit.
-    input(f"\nFinished! rasbot is now up to date on version {version}.")
-    sys.exit()
     
 def pip_install(package:str):
     """Attempts to install a package.
