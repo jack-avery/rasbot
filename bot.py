@@ -170,7 +170,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     self.logger.info(f"{err}")
 
         except Exception as err:
-            self.send_message(f'An error occurred in the processing of your request: {str(err)}.'
+            self.send_message(f'An error occurred in the processing of your request: {str(err)}. '
                               +'A full stack trace has been output to the command window.')
             traceback.print_exc()
 
