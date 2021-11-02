@@ -136,24 +136,24 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.caller_ismod = ismod
 
         # Reading the message
-        msg = str(e.arguments)
-        self.msg = msg[2:-2].split(' ')
+        self.msg = str(e.arguments)
+        self.msg_split = self.msg[2:-2].split(' ')
 
         try:
             # Do per-message methods
             self.commands.do_per_message_methods(self)
 
             # If the message starts with the command prefix...
-            if self.msg[0][:len(self.prefix)].lower()==self.prefix:
+            if self.msg_split[0][:len(self.prefix)].lower()==self.prefix:
                 # Isolating command and command arguments
                 # Verify that it's actually a command before continuing.
-                cmd = self.msg[0][len(self.prefix):].lower()
+                cmd = self.msg_split[0][len(self.prefix):].lower()
                 if cmd not in self.commands.commands:
                     self.logger.debug(f"Ignoring invalid command call '{cmd}' from {self.caller_name} (mod:{self.caller_ismod})")
                     return
 
                 # Isolate command arguments from command
-                self.cmdargs = self.msg[1:]
+                self.cmdargs = self.msg_split[1:]
 
                 try:
                     # Run the command and string result message
@@ -170,8 +170,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     self.logger.info(f"{err}")
 
         except Exception as err:
-            self.connection.privmsg(self.channel, f'An error occurred in the processing of your request: {str(err)}'
-                                                +'. A full stack trace has been output to the command window.')
+            self.send_message(f'An error occurred in the processing of your request: {str(err)}.'
+                              +'A full stack trace has been output to the command window.')
             traceback.print_exc()
 
     def send_message(self, message:str):
