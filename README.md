@@ -28,43 +28,47 @@ py -m pip install -r requirements.txt
 Joined #raspy_on_osu! (57511738)
 ```
 
-> If `setup.py` fails, see "Setting up your Authentication".
-
-> You can modify environment variables in `definitions.py`, but be careful not to break your installation!
+> If `setup.py` fails, see "Setting up your authentication manually".
 
 **rasbot will automatically check for updates every time you run `run.py`.**
-You can check for updates manually by running update.py, and force an update using the command:
+You can check for updates manually by running update.py, and force a reinstallation of built-in modules using the command:
 ```
 update.py --force
 ```
-This is useful if your installation is broken, as it reinstalls rasbot.
 
 # Managing Commands
-**Creating a command:**
 ```
-r!cmdadd <name> <cooldown> <mod-only?> <response>
-```
-**Removing a command:**
-```
+Create/update a command:
+r!cmdadd <name> <cooldown> <parameters> <response>
+
+Remove a command:
 r!cmddel <name>
 ```
 
-**To use a method, encase the method name in `&` symbols, such as: `&help&`**
->For information about creating your own method, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/methods/README.md).
+Valid parameters include:<br/>
+`-modonly`: Set the command to be moderator/broadcaster use only.<br/>
+`-hidden`: Set the command to be hidden from the `help` method.
 
-**A command's name must comply to a Regex.** By default, the Regex is alphanumeric, allowing underscores: `[a-z0-9_]+`
+By default, a command's name must contain only alphanumeric characters and underscores.
 
-**Example:**
->To add the provided `np` method as a command:
->`r!cmdadd np 5 &np&`
->
->... and as mod-only:
->`r!cmdadd np 5 -modonly &np&`
->
->... and to remove it:
->`r!cmddel np`
+**Example**:
+```
+Creating the np command which uses methods/np.py:
+r!cmdadd np 5 &np&
 
-# Setting up your Authentication
+Making it hidden and mod-only:
+r!cmdadd np 5 -hidden -modonly &np&
+
+Removing it:
+r!cmddel np
+```
+
+# Methods
+Methods are subprograms that allow the user to run specific snippits of code whenever a message is sent, or a command response contains a methods' name encased in `&`.<br/>
+To use a method in a command, encase the method name in `&` symbols, such as in the examples above.<br/>
+*For documentation on creating your own method, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/methods/README.md).*
+
+# Setting up your authentication manually
 
 If `setup.py` doesn't work, here's how to do it manually...
 
@@ -108,4 +112,4 @@ client_secret:4gijoa48u9adfg
 irc_oauth:gafd89ugi34j5aer
 
 ```
->Make sure that there is an empty line at the bottom of the file.
+>Make sure that there is the empty line at the bottom of the file.
