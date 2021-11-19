@@ -87,7 +87,8 @@ class Authentication:
         return self.auth
 
     def get_headers(self):
-        """Returns headers. For use in some queries, e.g. the `uptime` method.
+        """Returns headers.
+        For use in some queries, e.g. the `uptime` method.
         """
         return {'Client-ID': self.auth["client_id"],
                 'Authorization': f'Bearer {self.auth["oauth"]}',
@@ -108,4 +109,5 @@ class Authentication:
         
         # If it can't find the key...
         except KeyError:
-            raise AuthenticationDeniedError(f"got error response status {r['status']}, message '{r['message']}'")
+            raise AuthenticationDeniedError("got error response status"
+                    +f"{r['status']}, message '{r['message']}'")

@@ -23,7 +23,7 @@ from authentication import Authentication
 )
 def run(channel=None,auth=None,cfg=None,debug=False):
     auth = Authentication(auth)
-    
+
     if channel is None:
         channel = auth.get_auth()['user_id']
 
