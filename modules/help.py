@@ -1,9 +1,9 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseMethod
+from commands import BaseModule
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def main(self,bot):
         # If no command is provided, just run the base help message.
         if len(bot.cmdargs) == 0:

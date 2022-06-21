@@ -1,8 +1,8 @@
 # This is a test method. Feel free to use it as a template.
 
-from commands import BaseMethod
+from commands import BaseModule
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def __init__(self):
         self.count = 0
 

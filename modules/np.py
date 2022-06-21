@@ -3,10 +3,10 @@
 # Point the path in definitions.py to the file
 # Create a command using cmdadd with &np& as the response.
 
-from commands import BaseMethod
+from commands import BaseModule
 from definitions import PATH_TO_STREAMCOMPANION_NP_FILE
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def main(self,bot):
         try:
             with open(PATH_TO_STREAMCOMPANION_NP_FILE,'r') as file:

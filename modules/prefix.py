@@ -1,11 +1,11 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseMethod
+from commands import BaseModule
 import config
 from definitions import DEFAULT_PREFIX
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def main(self, bot):
         if len(bot.cmdargs) == 0:
             newprefix = DEFAULT_PREFIX

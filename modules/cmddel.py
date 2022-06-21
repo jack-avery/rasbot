@@ -1,14 +1,14 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseMethod
+from commands import BaseModule
 from definitions import VALID_COMMAND_REGEX,\
     CommandDoesNotExistError,\
     CommandIsBuiltInError,\
     CommandGivenInvalidNameError
 import config
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def main(self,bot):
         cmd = bot.cmdargs
 

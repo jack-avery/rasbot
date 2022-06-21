@@ -1,10 +1,10 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseMethod
+from commands import BaseModule
 import requests, datetime, time
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def main(self, bot):
         r = requests.get(f"https://api.twitch.tv/helix/streams?user_id={bot.channel_id}", headers=bot.auth.get_headers()).json()
         try:

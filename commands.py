@@ -51,11 +51,11 @@ class Command:
 
         # Apply any methods encased in &&
         returned_response = self.response
-        for method_name, method in methods.items():
-            if f'&{method_name}&' in returned_response:
+        for module_name, module in modules.items():
+            if f'&{module_name}&' in returned_response:
                 returned_response = returned_response.replace(
-                                                              f'&{method_name}&',
-                                                              str(method.main(bot))
+                                                              f'&{module_name}&',
+                                                              str(module.main(bot))
                                                              )
 
         # Update the last usage time and return the response
@@ -105,21 +105,21 @@ def command_del(name:str):
     except KeyError:
         raise CommandDoesNotExistError(f'command {name} does not exist')
 
-class BaseMethod:
-    """The base class for a Method, custom or not.
+class BaseModule:
+    """The base class for a Module, custom or not.
 
-    Facilitates defaults for a Method so as to prevent errors.
+    Facilitates defaults for a Module so as to prevent errors.
     """
 
     def main(self, bot):
-        """Code to be run for the methods' && code.
+        """Code to be run for the modules' && code.
         """
         pass
 
     def help(self):
-        """The help message when used with the `help` method.
+        """The help message when used with the `help` module.
         """
-        return f'No help message available for method.'
+        return f'No help message available for module.'
 
     # Default per-message function.
     def per_message(self, bot):
@@ -129,26 +129,26 @@ class BaseMethod:
         """
         pass
 
-def method_add(name:str):
-    '''Creates a new method and appends it to the methods dict.
+def module_add(name:str):
+    '''Creates a new module and appends it to the modules dict.
 
-    :param name: The name of the method. File must be visible in the methods folder.
+    :param name: The name of the module. File must be visible in the modules folder.
     '''
-    spec = importlib.util.spec_from_file_location(f"{name}",f"methods/{name}.py")
+    spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
 
-    methods[name] = module.Method()
+    modules[name] = module.Module()
 
 def do_per_message_methods(bot):
-    """Runs the per_message() of every Method imported from `./methods`.
+    """Runs the per_message() of every Module imported from `./modules`.
     """
-    for module in methods.values():
+    for module in modules.values():
         module.per_message(bot)
 
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
-methods = dict()
+modules = dict()
 command_re = re.compile(VALID_COMMAND_REGEX)
 commands["help"] = Command("help",5,"&help&")
 commands["uptime"] = Command("uptime",5,"&uptime&")

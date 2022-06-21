@@ -1,7 +1,7 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseMethod
+from commands import BaseModule
 import config
 from definitions import VALID_COMMAND_REGEX,\
     MODONLY_ARG,\
@@ -10,7 +10,7 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandIsBuiltInError,\
     CommandMustHavePositiveCooldownError
 
-class Method(BaseMethod):
+class Module(BaseModule):
     def main(self, bot):
         try:
             cmd = bot.cmdargs[:]

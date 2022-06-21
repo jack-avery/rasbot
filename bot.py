@@ -83,15 +83,15 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         self.logger.info(f"Imported {len(cfg['commands'])} custom command(s)")
 
-        # Import methods
-        methods = os.listdir('methods')
-        for method in methods:
-            if method.endswith('.py'):
-                self.logger.debug(f"Importing method {method}")
+        # Import base modules
+        modules = os.listdir('modules')
+        for module in modules:
+            if module.endswith('.py'):
+                self.logger.debug(f"Importing module {module}")
                 
-                self.commands.method_add(method[:-3])
+                self.commands.module_add(module[:-3])
 
-        self.logger.info(f"Imported {len(self.commands.methods)} method(s)")
+        self.logger.info(f"Imported {len(self.commands.modules)} module(s)")
 
         # Resolve channel name
         if channel is None:
