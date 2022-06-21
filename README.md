@@ -2,16 +2,16 @@
 **Modular Python-based Twitch bot optimized for customizability and ease of use.**
 
 rasbot is a Python-based Twitch bot that runs on *your* Twitch account,
-and comes with a short list of methods to facilitate the creation of simple chat commands,
+and comes with a short list of modules to facilitate the creation of simple chat commands,
 such as a simple `keyboard` command that shows your keyboard.
 
-rasbot also comes set up to allow users to easily create their own custom methods,
+rasbot also comes set up to allow users to easily create their own custom modules,
 where if you know how to code it in Python, it can run as a command for your Twitch bot,
-for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/master/methods/np.py)
-method that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion)
+for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/master/modules/np.py)
+module that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion)
 and outputs 'now playing' information into the chat.
 
-Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share methods.
+Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share modules.
 
 # How to Use
 1. Download and install [Python version 3.10.0+](https://www.python.org/downloads/)
@@ -53,7 +53,7 @@ By default, a command's name must contain only alphanumeric characters and under
 
 **Example**:
 ```
-Creating the np command which uses methods/np.py:
+Creating the np command which uses modules/np.py:
 r!cmdadd np 5 &np&
 
 Making it hidden and mod-only:
@@ -63,10 +63,10 @@ Removing it:
 r!cmddel np
 ```
 
-# Methods
-Methods are subprograms that allow the user to run specific snippits of code whenever a message is sent, or a command response contains a methods' name encased in `&`.<br/>
-To use a method in a command, encase the method name in `&` symbols, such as in the examples above.<br/>
-*For documentation on creating your own method, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/methods/README.md).*
+# Modules
+Modules are subprograms that allow the user to run specific snippits of code whenever a message is sent, or a command response contains a modules' name encased in `&`.<br/>
+To use a modules' method in a command, encase the module name in `&` symbols, such as in the examples above.<br/>
+*For documentation on creating your own module, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/modules/README.md).*
 
 # Setting up your authentication manually
 
