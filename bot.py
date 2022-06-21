@@ -6,7 +6,6 @@
 import logging
 import os
 import sys
-import time
 import traceback
 import irc.bot
 import commands
