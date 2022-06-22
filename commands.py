@@ -67,7 +67,7 @@ class Command:
         
         return returned_response
 
-def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False, hidden:bool = False):
+def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:bool = False, hidden:bool = False, ignore_builtin_check:bool = False):
     '''Creates a new command (or modifies an existing one),
     and appends it to the commands dict.
 
@@ -76,9 +76,15 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     :param cooldown: The cooldown of the command in seconds.
 
     :param response: The text response of the command. Encapsulate custom commands in &&.
+
+    :param requires_mod: Whether this command requires moderator access to use.
+
+    :param hidden: Whether to hide this command from the 'help' module.
+
+    :param ignore_builtin_check: Whether to ignore the built-in module check. Use at your own risk!
     '''
     # You cannot modify built-in commands
-    if name in BUILTIN_COMMANDS:
+    if name in BUILTIN_COMMANDS and not ignore_builtin_check:
         raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
 
     # Command cannot have a negative cooldown
@@ -91,8 +97,8 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     
     # Resolve any modules the command mentions and add new ones to commands_modules
     for m in module_re.findall(response):
-        if m not in commands_modules:
-            commands_modules.append(m)
+        if m not in modules.keys():
+            module_add(m)
 
     commands[name] = Command(name,cooldown,response,requires_mod,hidden)
 
@@ -161,10 +167,10 @@ commands_modules = list()
 modules = dict()
 command_re = re.compile(VALID_COMMAND_REGEX)
 module_re = re.compile(MODULE_MENTION_REGEX)
-commands["help"] = Command("help",5,"&help&")
-commands["uptime"] = Command("uptime",5,"&uptime&")
-commands["cmdadd"] = Command("cmdadd",0,"&cmdadd&",True)
-commands["cmddel"] = Command("cmddel",0,"&cmddel&",True)
-commands["prefix"] = Command("prefix",0,"&prefix&",True)
-commands["debugechofull"] = Command("debugechofull",0,"&debugechofull&",True,True)
-commands["debugmsgcount"] = Command("debugmsgcount",0,"&debugmsgcount&",True,True)
+command_modify("help",5,"&help&",False,False,True)
+command_modify("uptime",5,"&uptime&",False,False,True)
+command_modify("cmdadd",0,"&cmdadd&",True,False,True)
+command_modify("cmddel",0,"&cmddel&",True,False,True)
+command_modify("prefix",0,"&prefix&",True,False,True)
+command_modify("debugechofull",0,"&debugechofull&",True,True,True)
+command_modify("debugmsgcount",0,"&debugmsgcount&",True,True,True)
