@@ -11,5 +11,5 @@ class Module(BaseModule):
         return self.count
 
     # Count messages since the bot started
-    def per_message(self, bot):
+    def on_pubmsg(self, bot):
         self.count+=1

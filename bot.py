@@ -152,7 +152,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         try:
             # Do per-message methods
-            self.commands.do_per_message_methods(self)
+            self.commands.do_on_pubmsg_methods(self)
 
             # If the message starts with the command prefix...
             if self.msg_split[0][:len(self.prefix)].lower()==self.prefix:

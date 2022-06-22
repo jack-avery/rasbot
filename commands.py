@@ -129,7 +129,7 @@ class BaseModule:
         return f'No help message available for module.'
 
     # Default per-message function.
-    def per_message(self, bot):
+    def on_pubmsg(self, bot):
         """Code to be run for every message received.
 
         By default, does nothing.
@@ -147,11 +147,11 @@ def module_add(name:str):
 
     modules[name] = module.Module()
 
-def do_per_message_methods(bot):
-    """Runs the per_message() of every Module imported from `./modules`.
+def do_on_pubmsg_methods(bot):
+    """Runs the on_pubmsg() of every Module imported from `./modules`.
     """
     for module in modules.values():
-        module.per_message(bot)
+        module.on_pubmsg(bot)
 
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
