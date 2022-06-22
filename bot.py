@@ -189,8 +189,29 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             traceback.print_exc()
 
     def send_message(self, message:str):
-        """Sends a message. For easy use within methods.
+        """Sends a message. For easy use within modules.
 
         :param message: The message to send.
         """
-        self.connection.privmsg(self.channel, message)
+        self.connection.privmsg(self.channel, f'{message}')
+    
+    def log_error(self, message:str):
+        """Log an error. For easy use within modules.
+
+        :param message: The error to log.
+        """
+        self.logger.error(f'{message}')
+
+    def log_info(self, message:str):
+        """Log an info-level string. For easy use within modules.
+
+        :param message: The message to log.
+        """
+        self.logger.info(f'{message}')
+    
+    def log_debug(self, message:str):
+        """Log debug information. For easy use within modules.
+
+        :param message: The debug info to log.
+        """
+        self.logger.debug(f'{message}')
