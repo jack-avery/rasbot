@@ -9,7 +9,8 @@ from definitions import BUILTIN_COMMANDS,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
-    CommandStillOnCooldownError
+    CommandStillOnCooldownError,\
+    ModuleImportError
 
 ###
 #   rasbot commands module
@@ -141,11 +142,16 @@ def module_add(name:str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
-    spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    try:
+        spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
 
-    modules[name] = module.Module()
+        modules[name] = module.Module()
+    except FileNotFoundError:
+        raise ModuleImportError(f'module {name} does not exist')
+    except:
+        raise ModuleImportError(f'could not load module {name}')
 
 def do_on_pubmsg_methods(bot):
     """Runs the on_pubmsg() of every Module imported from `./modules`.

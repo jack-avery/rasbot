@@ -13,7 +13,7 @@ import config
 import update
 from definitions import CommandIsModOnlyError,\
     CommandStillOnCooldownError,\
-    BUILTIN_COMMANDS
+    BUILTIN_COMMANDS, ModuleImportError
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None, debug:bool=False):
@@ -98,9 +98,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 
                 # Import modules used by user-defined commands
                 elif module in self.commands.commands_modules:
-                    self.logger.debug(f"Importing module {module}")
-                    self.commands.module_add(module)
-                    modules_custom+=1
+                    try:
+                        self.logger.debug(f"Importing module {module}")
+                        self.commands.module_add(module)
+                        modules_custom+=1
+                    except ModuleImportError as err:
+                        self.logger.info(f"Failed loading a module: {err}")
 
         if modules_custom > 0:
             self.logger.info(f"Imported {modules_custom} custom module(s)")
