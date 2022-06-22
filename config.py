@@ -54,8 +54,7 @@ def write(bot):
     for name,command in bot.commands.commands.items():
         # The builtins are already added each init
         if name not in BUILTIN_COMMANDS:
-            lines.append(f"{name} {command.cooldown} {command.requires_mod}"
-                         +"{command.hidden} {command.response}")
+            lines.append(f"{name} {command.cooldown} {command.requires_mod} {command.hidden} {command.response}")
 
     # Adding newlines
     for i,line in enumerate(lines):
