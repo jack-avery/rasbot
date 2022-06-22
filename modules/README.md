@@ -1,5 +1,5 @@
 # Creating your own custom method:
-**You can take a look at `modules/echofull.py` for an example**
+**You can take a look at `modules/debugechofull.py` for an example**
 
 Name the file after your module like `modulename.py`.
 For example, if you wanted a modules' method to be called using `&thing&`, you would name your file `thing.py`.
