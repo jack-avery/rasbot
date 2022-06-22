@@ -12,8 +12,7 @@ import commands
 import config
 import update
 from definitions import CommandIsModOnlyError,\
-    CommandStillOnCooldownError,\
-    BUILTIN_COMMANDS, ModuleImportError
+    CommandStillOnCooldownError
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None, debug:bool=False):
