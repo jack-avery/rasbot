@@ -9,8 +9,7 @@ from definitions import BUILTIN_COMMANDS,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
-    CommandStillOnCooldownError,\
-    ModuleImportError
+    CommandStillOnCooldownError
 
 ###
 #   rasbot commands module
@@ -55,10 +54,13 @@ class Command:
         # Apply any methods encased in &&
         returned_response = self.response
         for m in module_re.findall(returned_response):
-            returned_response = returned_response.replace(
-                                                            f'&{m}&',
-                                                            str(modules[m].main(bot))
-                                                         )
+            try:
+                returned_response = returned_response.replace(
+                                                                f'&{m}&',
+                                                                str(modules[m].main(bot))
+                                                            )
+            except KeyError:
+                raise KeyError(f'command {self.name} calls unimported/nonexistent module {m}')
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
@@ -141,16 +143,11 @@ def module_add(name:str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
-    try:
-        spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+    spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
 
-        modules[name] = module.Module()
-    except FileNotFoundError:
-        raise ModuleImportError(f'module {name} does not exist')
-    except:
-        raise ModuleImportError(f'could not load module {name}')
+    modules[name] = module.Module()
 
 def do_on_pubmsg_methods(bot):
     """Runs the on_pubmsg() of every Module imported from `./modules`.

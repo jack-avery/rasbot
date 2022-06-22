@@ -98,12 +98,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 
                 # Import modules used by user-defined commands
                 elif module in self.commands.commands_modules:
-                    try:
-                        self.logger.debug(f"Importing module {module}")
-                        self.commands.module_add(module)
-                        modules_custom+=1
-                    except ModuleImportError as err:
-                        self.logger.info(f"Failed loading a module: {err}")
+                    self.logger.debug(f"Importing module {module}")
+                    self.commands.module_add(module)
+                    modules_custom+=1
 
         if modules_custom > 0:
             self.logger.info(f"Imported {modules_custom} custom module(s)")
