@@ -13,13 +13,13 @@ class Module(BaseModule):
         
         # If a command is provided, run the help for it.
         else:
-            method = bot.cmdargs[0].lower()
+            module = bot.cmdargs[0].lower()
 
-            if method in bot.commands.methods.keys():
-                return str(bot.commands.methods[method].help())
+            if module in bot.commands.modules.keys():
+                return str(bot.commands.modules[module].help())
             
             else:
-                return f'Method {method} not found.'
+                return f'Module {module} not found.'
 
     def help(self):
         return 'Prints all available commands, or, if provided a method, prints the help message for that method. Usage: help <method?>'

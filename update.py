@@ -90,11 +90,11 @@ def update_inner():
     # Update commands
     for command in BUILTIN_COMMANDS:
         print(f"Updating built-in method {command}...")
-        text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/methods/{command}.py").text
+        text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/modules/{command}.py").text
         
-        with open(f"methods/{command}.py",'w') as commandfile:
+        with open(f"modules/{command}.py",'w') as commandfile:
             commandfile.write(text)
-    print("Finished updating methods.\n")
+    print("Finished updating modules.\n")
 
     # Update modules
     for module in BUILTIN_MODULES:
