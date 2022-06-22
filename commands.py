@@ -54,12 +54,11 @@ class Command:
 
         # Apply any methods encased in &&
         returned_response = self.response
-        for module_name, module in modules.items():
-            if f'&{module_name}&' in returned_response:
-                returned_response = returned_response.replace(
-                                                              f'&{module_name}&',
-                                                              str(module.main(bot))
-                                                             )
+        for m in module_re.findall(returned_response):
+            returned_response = returned_response.replace(
+                                                            f'&{m}&',
+                                                            str(modules[m].main(bot))
+                                                         )
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
