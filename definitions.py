@@ -13,8 +13,11 @@ BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix','debugechofull','
 BUILTIN_MODULES = ['authentication','bot','commands','config','definitions','refresh_oauth','run','update','setup']
 """Built-in modules. Used for the autoupdate function."""
 
-VALID_COMMAND_REGEX = "[a-z0-9_]+"
+VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 """Regex to compare given command names to for validation."""
+
+MODULE_MENTION_REGEX = r'&([a-zA-Z]+)&'
+"""Regex to compare command responses to for finding any mentioned modules."""
 
 DEFAULT_PREFIX = "r!"
 """Default prefix for a new channel config."""

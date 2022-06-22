@@ -12,7 +12,8 @@ import commands
 import config
 import update
 from definitions import CommandIsModOnlyError,\
-    CommandStillOnCooldownError
+    CommandStillOnCooldownError,\
+    BUILTIN_COMMANDS
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth, channel_id:int, channel:str=None, cfgid:int=None, debug:bool=False):
@@ -83,15 +84,26 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         self.logger.info(f"Imported {len(cfg['commands'])} custom command(s)")
 
-        # Import base modules
+        # Import modules
         modules = os.listdir('modules')
+        modules_custom = 0
         for module in modules:
             if module.endswith('.py'):
-                self.logger.debug(f"Importing module {module}")
-                
-                self.commands.module_add(module[:-3])
+                # trim .py ending
+                module = module[:-3]
 
-        self.logger.info(f"Imported {len(self.commands.modules)} module(s)")
+                # Import builtin required modules
+                if module in BUILTIN_COMMANDS:
+                    self.commands.module_add(module)
+                
+                # Import modules used by user-defined commands
+                elif module in self.commands.commands_modules:
+                    self.logger.debug(f"Importing module {module}")
+                    self.commands.module_add(module)
+                    modules_custom+=1
+
+        if modules_custom > 0:
+            self.logger.info(f"Imported {modules_custom} custom module(s)")
 
         # Resolve channel name
         if channel is None:

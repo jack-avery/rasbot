@@ -3,7 +3,9 @@ import re
 import time
 from definitions import BUILTIN_COMMANDS,\
     VALID_COMMAND_REGEX,\
-    CommandDoesNotExistError, CommandGivenInvalidNameError,\
+    MODULE_MENTION_REGEX,\
+    CommandDoesNotExistError,\
+    CommandGivenInvalidNameError,\
     CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
@@ -84,6 +86,11 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     # Command must match the regex defined by VALID_COMMAND_REGEX
     if not command_re.match(name):
         raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
+    
+    # Resolve any modules the command mentions and add new ones to commands_modules
+    for m in module_re.findall(response):
+        if m not in commands_modules:
+            commands_modules.append(m)
 
     commands[name] = Command(name,cooldown,response,requires_mod,hidden)
 
@@ -148,8 +155,10 @@ def do_per_message_methods(bot):
 
 # Do not modify this! These are built-in commands, initialized on module import.
 commands = dict()
+commands_modules = list()
 modules = dict()
 command_re = re.compile(VALID_COMMAND_REGEX)
+module_re = re.compile(MODULE_MENTION_REGEX)
 commands["help"] = Command("help",5,"&help&")
 commands["uptime"] = Command("uptime",5,"&uptime&")
 commands["cmdadd"] = Command("cmdadd",0,"&cmdadd&",True)
