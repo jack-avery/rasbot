@@ -55,4 +55,4 @@ class Module(BaseModule):
             return 'Cooldown must be a positive integer.'
 
     def help(self):
-        return 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown> <mod-only?> <response>.'
+        return 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown> <mod-only?> <hidden?> <response>.'
