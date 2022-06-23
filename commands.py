@@ -71,6 +71,8 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     '''Creates a new command (or modifies an existing one),
     and appends it to the commands dict.
 
+    Automatically attempts to import any unimported modules.
+
     :param name: The name of the command.
 
     :param cooldown: The cooldown of the command in seconds.
