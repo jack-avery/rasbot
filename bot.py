@@ -4,7 +4,6 @@
 ###
 
 import logging
-import os
 import sys
 import traceback
 import irc.bot
