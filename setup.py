@@ -7,11 +7,7 @@ from definitions import DEFAULT_AUTHFILE,\
 
 # Check for new requirements
 print("Running local requirements.txt...")
-with open("requirements.txt",'r') as requirementsfile:
-    requirements = requirementsfile.readlines()
-
-for package in requirements:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--quiet"])
+subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 print("All requirements installed.\n")
 
 # We don't want people to accidentally overwrite their current auth

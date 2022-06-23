@@ -129,11 +129,7 @@ def update_inner():
         versionfile.write(version)
 
 def check_requirements():
-    with open("requirements.txt",'r') as requirementsfile:
-        requirements = requirementsfile.readlines()
-    
-    for package in requirements:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--quiet"])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
 
 if __name__ == "__main__":
     check_cli()
