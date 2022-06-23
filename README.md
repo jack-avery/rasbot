@@ -18,12 +18,8 @@ Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot
 2. Download the Source Code:
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot` <br/>
 > Or, click on **Code** and **Download ZIP**.
-3. Run this command in the installation folder to install requirements:
-```
-py -m pip install -r requirements.txt
-```
-4. Run `setup.py` and follow the steps to set up your authentication.
-5. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to: 
+3. Run `setup.py` and follow the steps to set up your authentication.
+4. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to: 
 ```
 Joined #raspy_on_osu! (57511738)
 ```
