@@ -95,7 +95,7 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     if not command_re.match(name):
         raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
     
-    # Resolve any modules the command mentions and add new ones to commands_modules
+    # Resolve any modules the command mentions and import new ones
     for m in module_re.findall(response):
         if m not in modules.keys():
             module_add(m)
