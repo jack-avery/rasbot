@@ -1,7 +1,6 @@
 import os
 import sys
 import subprocess
-from authentication import Authentication
 from definitions import DEFAULT_AUTHFILE,\
     AuthenticationDeniedError
 
@@ -19,6 +18,8 @@ if os.path.isfile(DEFAULT_AUTHFILE):
         exit()
 
 # Set up
+# Import auth here as it uses requests and will error out otherwise
+from authentication import Authentication
 auth = Authentication()
 
 # Getting Twitch username
