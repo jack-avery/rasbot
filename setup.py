@@ -2,6 +2,12 @@ import os
 from authentication import Authentication
 from definitions import DEFAULT_AUTHFILE,\
     AuthenticationDeniedError
+from update import check_requirements
+
+# Check for new requirements
+print("Running local requirements.txt...")
+check_requirements()
+print("All requirements installed.\n")
 
 # We don't want people to accidentally overwrite their current auth
 if os.path.isfile(DEFAULT_AUTHFILE):

@@ -108,9 +108,11 @@ def update_inner():
 
     # Check for new requirements
     print("Running requirements.txt...")
-    requirements = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/requirements.txt").text.split("\n")
-    for requirement in requirements:
-        pip_install(requirement)
+    requirements = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/requirements.txt").text
+    with open("requirements.txt",'w') as requirementsfile:
+        requirementsfile.write(requirements)
+
+    check_requirements()
     print("All requirements checked.\n")
 
     # Update readme
@@ -125,11 +127,13 @@ def update_inner():
     version = requests.get("https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text
     with open("version",'w') as versionfile:
         versionfile.write(version)
+
+def check_requirements():
+    with open("requirements.txt",'r') as requirementsfile:
+        requirements = requirementsfile.readlines()
     
-def pip_install(package:str):
-    """Attempts to install a package.
-    """
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--quiet"])
+    for package in requirements:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--quiet"])
 
 if __name__ == "__main__":
     check_cli()
