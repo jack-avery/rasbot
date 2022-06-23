@@ -1,5 +1,6 @@
 import importlib.util
 import re
+import threading
 import time
 from definitions import BUILTIN_COMMANDS,\
     VALID_COMMAND_REGEX,\
@@ -122,11 +123,13 @@ def command_del(name:str):
     except KeyError:
         raise CommandDoesNotExistError(f'command {name} does not exist')
 
-class BaseModule:
+class BaseModule(threading.Thread):
     """The base class for a Module, custom or not.
 
     Facilitates defaults for a Module so as to prevent errors.
     """
+    def __init__(self):
+        threading.Thread.__init__(self)
 
     def main(self, bot):
         """Code to be run for the modules' && code.
@@ -156,6 +159,7 @@ def module_add(name:str):
     spec.loader.exec_module(module)
 
     modules[name] = module.Module()
+    modules[name].start()
 
 def do_on_pubmsg_methods(bot):
     """Runs the on_pubmsg() of every Module imported from `./modules`.
@@ -176,3 +180,7 @@ command_modify("cmddel",0,"&cmddel&",True,False,True)
 command_modify("prefix",0,"&prefix&",True,False,True)
 command_modify("debugechofull",0,"&debugechofull&",True,True,True)
 command_modify("debugmsgcount",0,"&debugmsgcount&",True,True,True)
+
+# Using a repeating timer can cause issues when using CTRL+C to close the program
+# So let's leave this one out and keep it as an example.
+# command_modify("debugseccount",0,"&debugseccount&",True,True,True)

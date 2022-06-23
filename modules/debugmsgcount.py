@@ -4,6 +4,8 @@ from commands import BaseModule
 
 class Module(BaseModule):
     def __init__(self):
+        # Make sure you call BaseModule init if overriding!
+        BaseModule.__init__(self)
         self.count = 0
 
     # Show the amount of messages since the bot started
