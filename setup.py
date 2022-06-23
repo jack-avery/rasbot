@@ -1,12 +1,17 @@
 import os
+import sys
+import subprocess
 from authentication import Authentication
 from definitions import DEFAULT_AUTHFILE,\
     AuthenticationDeniedError
-from update import check_requirements
 
 # Check for new requirements
 print("Running local requirements.txt...")
-check_requirements()
+with open("requirements.txt",'r') as requirementsfile:
+    requirements = requirementsfile.readlines()
+
+for package in requirements:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package, "--quiet"])
 print("All requirements installed.\n")
 
 # We don't want people to accidentally overwrite their current auth
