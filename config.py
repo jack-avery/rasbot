@@ -46,6 +46,8 @@ def write(bot):
 
     :param bot: The TwitchBot to write the config for.
     """
+    bot.log_debug(f"Writing configuration to {bot.cfgid}")
+
     # Append prefix to lines
     lines = list()
     lines.append(bot.prefix)

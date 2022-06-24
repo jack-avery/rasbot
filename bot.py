@@ -66,11 +66,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Instantiate commands module
         self.commands = commands
+        self.commands.setup(self)
 
         # Import commands
         for command in cfg["commands"]:
-            self.logger.debug(f'Importing command {" ".join(command)}')
-        
             # For some reason "False" doesn't eval to False.
             if command[2] == "False":
                 command[2] = False

@@ -86,6 +86,8 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
 
     :param ignore_builtin_check: Whether to ignore the built-in module check. Use at your own risk!
     '''
+    refs['bot'].log_debug(f'Importing command "{name} {cooldown} {requires_mod} {hidden} {response}"')
+
     # You cannot modify built-in commands
     if name in BUILTIN_COMMANDS and not ignore_builtin_check:
         raise CommandIsBuiltInError(f"attempt made to modify builtin command {name}")
@@ -130,6 +132,7 @@ class BaseModule(threading.Thread):
     """
     def __init__(self):
         threading.Thread.__init__(self)
+        self.helpmsg = 'No help message available for module.'
 
     def main(self, bot):
         """Code to be run for the modules' && code.
@@ -139,7 +142,7 @@ class BaseModule(threading.Thread):
     def help(self):
         """The help message when used with the `help` module.
         """
-        return f'No help message available for module.'
+        return self.helpmsg
 
     # Default per-message function.
     def on_pubmsg(self, bot):
@@ -154,6 +157,7 @@ def module_add(name:str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
+    refs['bot'].log_debug(f"Importing module {name}.py")
     spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -167,19 +171,28 @@ def do_on_pubmsg_methods(bot):
     for module in modules.values():
         module.on_pubmsg(bot)
 
-# Do not modify this! These are built-in commands, initialized on module import.
+def setup(bot):
+    """Set up this instance of commands
+    """
+    refs['bot'] = bot
+
+    # Do not modify this! These are built-in commands, initialized on module import.
+    command_modify("help",5,"&help&",False,False,True)
+    command_modify("uptime",5,"&uptime&",False,False,True)
+    command_modify("cmdadd",0,"&cmdadd&",True,False,True)
+    command_modify("cmddel",0,"&cmddel&",True,False,True)
+    command_modify("prefix",0,"&prefix&",True,False,True)
+    command_modify("debugechofull",0,"&debugechofull&",True,True,True)
+    command_modify("debugmsgcount",0,"&debugmsgcount&",True,True,True)
+    
+    refs['bot'].log_debug("Built-ins completed")
+
 commands = dict()
 commands_modules = list()
 modules = dict()
+refs = dict()
 command_re = re.compile(VALID_COMMAND_REGEX)
 module_re = re.compile(MODULE_MENTION_REGEX)
-command_modify("help",5,"&help&",False,False,True)
-command_modify("uptime",5,"&uptime&",False,False,True)
-command_modify("cmdadd",0,"&cmdadd&",True,False,True)
-command_modify("cmddel",0,"&cmddel&",True,False,True)
-command_modify("prefix",0,"&prefix&",True,False,True)
-command_modify("debugechofull",0,"&debugechofull&",True,True,True)
-command_modify("debugmsgcount",0,"&debugmsgcount&",True,True,True)
 
 # Using a repeating timer can cause issues when using CTRL+C to close the program
 # So let's leave this one out and keep it as an example.
