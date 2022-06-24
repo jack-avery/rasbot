@@ -130,9 +130,10 @@ class BaseModule(threading.Thread):
 
     Facilitates defaults for a Module so as to prevent errors.
     """
+    helpmsg = 'No help message available for module.'
+
     def __init__(self):
         threading.Thread.__init__(self)
-        self.helpmsg = 'No help message available for module.'
 
     def main(self, bot):
         """Code to be run for the modules' && code.

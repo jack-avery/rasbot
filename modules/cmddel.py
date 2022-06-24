@@ -9,6 +9,8 @@ from definitions import VALID_COMMAND_REGEX,\
 import config
 
 class Module(BaseModule):
+    helpmsg = 'Deletes an existing command. Usage: cmddel <name>.'
+
     def main(self,bot):
         cmd = bot.cmdargs
 
@@ -26,6 +28,3 @@ class Module(BaseModule):
 
         except CommandGivenInvalidNameError:
             return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
-
-    def help(self):
-        return 'Deletes an existing command. Usage: cmddel <name>.'

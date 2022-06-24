@@ -4,6 +4,8 @@
 from commands import BaseModule
 
 class Module(BaseModule):
+    helpmsg = 'Prints all available commands, or, if provided a method, prints the help message for that method. Usage: help <method?>'
+
     def main(self,bot):
         # If no command is provided, just run the base help message.
         if len(bot.cmdargs) == 0:
@@ -20,6 +22,3 @@ class Module(BaseModule):
             
             else:
                 return f'Module {module} not found.'
-
-    def help(self):
-        return 'Prints all available commands, or, if provided a method, prints the help message for that method. Usage: help <method?>'

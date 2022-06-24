@@ -11,6 +11,8 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandMustHavePositiveCooldownError
 
 class Module(BaseModule):
+    helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown> <mod-only?> <hidden?> <response>.'
+
     def main(self, bot):
         try:
             cmd = bot.cmdargs[:]
@@ -53,6 +55,3 @@ class Module(BaseModule):
 
         except ValueError:
             return 'Cooldown must be a positive integer.'
-
-    def help(self):
-        return 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown> <mod-only?> <hidden?> <response>.'

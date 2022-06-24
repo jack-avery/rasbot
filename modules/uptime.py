@@ -5,6 +5,8 @@ from commands import BaseModule
 import requests, datetime, time
 
 class Module(BaseModule):
+    helpmsg = 'Returns the current stream uptime. Usage: uptime'
+
     def main(self, bot):
         r = requests.get(f"https://api.twitch.tv/helix/streams?user_id={bot.channel_id}", headers=bot.auth.get_headers()).json()
         try:
@@ -29,6 +31,3 @@ class Module(BaseModule):
         h=round((m-m%60)/60)
         
         return f'Uptime: {h} hours {m%60} minutes {round(s%60)} seconds.'
-
-    def help(self):
-        return 'Returns the current stream uptime. Usage: uptime'

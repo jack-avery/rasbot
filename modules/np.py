@@ -7,12 +7,11 @@ from commands import BaseModule
 from definitions import PATH_TO_STREAMCOMPANION_NP_FILE
 
 class Module(BaseModule):
+    helpmsg = 'Prints "Now Playing" information from a configured file. Usage: np'
+
     def main(self,bot):
         try:
             with open(PATH_TO_STREAMCOMPANION_NP_FILE,'r') as file:
                 return f'{file.readlines()[0]}'
         except (FileNotFoundError, IndexError):
             return 'No NP data found.'
-
-    def help(self):
-        return 'Prints "Now Playing" information from a configured file. Usage: np'

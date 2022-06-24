@@ -6,6 +6,8 @@ import config
 from definitions import DEFAULT_PREFIX
 
 class Module(BaseModule):
+    helpmsg = f'Sets a new prefix for the bot. Default is {DEFAULT_PREFIX}. Usage: prefix <prefix?>'
+
     def main(self, bot):
         if len(bot.cmdargs) == 0:
             newprefix = DEFAULT_PREFIX
@@ -18,6 +20,3 @@ class Module(BaseModule):
         bot.prefix = newprefix
         config.write(bot)
         return f'Prefix updated to {newprefix}.'
-
-    def help(self):
-        return f'Sets a new prefix for the bot. Default is {DEFAULT_PREFIX}. Usage: prefix <prefix?>'

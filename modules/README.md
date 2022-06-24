@@ -10,8 +10,8 @@ The code to run on command goes in a method called `main` that accepts **one** a
 The argument being passed is the `TwitchBot` object, including all variables attached.
 >Whatever it returns will be sent to chat.
 
-Your module can have a help message, returned from the `help` method.
-Whatever it returns will be returned if the method is provided as an argument for the `help` command.
+Your module can have a help message, stored in the `helpmsg` variable.
+Whatever it contains will be shown if the method is provided as an argument for the `help` command.
 >Example: `r!help thing` would print the help message for `thing.py`, if it exists.
 
 Otherwise, you're free to add whatever you want to the module, as long as you know how to code it.
