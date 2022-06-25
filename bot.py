@@ -70,12 +70,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import commands
         for command in cfg["commands"]:
-            # For some reason "False" doesn't eval to False.
-            if command[2] == "False":
-                command[2] = False
-
-            if command[3] == "False":
-                command[3] = False
+            # Evaluate modonly/hidden flags
+            for i in range(2):
+                if command[i+2] == "False":
+                    command[i+2] = False
+                elif command[i+2] == "True":
+                    command[i+2] = True
+                else:
+                    self.logger.error(f"Command {command[0]} might have imported incorrectly: invalid flag?")
 
             self.commands.command_modify(command[0],command[1]," ".join(command[4:]),command[2],command[3])
 
