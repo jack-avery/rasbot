@@ -99,11 +99,17 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
     # Command must match the regex defined by VALID_COMMAND_REGEX
     if not command_re.match(name):
         raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
+
+    if len(response) == 0:
+        raise Command
     
     # Resolve any modules the command mentions and import new ones
     for m in module_re.findall(response):
         if m not in modules.keys():
-            module_add(m)
+            try:
+                module_add(m)
+            except ModuleNotFoundError as err:
+                raise err
 
     commands[name] = Command(name,cooldown,response,requires_mod,hidden)
 
@@ -159,12 +165,16 @@ def module_add(name:str):
     :param name: The name of the module. File must be visible in the modules folder.
     '''
     refs['bot'].log_debug(f"Importing module {name}.py")
-    spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
 
-    modules[name] = module.Module()
-    modules[name].start()
+    try:
+        spec = importlib.util.spec_from_file_location(f"{name}",f"modules/{name}.py")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        modules[name] = module.Module()
+        modules[name].start()
+    except FileNotFoundError:
+        raise ModuleNotFoundError(f"{name} does not exist in modules folder")
 
 def do_on_pubmsg_methods(bot):
     """Runs the on_pubmsg() of every Module imported from `./modules`.

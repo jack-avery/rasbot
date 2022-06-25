@@ -48,6 +48,3 @@ class CommandDoesNotExistError(Exception):pass
 class CommandIsModOnlyError(Exception):pass
 class CommandMustHavePositiveCooldownError(Exception):pass
 class CommandGivenInvalidNameError(Exception):pass
-
-# Module-related errors
-class ModuleImportError(Exception):pass

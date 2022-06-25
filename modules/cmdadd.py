@@ -55,3 +55,6 @@ class Module(BaseModule):
 
         except ValueError:
             return 'Cooldown must be a positive integer.'
+        
+        except ModuleNotFoundError as err:
+            return f'Module {err}.'
