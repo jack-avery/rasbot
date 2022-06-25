@@ -15,11 +15,13 @@ Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot
 
 # How to Use
 1. Download and install [Python version 3.10.0+](https://www.python.org/downloads/)
+> Some users have expressed issues if it is not added to the path variables.
+> You can open the installer again to modify your installation and add it to the path.
 2. Download the Source Code:
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot` <br/>
 > Or, click on **Code** and **Download ZIP**.
 3. Run `setup.py` and follow the steps to set up your authentication.
-4. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to: 
+4. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to:
 ```
 Joined #raspy_on_osu! (57511738)
 ```
@@ -45,7 +47,7 @@ Valid parameters include:<br/>
 `-modonly`: Set the command to be moderator/broadcaster use only.<br/>
 `-hidden`: Set the command to be hidden from the `help` method.
 
-By default, a command's name must contain only alphanumeric characters and underscores.
+By default, a command's name must contain only lowercase characters and underscores.
 
 **Example**:
 ```
@@ -67,6 +69,13 @@ To use a modules' method in a command, encase the module name in `&` symbols, su
 # Setting up your authentication manually
 
 If `setup.py` doesn't work, here's how to do it manually...
+
+**To install the requirements for rasbot to run, you can run this command in the project directory:**
+```
+python -m pip install -r requirements.txt
+```
+> If it says something along the lines of "pip is not a module", make sure you added Python to the path.
+> You can check for this by re-opening the installer.
 
 **To have rasbot run properly, you need 5 things:**
 1. `user_id:` Your Twitch username.
