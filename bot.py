@@ -85,9 +85,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Resolve channel name
         if channel is None:
-            self.channel = "#"+self.authkeys['user_id']
+            self.channel = self.authkeys['user_id']
         else:
-            self.channel = "#"+channel
+            self.channel = channel
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
@@ -100,9 +100,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.cap('REQ', ':twitch.tv/membership')
         c.cap('REQ', ':twitch.tv/tags')
         c.cap('REQ', ':twitch.tv/commands')
-        c.join(self.channel)
+        c.join(f"#{self.channel}")
 
-        self.logger.info(f'Joined {self.channel}! ({self.channel_id})\n')
+        self.logger.info(f'Joined #{self.channel}! ({self.channel_id})\n')
 
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent.
@@ -150,7 +150,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     cmdresult = self.commands.commands[cmd].run(self)
 
                     # If there is a string result message, print it to chat
-                    if cmdresult:
+                    if cmdresult and cmdresult != "None":
                         self.send_message(f"{name} > {cmdresult}")
                 
                 # If the command is still on cooldown, do nothing.
