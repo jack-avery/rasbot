@@ -101,7 +101,7 @@ def command_modify(name:str, cooldown:int = 5, response:str = '', requires_mod:b
         raise CommandGivenInvalidNameError(f"command provided invalid name {name}")
 
     if len(response) == 0:
-        raise Command
+        refs['bot'].log_error(f"Command {name} might have imported incorrectly: empty response?")
     
     # Resolve any modules the command mentions and import new ones
     for m in module_re.findall(response):
