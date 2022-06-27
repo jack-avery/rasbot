@@ -151,7 +151,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
                     # If there is a string result message, print it to chat
                     if cmdresult and cmdresult != "None":
-                        self.send_message(f"{name} > {cmdresult}")
+                        self.send_message(f"{cmdresult}")
                 
                 # If the command is still on cooldown, do nothing.
                 # If the command is mod-only and a non-mod calls it, do nothing.

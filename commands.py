@@ -188,13 +188,11 @@ def setup(bot):
     refs['bot'] = bot
 
     # Do not modify this! These are built-in commands, initialized on module import.
-    command_modify("help",5,"&help&",False,False,True)
-    command_modify("uptime",5,"&uptime&",False,False,True)
-    command_modify("cmdadd",0,"&cmdadd&",True,False,True)
-    command_modify("cmddel",0,"&cmddel&",True,False,True)
-    command_modify("prefix",0,"&prefix&",True,False,True)
-    command_modify("debugechofull",0,"&debugechofull&",True,True,True)
-    command_modify("debugmsgcount",0,"&debugmsgcount&",True,True,True)
+    command_modify("help",5,"&caller& > &help&",False,False,True)
+    command_modify("uptime",5,"&caller& > &uptime&",False,False,True)
+    command_modify("cmdadd",0,"&caller& > &cmdadd&",True,False,True)
+    command_modify("cmddel",0,"&caller& > &cmddel&",True,False,True)
+    command_modify("prefix",0,"&caller& > &prefix&",True,False,True)
     
     refs['bot'].log_debug("Built-ins completed")
 
@@ -204,7 +202,3 @@ modules = dict()
 refs = dict()
 command_re = re.compile(VALID_COMMAND_REGEX)
 module_re = re.compile(MODULE_MENTION_REGEX)
-
-# Using a repeating timer can cause issues when using CTRL+C to close the program
-# So let's leave this one out and keep it as an example.
-# command_modify("debugseccount",0,"&debugseccount&",True,True,True)

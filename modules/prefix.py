@@ -15,7 +15,7 @@ class Module(BaseModule):
             newprefix = bot.cmdargs[0].lower()
         
         if newprefix.startswith('/'):
-            return f'Prefix start with Twitch reserved character /.'
+            return f'Prefix cannot start with Twitch reserved character /.'
         
         bot.prefix = newprefix
         config.write(bot)

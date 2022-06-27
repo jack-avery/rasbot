@@ -7,8 +7,11 @@
 # Definitions
 ##
 
-BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix','debugechofull','debugmsgcount']
-"""Built-in commands."""
+BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix']
+"""Built-in commands. Used to prevent users from overwriting built-ins."""
+
+BUILTIN_COMMAND_MODULES = ['help','uptime','cmdadd','cmddel','prefix','debugechofull','debugmsgcount', 'target', 'caller']
+"""Built-in command modules. Used for the autoupdate function."""
 
 BUILTIN_MODULES = ['authentication','bot','commands','config','definitions','refresh_oauth','run','update','setup']
 """Built-in modules. Used for the autoupdate function."""

@@ -2,7 +2,7 @@ import subprocess
 import sys
 import requests
 import click
-from definitions import BUILTIN_COMMANDS,\
+from definitions import BUILTIN_COMMAND_MODULES, BUILTIN_COMMANDS,\
     BUILTIN_MODULES
 
 @click.command()
@@ -88,7 +88,7 @@ def update_first():
 
 def update_inner():
     # Update commands
-    for command in BUILTIN_COMMANDS:
+    for command in BUILTIN_COMMAND_MODULES:
         print(f"Updating built-in method {command}...")
         text = requests.get(f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/modules/{command}.py").text
         
