@@ -150,7 +150,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     cmdresult = self.commands.commands[cmd].run(self)
 
                     # If there is a string result message, print it to chat
-                    if cmdresult:
+                    if cmdresult and cmdresult != "None":
                         self.send_message(f"{name} > {cmdresult}")
                 
                 # If the command is still on cooldown, do nothing.
