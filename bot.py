@@ -87,7 +87,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         if channel is None:
             self.channel = self.authkeys['user_id']
         else:
-            self.channel = channel
+            self.channel = f"#{channel}"
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
@@ -100,9 +100,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.cap('REQ', ':twitch.tv/membership')
         c.cap('REQ', ':twitch.tv/tags')
         c.cap('REQ', ':twitch.tv/commands')
-        c.join(f"#{self.channel}")
+        c.join(f"{self.channel}")
 
-        self.logger.info(f'Joined #{self.channel}! ({self.channel_id})\n')
+        self.logger.info(f'Joined {self.channel}! ({self.channel_id})\n')
 
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent.
