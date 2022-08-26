@@ -2,6 +2,7 @@
 
 from commands import BaseModule
 
+
 class Module(BaseModule):
     # Echo the user's message back to them
     def main(self, bot):

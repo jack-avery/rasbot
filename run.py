@@ -3,6 +3,7 @@ import click
 from bot import TwitchBot
 from authentication import Authentication
 
+
 @click.command()
 @click.option(
     "--channel",
@@ -21,7 +22,7 @@ from authentication import Authentication
     help="Have this instance be verbose about actions.",
     default=False
 )
-def run(channel=None,auth=None,cfg=None,debug=False):
+def run(channel=None, auth=None, cfg=None, debug=False):
     auth = Authentication(auth)
 
     if channel is None:
@@ -30,11 +31,12 @@ def run(channel=None,auth=None,cfg=None,debug=False):
     # Resolve ID from channel name
     url = f"https://api.twitch.tv/helix/users?login={channel}"
     r = requests.get(url, headers=auth.get_headers()).json()
-    channel_id=int(f"{r['data'][0]['id']}")
+    channel_id = int(f"{r['data'][0]['id']}")
 
     # Start the bot
-    tb = TwitchBot(auth,channel_id,channel,cfg,debug)
+    tb = TwitchBot(auth, channel_id, channel, cfg, debug)
     tb.start()
+
 
 if __name__ == "__main__":
     run()

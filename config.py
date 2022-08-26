@@ -5,6 +5,7 @@
 
 from definitions import BUILTIN_COMMANDS, DEFAULT_PREFIX
 
+
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
 
@@ -12,9 +13,9 @@ def read(cfgid) -> dict:
     """
     # Attempt to read config
     try:
-        with open(cfgid,'r') as cfg:
+        with open(cfgid, 'r') as cfg:
             lines = cfg.readlines()
-    
+
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
@@ -26,7 +27,7 @@ def read(cfgid) -> dict:
         return config
 
     # Removing newlines
-    for i,line in enumerate(lines):
+    for i, line in enumerate(lines):
         lines[i] = line[:-1]
 
     # Append prefix to dict
@@ -41,6 +42,7 @@ def read(cfgid) -> dict:
 
     return config
 
+
 def write(bot):
     """Writes the config file for the given TwitchBot.
 
@@ -53,23 +55,25 @@ def write(bot):
     lines.append(bot.prefix)
 
     # Adding commands
-    for name,command in bot.commands.commands.items():
+    for name, command in bot.commands.commands.items():
         # The builtins are already added each init
         if name not in BUILTIN_COMMANDS:
-            lines.append(f"{name} {command.cooldown} {command.requires_mod} {command.hidden} {command.response}")
+            lines.append(
+                f"{name} {command.cooldown} {command.requires_mod} {command.hidden} {command.response}")
 
     # Adding newlines
-    for i,line in enumerate(lines):
+    for i, line in enumerate(lines):
         lines[i] = line+"\n"
 
     # Writing config
-    with open(bot.cfgid,'w') as cfg:
+    with open(bot.cfgid, 'w') as cfg:
         cfg.writelines(lines)
+
 
 def create_default(cfgid):
     """Creates the default config for a new user.
 
     :param cfgid: The path to the channel's config.
     """
-    with open(cfgid,'w') as cfg:
+    with open(cfgid, 'w') as cfg:
         cfg.writelines([f'{DEFAULT_PREFIX}\n'])

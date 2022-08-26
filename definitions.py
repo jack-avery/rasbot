@@ -7,13 +7,15 @@
 # Definitions
 ##
 
-BUILTIN_COMMANDS = ['help','uptime','cmdadd','cmddel','prefix']
+BUILTIN_COMMANDS = ['help', 'uptime', 'cmdadd', 'cmddel', 'prefix']
 """Built-in commands. Used to prevent users from overwriting built-ins."""
 
-BUILTIN_COMMAND_MODULES = ['help','uptime','cmdadd','cmddel','prefix','debugechofull','debugmsgcount', 'target', 'caller']
+BUILTIN_COMMAND_MODULES = ['help', 'uptime', 'cmdadd', 'cmddel',
+                           'prefix', 'debugechofull', 'debugmsgcount', 'target', 'caller']
 """Built-in command modules. Used for the autoupdate function."""
 
-BUILTIN_MODULES = ['authentication','bot','commands','config','definitions','refresh_oauth','run','update','setup']
+BUILTIN_MODULES = ['authentication', 'bot', 'commands', 'config',
+                   'definitions', 'refresh_oauth', 'run', 'update', 'setup']
 """Built-in modules. Used for the autoupdate function."""
 
 VALID_COMMAND_REGEX = r'[a-z0-9_]+'
@@ -42,12 +44,33 @@ PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/
 ##
 
 # Authentication-related errors
-class AuthenticationDeniedError(Exception):pass
+
+
+class AuthenticationDeniedError(Exception):
+    pass
 
 # Command-related errors
-class CommandStillOnCooldownError(Exception):pass
-class CommandIsBuiltInError(Exception):pass
-class CommandDoesNotExistError(Exception):pass
-class CommandIsModOnlyError(Exception):pass
-class CommandMustHavePositiveCooldownError(Exception):pass
-class CommandGivenInvalidNameError(Exception):pass
+
+
+class CommandStillOnCooldownError(Exception):
+    pass
+
+
+class CommandIsBuiltInError(Exception):
+    pass
+
+
+class CommandDoesNotExistError(Exception):
+    pass
+
+
+class CommandIsModOnlyError(Exception):
+    pass
+
+
+class CommandMustHavePositiveCooldownError(Exception):
+    pass
+
+
+class CommandGivenInvalidNameError(Exception):
+    pass

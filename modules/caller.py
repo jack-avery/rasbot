@@ -3,8 +3,9 @@
 
 from commands import BaseModule
 
+
 class Module(BaseModule):
     helpmsg = 'Returns the name of the caller.'
 
-    def main(self,bot):
+    def main(self, bot):
         return bot.caller_name

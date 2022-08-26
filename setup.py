@@ -6,7 +6,8 @@ from definitions import DEFAULT_AUTHFILE,\
 
 # Check for new requirements
 print("Running local requirements.txt...")
-subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+subprocess.check_call([sys.executable, "-m", "pip",
+                      "install", "-r", "requirements.txt"])
 print("All requirements installed.\n")
 
 # We don't want people to accidentally overwrite their current auth
@@ -50,7 +51,7 @@ print("\nAlmost done! Now, go to twitchapps.com/tmi/ and log in.")
 
 # Making sure the key is stripped
 irc_oauth = input("Enter the text it gives you: ")
-if "oauth:" in irc_oauth: 
+if "oauth:" in irc_oauth:
     irc_oauth = irc_oauth[irc_oauth.find(":")+1:]
 
 # Adding all the info to the auth

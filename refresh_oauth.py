@@ -2,6 +2,7 @@ import click
 from authentication import Authentication
 from definitions import AuthenticationDeniedError
 
+
 @click.command()
 @click.option(
     "--auth",
@@ -18,7 +19,9 @@ def refresh_oauth(auth):
         exit()
 
     a.write_authfile()
-    input(f"Your new OAuth token has been written to {a.file}. You may close this window.")
+    input(
+        f"Your new OAuth token has been written to {a.file}. You may close this window.")
+
 
 if __name__ == "__main__":
     refresh_oauth()

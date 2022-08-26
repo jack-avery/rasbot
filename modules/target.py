@@ -3,10 +3,11 @@
 
 from commands import BaseModule
 
+
 class Module(BaseModule):
     helpmsg = 'Returns a mentioned user. If no user is mentioned, returns the caller.'
 
-    def main(self,bot):
+    def main(self, bot):
         if len(bot.cmdargs) == 0:
             return bot.caller_name
 

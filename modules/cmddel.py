@@ -8,16 +8,17 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandGivenInvalidNameError
 import config
 
+
 class Module(BaseModule):
     helpmsg = 'Deletes an existing command. Usage: cmddel <name>.'
 
-    def main(self,bot):
+    def main(self, bot):
         cmd = bot.cmdargs
 
         try:
             bot.commands.command_del(cmd[0].lower())
             config.write(bot)
-            
+
             return f'Command {cmd[0]} removed successfully.'
 
         except CommandIsBuiltInError:
