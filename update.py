@@ -2,8 +2,7 @@ import subprocess
 import sys
 import requests
 import click
-from definitions import BUILTIN_COMMAND_MODULES, BUILTIN_COMMANDS,\
-    BUILTIN_MODULES
+from definitions import BUILTIN_COMMAND_MODULES, BUILTIN_MODULES
 
 
 @click.command()
