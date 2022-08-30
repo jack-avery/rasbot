@@ -2,6 +2,7 @@ import importlib.util
 import re
 import threading
 import time
+
 from definitions import BUILTIN_COMMANDS,\
     VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
@@ -11,11 +12,6 @@ from definitions import BUILTIN_COMMANDS,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
     CommandStillOnCooldownError
-
-###
-#   rasbot commands module
-#   raspy#0292 - raspy_on_osu
-###
 
 
 class Command:

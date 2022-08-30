@@ -1,9 +1,5 @@
-###
-#   rasbot authentication module
-#   raspy#0292 - raspy_on_osu
-###
-
 import requests
+
 from definitions import DEFAULT_AUTHFILE,\
     AuthenticationDeniedError
 

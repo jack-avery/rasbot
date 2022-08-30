@@ -1,8 +1,3 @@
-###
-#   rasbot config management module
-#   raspy#0292 - raspy_on_osu
-###
-
 from definitions import BUILTIN_COMMANDS, DEFAULT_PREFIX
 
 

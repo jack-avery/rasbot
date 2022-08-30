@@ -1,18 +1,14 @@
-###
-#   rasbot main twitch bot module
-#   raspy#0292 - raspy_on_osu
-###
-
+import click
+import config
+import irc.bot
 import logging
+import requests
 import sys
 import traceback
-import irc.bot
+
 import commands
-import config
 import update
-import click
 from authentication import Authentication
-import requests
 from definitions import CommandIsModOnlyError,\
     CommandStillOnCooldownError,\
     AuthenticationDeniedError

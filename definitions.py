@@ -1,8 +1,3 @@
-###
-#   rasbot definitions module
-#   raspy#0292 - raspy_on_osu
-###
-
 ##
 # Definitions
 ##
