@@ -57,7 +57,7 @@ def check(silent=False, force=False, l=False):
         "https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text)
 
     if current < latest:
-        prompt(latest-current)
+        prompt()
     else:
         if not silent:
             input("\nrasbot is up to date. You may close this window.")
