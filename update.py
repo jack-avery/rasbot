@@ -2,6 +2,7 @@ import subprocess
 import sys
 import requests
 import click
+import semantic_version
 from definitions import BUILTIN_COMMAND_MODULES, BUILTIN_MODULES
 
 
@@ -42,7 +43,7 @@ def check(silent=False, force=False, l=False):
 
     with open('version', 'r') as verfile:
         try:
-            current = int(verfile.read())
+            current = semantic_version.Version(verfile.read())
         except ValueError:
             if not silent:
                 input(
@@ -52,7 +53,7 @@ def check(silent=False, force=False, l=False):
     if not silent:
         print(f"You are running on rasbot version: {current}")
 
-    latest = int(requests.get(
+    latest = semantic_version.Version(requests.get(
         "https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text)
 
     if current < latest:
@@ -62,14 +63,12 @@ def check(silent=False, force=False, l=False):
             input("\nrasbot is up to date. You may close this window.")
 
 
-def prompt(diff: int):
+def prompt():
     """Prompts the user to update rasbot.
-
-    :param diff: How many versions the user is running out of date.
     """
     print("--")
     print(
-        f"HEY! Your version of rasbot is running {diff} version(s) out of date!")
+        f"HEY! Your version of rasbot is running out of date!")
     print("Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with.")
     print("--\n")
 
