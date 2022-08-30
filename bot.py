@@ -32,9 +32,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         :param debug: Whether the bot should be verbose about actions.
         """
-        # Check for updates first!
-        update.check(True)
-
         # Set up logging
         if debug:
             logmode = logging.DEBUG
@@ -223,6 +220,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     default=False
 )
 def run(channel=None, auth=None, cfg=None, debug=False):
+    # Check for updates first!
+    update.check(True)
+
     auth = Authentication(auth)
 
     if channel is None:
