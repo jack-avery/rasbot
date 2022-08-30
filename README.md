@@ -21,14 +21,14 @@ Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot` <br/>
 > Or, click on **Code** and **Download ZIP**.
 3. Run `setup.py` and follow the steps to set up your authentication.
-4. Run `run.py`. If you set up rasbot correctly, it will log some information and print something similar to:
+4. Run `bot.py`. If you set up rasbot correctly, it will log some information and print something similar to:
 ```
 Joined #raspy_on_osu! (57511738)
 ```
 
 > If `setup.py` fails, see "Setting up your authentication manually".
 
-**rasbot will automatically check for updates every time you run `run.py`.**
+**rasbot will automatically check for updates every time you run `bot.py`.**
 You can check for updates manually by running update.py, and force a reinstallation of built-in modules using the command:
 ```
 update.py --force
