@@ -10,7 +10,7 @@ class Module(BaseModule):
     helpmsg = f'Sets a new prefix for the bot. Default is {DEFAULT_PREFIX}. Usage: prefix <prefix?>'
 
     def main(self, bot):
-        if len(bot.cmdargs) == 0:
+        if not bot.cmdargs:
             newprefix = DEFAULT_PREFIX
         else:
             newprefix = bot.cmdargs[0].lower()

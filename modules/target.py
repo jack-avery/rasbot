@@ -8,7 +8,7 @@ class Module(BaseModule):
     helpmsg = 'Returns a mentioned user. If no user is mentioned, returns the caller.'
 
     def main(self, bot):
-        if len(bot.cmdargs) == 0:
+        if not bot.cmdargs:
             return bot.caller_name
 
         user = bot.cmdargs[0]

@@ -106,7 +106,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
         raise CommandGivenInvalidNameError(
             f"command provided invalid name {name}")
 
-    if len(response) == 0:
+    if not response:
         refs['bot'].log_error(
             f"Command {name} might have imported incorrectly: empty response?")
 

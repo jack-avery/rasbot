@@ -58,4 +58,4 @@ class Module(BaseModule):
             return 'Cooldown must be a positive integer.'
 
         except ModuleNotFoundError as err:
-            return f'Module {err}.'
+            return f'Module {err} does not exist.'
