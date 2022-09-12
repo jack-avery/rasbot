@@ -5,7 +5,7 @@ from commands import BaseModule
 
 
 class Module(BaseModule):
-    helpmsg = 'Returns the name of the caller.'
+    helpmsg = "Returns the display name of the last messages' author."
 
     def main(self, bot):
-        return bot.caller_name
+        return bot.author_name

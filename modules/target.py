@@ -5,11 +5,11 @@ from commands import BaseModule
 
 
 class Module(BaseModule):
-    helpmsg = 'Returns a mentioned user. If no user is mentioned, returns the caller.'
+    helpmsg = "Returns a mentioned user. If no user is mentioned, returns the last messages' author."
 
     def main(self, bot):
         if not bot.cmdargs:
-            return bot.caller_name
+            return bot.author_name
 
         user = bot.cmdargs[0]
         if user[0] == "@":

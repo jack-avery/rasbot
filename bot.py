@@ -15,7 +15,7 @@ from definitions import CommandIsModOnlyError,\
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, auth, channel_id: int, channel: str = None, cfgid: int = None, debug: bool = False):
+    def __init__(self, auth, channel_id: int, channel: str, cfgid: int = None, debug: bool = False):
         """Create a new instance of a Twitch bot.
 
         :param auth: The Authentication object to use.
@@ -44,6 +44,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         stdout_handler.setFormatter(stdout_formatter)
         self.logger.addHandler(stdout_handler)
 
+        # Initialize authentication
         self.auth = auth
         self.authkeys = self.auth.get_auth()
         self.channel_id = channel_id
@@ -51,11 +52,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info(f"Starting as {self.authkeys['user_id']}...")
 
         # Import channel info
-        if cfgid is None:
-            self.cfgid = f"_{self.channel_id}.txt"
-        else:
-            self.cfgid = cfgid
-
+        self.cfgid = cfgid
         self.logger.info(f"Reading config from {self.cfgid}...")
 
         cfg = config.read(self.cfgid)
@@ -67,14 +64,15 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.commands = commands
         self.commands.setup(self)
 
-        # Import commands
+        # Import commands from config
         for command in cfg["commands"]:
             # Evaluate modonly/hidden flags
             for i in range(2):
-                if command[i+2] == "False":
-                    command[i+2] = False
-                elif command[i+2] == "True":
-                    command[i+2] = True
+                i += 2  # Match indices
+                if command[i] == "False":
+                    command[i] = False
+                elif command[i] == "True":
+                    command[i] = True
                 else:
                     self.logger.error(
                         f"Command {command[0]} might have imported incorrectly: invalid flag?")
@@ -84,11 +82,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         self.logger.info(f"Imported {len(cfg['commands'])} custom command(s)")
 
-        # Resolve channel name
-        if channel is None:
-            self.channel = self.authkeys['user_id']
-        else:
-            self.channel = f"#{channel}"
+        # Set channel name
+        self.channel = f"#{channel}"
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
@@ -110,58 +105,62 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent.
         """
-        # Resolving username and mod status
-        for i in e.tags:
-            if i['key'] == "display-name":
-                name = str.lower(i['value'])
+        # Recomprehend tags into something usable
+        e.tags = {i["key"]: i["value"] for i in e.tags}
 
-            if i['key'] == "mod":
-                ismod = i['value']
+        # Grab display name, userid and mod status
+        name = str.lower(e.tags["display-name"])
+        uid = int(e.tags['user-id'])
+        ismod = int(e.tags['mod'])
 
-        # Setting mod status to a bool and giving broadcaster moderator priveleges
-        if ismod == '1' or name.lower() == self.channel.lower()[1:]:
+        # Giving broadcaster moderator priveleges
+        if uid == self.channel_id:
             ismod = True
-        else:
-            ismod = False
+        else:  # Else just set it to a bool
+            ismod = bool(ismod)
 
-        self.caller_name = name
-        self.caller_ismod = ismod
+        # For use within modules
+        self.author_name = name
+        self.author_uid = uid
+        self.author_ismod = ismod
 
         # Reading the message
-        self.msg = str(e.arguments)
-        self.msg_split = self.msg[2:-2].split(' ')
+        self.msg = e.arguments[0]
+        self.msg_split = self.msg.split(' ')
 
         try:
             # Do per-message methods
             self.commands.do_on_pubmsg_methods(self)
 
-            # If the message starts with the command prefix...
-            if self.msg_split[0][:len(self.prefix)].lower() == self.prefix:
-                # Isolating command and command arguments
-                # Verify that it's actually a command before continuing.
-                cmd = self.msg_split[0][len(self.prefix):].lower()
-                if cmd not in self.commands.commands:
-                    self.logger.debug(
-                        f"Ignoring invalid command call '{cmd}' from {self.caller_name} (mod:{self.caller_ismod})")
-                    return
+            # Don't continue if the message doesn't start with the prefix.
+            if not self.msg.startswith(self.prefix):
+                return
 
-                # Isolate command arguments from command
-                self.cmdargs = self.msg_split[1:]
+            # Isolating command and command arguments
+            # Verify that it's actually a command before continuing.
+            cmd = self.msg_split[0][len(self.prefix):].lower()
+            if cmd not in self.commands.commands:
+                self.logger.debug(
+                    f"Ignoring invalid command call '{cmd}' from {self.author_name} (mod:{self.author_ismod})")
+                return
 
-                try:
-                    # Run the command and string result message
-                    self.logger.info(
-                        f"Running command call '{cmd}' from {self.caller_name} (mod:{self.caller_ismod}) (args:{self.cmdargs})")
-                    cmdresult = self.commands.commands[cmd].run(self)
+            # Isolate command arguments from command
+            self.cmdargs = self.msg_split[1:]
 
-                    # If there is a string result message, print it to chat
-                    if cmdresult and cmdresult != "None":
-                        self.send_message(f"{cmdresult}")
+            try:
+                # Run the command and string result message
+                self.logger.info(
+                    f"Running command call '{cmd}' from {self.author_name} (mod:{self.author_ismod}) (args:{self.cmdargs})")
+                cmdresult = self.commands.commands[cmd].run(self)
 
-                # If the command is still on cooldown, do nothing.
-                # If the command is mod-only and a non-mod calls it, do nothing.
-                except (CommandStillOnCooldownError, CommandIsModOnlyError) as err:
-                    self.logger.info(f"{err}")
+                # If there is a string result message, print it to chat
+                if cmdresult and cmdresult != "None":
+                    self.send_message(f"{cmdresult}")
+
+            # If the command is still on cooldown, do nothing.
+            # If the command is mod-only and a non-mod calls it, do nothing.
+            except (CommandStillOnCooldownError, CommandIsModOnlyError) as err:
+                self.logger.info(f"{err}")
 
         except Exception as err:
             self.send_message(f'An error occurred in the processing of your request: {str(err)}. '
@@ -169,7 +168,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             traceback.print_exc()
 
     def send_message(self, message: str):
-        """Sends a message. For easy use within modules.
+        """Sends a message to the public chat. For easy use within modules.
 
         :param message: The message to send.
         """
@@ -215,13 +214,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     help="Have this instance be verbose about actions.",
     default=False
 )
-def run(channel=None, auth=None, cfg=None, debug=False):
+def run(channel=None, auth=None, cfgid=None, debug=False):
     # Check for updates first!
     update.check(True)
 
     auth = Authentication(auth)
 
-    if channel is None:
+    if not channel:
         channel = auth.get_auth()['user_id']
 
     # Resolve ID from channel name
@@ -244,8 +243,11 @@ def run(channel=None, auth=None, cfg=None, debug=False):
                     input("This error is unrecoverable. rasbot will now exit.")
                     exit(1)
 
+    if not cfgid:
+        cfgid = f"_{channel_id}.txt"
+
     # Start the bot
-    tb = TwitchBot(auth, channel_id, channel, cfg, debug)
+    tb = TwitchBot(auth, channel_id, channel, cfgid, debug)
     tb.start()
 
 
