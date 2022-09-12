@@ -23,7 +23,7 @@ class Authentication:
 
         oauth:<twitch_oauth>
         """
-        if file is None:
+        if not file:
             self.file = DEFAULT_AUTHFILE
         else:
             self.file = file

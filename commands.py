@@ -47,9 +47,9 @@ class Command:
                 f"command {self.name} called while still on cooldown")
 
         # Do not allow non-moderators to use mod-only commands
-        if not bot.caller_ismod and self.requires_mod:
+        if not bot.author_ismod and self.requires_mod:
             raise CommandIsModOnlyError(
-                f"mod-only command {self.name} called by non-mod {bot.caller_name}")
+                f"mod-only command {self.name} called by non-mod {bot.author_name}")
 
         # Apply any methods encased in &&
         returned_response = self.response
