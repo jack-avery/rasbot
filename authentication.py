@@ -1,5 +1,6 @@
 import requests
 
+import setup
 from definitions import DEFAULT_AUTHFILE,\
     AuthenticationDeniedError
 
@@ -36,14 +37,16 @@ class Authentication:
         Assigns the read values to this `Authentication` objects' `auth` field.
         """
         # Attempting to read the auth file
-        try:
-            with open(self.file, 'r') as authfile:
-                authlines = authfile.readlines()
+        authlines = False
+        while not authlines:
+            try:
+                with open(self.file, 'r') as authfile:
+                    authlines = authfile.readlines()
 
-        # If not found, write the default and return
-        except FileNotFoundError:
-            self.create_default()
-            return
+            # If not found, write the default and return
+            except FileNotFoundError:
+                print("Authfile is missing. Running setup...")
+                setup.main(self.file)
 
         # Parsing the auth file into the auth dict
         self.auth = dict()
@@ -54,6 +57,13 @@ class Authentication:
             line = line.split(':')
             # Append to dict
             self.auth[line[0]] = line[1]
+
+        # Verify the auth has everything it needs...
+        if [k for k in self.auth.keys()] != ['user_id', 'client_id', 'client_secret', 'irc_oauth', 'oauth']:
+            print("Your authfile is missing crucial elements.")
+            print("You may need to re-run setup.py.")
+            input("rasbot cannot continue, exiting.")
+            exit()
 
     def write_authfile(self):
         """Writes to the authfile set by self.file.
@@ -67,17 +77,6 @@ class Authentication:
         with open(self.file, 'w') as authfile:
             authfile.writelines(authlines)
 
-    def create_default(self):
-        """Writes the default authfile.
-        """
-        self.auth = dict()
-        self.auth['user_id'] = "twitch username"
-        self.auth['client_id'] = "client id"
-        self.auth['client_secret'] = "client secret"
-        self.auth['irc_oauth'] = "irc oauth"
-
-        self.write_authfile()
-
     def get_auth(self):
         """Returns this `Authentication` objects' `auth` dict.
         """
@@ -85,14 +84,14 @@ class Authentication:
 
     def get_headers(self):
         """Returns headers.
-        For use in some queries, e.g. the `uptime` method.
+        For use in some queries, e.g. the `uptime` module.
         """
         return {'Client-ID': self.auth["client_id"],
                 'Authorization': f'Bearer {self.auth["oauth"]}',
                 'Accept': 'application/vnd.twitchtv.v5+json'}
 
-    def request_oauth(self):
-        """Returns a new OAuth key requested from twitch.
+    def refresh_oauth(self):
+        """Refreshes this authfiles' OAuth key.
         """
         # Request new oauth token from Twitch
         r = requests.post(f"https://id.twitch.tv/oauth2/token"
@@ -102,7 +101,8 @@ class Authentication:
 
         # Return the new OAuth key
         try:
-            return r['access_token']
+            self.auth['oauth'] = r['access_token']
+            self.write_authfile()
 
         # If it can't find the key...
         except KeyError:

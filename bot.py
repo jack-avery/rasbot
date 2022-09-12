@@ -214,7 +214,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     help="Have this instance be verbose about actions.",
     default=False
 )
-def run(channel=None, auth=None, cfgid=None, debug=False):
+def run(channel=None, auth=None, cfg=None, debug=False):
     # Check for updates first!
     update.check(True)
 
@@ -234,8 +234,7 @@ def run(channel=None, auth=None, cfgid=None, debug=False):
             if r['status'] == 401:
                 print("OAuth key is invalid or expired. Attempting a refresh...")
                 try:
-                    auth.auth['oauth'] = auth.request_oauth()
-                    auth.write_authfile()
+                    auth.refresh_oauth()
                 except AuthenticationDeniedError as err:
                     print(f"Authentication Denied: {err}")
                     print("Please ensure that your credentials are valid.")
@@ -243,11 +242,11 @@ def run(channel=None, auth=None, cfgid=None, debug=False):
                     input("This error is unrecoverable. rasbot will now exit.")
                     exit(1)
 
-    if not cfgid:
-        cfgid = f"_{channel_id}.txt"
+    if not cfg:
+        cfg = f"_{channel_id}.txt"
 
     # Start the bot
-    tb = TwitchBot(auth, channel_id, channel, cfgid, debug)
+    tb = TwitchBot(auth, channel_id, channel, cfg, debug)
     tb.start()
 
 
