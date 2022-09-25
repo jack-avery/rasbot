@@ -4,6 +4,7 @@
 from commands import BaseModule
 import config
 from definitions import VALID_COMMAND_REGEX,\
+    DEFAULT_COOLDOWN,\
     MODONLY_ARG,\
     HIDDEN_ARG,\
     CommandGivenInvalidNameError,\
@@ -19,7 +20,12 @@ class Module(BaseModule):
             cmd = bot.cmdargs[:]
 
             cmd_name = cmd.pop(0).lower()
-            cmd_cooldown = int(cmd.pop(0))
+
+            try:
+                cmd_cooldown = int(cmd[0])
+                cmd.pop(0)
+            except ValueError:
+                cmd_cooldown = DEFAULT_COOLDOWN
 
             if (cmd[0].lower() == MODONLY_ARG):
                 modonly = True
@@ -52,7 +58,7 @@ class Module(BaseModule):
             return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
 
         except IndexError:
-            return f'Please specify the name, cooldown in seconds, and response. Add {MODONLY_ARG} after the cooldown if you wish for the command to be mod-only.'
+            return f'Invalid usage.'
 
         except ValueError:
             return 'Cooldown must be a positive integer.'

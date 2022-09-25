@@ -22,6 +22,9 @@ MODULE_MENTION_REGEX = r'&([a-z0-9_]+)&'
 DEFAULT_PREFIX = "r!"
 """Default prefix for a new channel config."""
 
+DEFAULT_COOLDOWN = 5
+"""Default cooldown duration when none is specified."""
+
 DEFAULT_AUTHFILE = "_AUTH.txt"
 """Default authfile to use if none is provided as a commandline arg."""
 
