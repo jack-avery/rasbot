@@ -44,12 +44,12 @@ class Command:
         # Make sure the command is not on cooldown before doing anything
         if not time.time()-self.__last_used > self.cooldown:
             raise CommandStillOnCooldownError(
-                f"command {self.name} called while still on cooldown")
+                f"Command {self.name} called by {bot.author_name} while still on cooldown")
 
         # Do not allow non-moderators to use mod-only commands
         if not bot.author_ismod and self.requires_mod:
             raise CommandIsModOnlyError(
-                f"mod-only command {self.name} called by non-mod {bot.author_name}")
+                f"Mod-only command {self.name} called by non-mod {bot.author_name}")
 
         # Apply any methods encased in &&
         returned_response = self.response
@@ -62,7 +62,7 @@ class Command:
                 )
             except KeyError:
                 raise KeyError(
-                    f'command {self.name} calls unimported/nonexistent module {m}')
+                    f'Command {self.name} calls unimported/nonexistent module {m}')
 
         # Update the last usage time and return the response
         self.__last_used = time.time()
