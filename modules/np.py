@@ -4,7 +4,9 @@
 # Create a command using cmdadd with &np& as the response.
 
 from commands import BaseModule
-from definitions import PATH_TO_STREAMCOMPANION_NP_FILE
+
+PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
+"""Path to osu!StreamCompanion NP info file, for use in `methods/np.py`."""
 
 
 class Module(BaseModule):
