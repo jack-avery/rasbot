@@ -1,4 +1,4 @@
-# Creating your own custom method:
+# Creating your own custom module:
 **You can take a look at `modules/debugechofull.py` for an example**
 
 Name the file after your module like `modulename.py`.
