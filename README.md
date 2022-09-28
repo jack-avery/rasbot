@@ -40,4 +40,9 @@ Valid parameters include:<br/>
 # Modules 📦
 rasbot is designed modularly and allows you to add to the base application easily with *"plug-and-play"*-style extensions. You can see some sample modules, **including** built-in functions in the `modules` folder.
 
+To include a module as part of a command, encompass the module name in `&`, e.g.:
+```
+r!cmdadd np &np&
+```
+
 *For documentation on creating your own modules, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/modules/README.md).*
