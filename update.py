@@ -78,9 +78,6 @@ def prompt():
 
 def update_first():
     """Updates rasbot.
-
-    Reads from `BUILTIN_COMMANDS` and `BUILTIN_MODULES`,
-    and updates all files located in each.
     """
     # Update definitions and updater first!
     for module in ['definitions', 'update']:

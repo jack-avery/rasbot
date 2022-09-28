@@ -2,9 +2,6 @@
 # Definitions
 ##
 
-BUILTIN_COMMANDS = ['help', 'uptime', 'cmdadd', 'cmddel', 'prefix']
-"""Built-in commands. Used to prevent users from overwriting built-ins."""
-
 BUILTIN_COMMAND_MODULES = ['help', 'uptime', 'cmdadd', 'cmddel',
                            'prefix', 'debugechofull', 'debugmsgcount', 'target', 'caller']
 """Built-in command modules. Used for the autoupdate function."""
@@ -19,8 +16,44 @@ VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 MODULE_MENTION_REGEX = r'&([a-z0-9_]+)&'
 """Regex to compare command responses to for finding any mentioned modules."""
 
-DEFAULT_PREFIX = "r!"
-"""Default prefix for a new channel config."""
+DEFAULT_CONFIG = {
+    "meta": {
+        "prefix": "r!"
+    },
+    "commands": {
+        "help": {
+            "cooldown": 10,
+            "requires_mod": False,
+            "hidden": False,
+            "response": "&caller& > &help&"
+        },
+        "uptime": {
+            "cooldown": 10,
+            "requires_mod": False,
+            "hidden": False,
+            "response": "&caller& > &uptime&"
+        },
+        "cmdadd": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": False,
+            "response": "&caller& > &cmdadd&"
+        },
+        "cmddel": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": False,
+            "response": "&caller& > &cmddel&"
+        },
+        "prefix": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": False,
+            "response": "&caller& > &prefix&"
+        },
+    }
+}
+"""Default channel config."""
 
 DEFAULT_COOLDOWN = 5
 """Default cooldown duration when none is specified."""

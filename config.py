@@ -1,4 +1,4 @@
-from definitions import BUILTIN_COMMANDS, DEFAULT_PREFIX
+from definitions import DEFAULT_CONFIG
 import json
 
 
@@ -16,13 +16,7 @@ def read(cfgid) -> dict:
     # and return a basic config dict.
     except FileNotFoundError:
         create_default(cfgid)
-        config = {
-            'meta': {
-                'prefix': DEFAULT_PREFIX
-            },
-            'commands': {},
-            'modules': [],
-        }
+        config = DEFAULT_CONFIG
 
     return config
 
@@ -45,14 +39,12 @@ def write(bot):
 
     # Adding commands
     for name, command in bot.commands.commands.items():
-        # The builtins are already added each init
-        if name not in BUILTIN_COMMANDS:
-            data['commands'][name] = {
-                'cooldown': command.cooldown,
-                'requires_mod': command.requires_mod,
-                'hidden': command.hidden,
-                'response': command.response,
-            }
+        data['commands'][name] = {
+            'cooldown': command.cooldown,
+            'requires_mod': command.requires_mod,
+            'hidden': command.hidden,
+            'response': command.response,
+        }
 
     # Writing config
     with open(bot.cfgid, 'w') as cfg:
@@ -64,12 +56,5 @@ def create_default(cfgid):
 
     :param cfgid: The path to the channel's config.
     """
-    data = {
-        'meta': {
-            'prefix': DEFAULT_PREFIX
-        },
-        'commands': {},
-        'modules': [],
-    }
     with open(cfgid, 'w') as cfg:
-        cfg.write(json.dumps(data, indent=4))
+        cfg.write(json.dumps(DEFAULT_CONFIG, indent=4))

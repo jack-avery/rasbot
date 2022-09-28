@@ -69,7 +69,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             self.commands.command_modify(
                 name, command['cooldown'], command['response'], command['requires_mod'], command['hidden'])
 
-        self.logger.info(f"Imported {len(cfg['commands'])} custom command(s)")
+        self.logger.info(f"Imported {len(cfg['commands'])} command(s)")
 
         # Set channel name
         self.channel = f"#{channel}"

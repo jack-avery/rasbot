@@ -3,15 +3,15 @@
 
 from commands import BaseModule
 import config
-from definitions import DEFAULT_PREFIX
+from definitions import DEFAULT_CONFIG
 
 
 class Module(BaseModule):
-    helpmsg = f'Sets a new prefix for the bot. Default is {DEFAULT_PREFIX}. Usage: prefix <prefix?>'
+    helpmsg = f'Sets a new prefix for the bot. Usage: prefix <prefix?>'
 
     def main(self, bot):
         if not bot.cmdargs:
-            newprefix = DEFAULT_PREFIX
+            newprefix = DEFAULT_CONFIG['meta']['prefix']
         else:
             newprefix = bot.cmdargs[0].lower()
 

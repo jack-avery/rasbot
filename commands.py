@@ -3,8 +3,7 @@ import re
 import threading
 import time
 
-from definitions import BUILTIN_COMMANDS,\
-    VALID_COMMAND_REGEX,\
+from definitions import VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
     CommandDoesNotExistError,\
     CommandGivenInvalidNameError,\
@@ -91,11 +90,6 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
     refs['bot'].log_debug(
         f'Importing command "{name} {cooldown} {requires_mod} {hidden} {response}"')
 
-    # You cannot modify built-in commands
-    if name in BUILTIN_COMMANDS and not ignore_builtin_check:
-        raise CommandIsBuiltInError(
-            f"attempt made to modify builtin command {name}")
-
     # Command cannot have a negative cooldown
     if int(cooldown) < 0:
         raise CommandMustHavePositiveCooldownError(
@@ -126,11 +120,6 @@ def command_del(name: str):
 
     :param name: The name of the command.
     '''
-    # You cannot modify built-ins
-    if name in BUILTIN_COMMANDS:
-        raise CommandIsBuiltInError(
-            f"attempt made to modify builtin command {name}")
-
     # Command must match the regex defined by VALID_COMMAND_REGEX
     if not command_re.match(name):
         raise CommandGivenInvalidNameError(
@@ -201,15 +190,6 @@ def setup(bot):
     """Set up this instance of commands
     """
     refs['bot'] = bot
-
-    # Do not modify this! These are built-in commands, initialized on module import.
-    command_modify("help", 5, "&caller& > &help&", False, False, True)
-    command_modify("uptime", 5, "&caller& > &uptime&", False, False, True)
-    command_modify("cmdadd", 0, "&caller& > &cmdadd&", True, False, True)
-    command_modify("cmddel", 0, "&caller& > &cmddel&", True, False, True)
-    command_modify("prefix", 0, "&caller& > &prefix&", True, False, True)
-
-    refs['bot'].log_debug("Built-ins completed")
 
 
 commands = dict()
