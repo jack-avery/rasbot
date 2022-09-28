@@ -28,9 +28,9 @@ class Module(BaseModule):
         else:
             module = bot.cmdargs[0].lower()
 
-            if module in bot.commands.modules.keys():
+            if module in bot.commands.modules:
                 return str(bot.commands.modules[module].help())
 
-            if module in bot.commands.commands.keys():
+            if module in bot.commands.commands:
                 return str(f"Module '{module}' not found, but the matching command uses module(s): "
                            + f"{', '.join(self.module_re.findall(bot.commands.commands[module].response))}")
