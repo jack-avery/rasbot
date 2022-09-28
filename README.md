@@ -5,6 +5,8 @@
 Comes with essentials for creating & modifying commands, as well as some common commands.<br/>
 Additionally comes with **modules** focused on the popular rhythm game **osu!** that facilitate the common `!np` and `!request` commands.<br/>
 
+![image](https://cdn.discordapp.com/attachments/488850419301220352/1024615808879579188/unknown.png)
+
 If you know how to code it in Python, you can have it as a module for rasbot.
 
 Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share modules.
