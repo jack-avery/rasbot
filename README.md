@@ -1,15 +1,11 @@
 # rasbot
 **Modular Python-based Twitch bot optimized for customizability and ease of use.**
 
-rasbot is a Python-based Twitch bot that runs on *your* Twitch account,
-and comes with a short list of modules to facilitate the creation of simple chat commands,
-such as a simple `keyboard` command that shows your keyboard.
+**rasbot** is a Python-based Twitch bot lets you see and modify everything going on behind the scenes.<br/>
+Comes with essentials for creating & modifying commands, as well as some common commands.<br/>
+Additionally comes with **modules** focused on the popular rhythm game **osu!** that facilitate the common `!np` and `!request` commands.<br/>
 
-rasbot also comes set up to allow users to easily create their own custom modules,
-where if you know how to code it in Python, it can run as a command for your Twitch bot,
-for example, the provided [np](https://github.com/raspy-on-osu/rasbot/blob/master/modules/np.py)
-module that reads from a file created by [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion)
-and outputs 'now playing' information into the chat.
+If you know how to code it in Python, you can have it as a module for rasbot.
 
 Join our [official Discord server](https://discord.gg/qpyT4zx) to discuss rasbot development, including issues, ideas, and share modules.
 
