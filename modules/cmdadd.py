@@ -13,7 +13,7 @@ from definitions import VALID_COMMAND_REGEX,\
 
 
 class Module(BaseModule):
-    helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown> <mod-only?> <hidden?> <response>.'
+    helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <mod-only?> <hidden?> <response>.'
 
     def main(self, bot):
         try:

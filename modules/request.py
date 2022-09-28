@@ -18,6 +18,8 @@ OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b\/(\d+)$'
 
 
 class Module(BaseModule):
+    helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link>'
+
     def __init__(self):
         BaseModule.__init__(self)
 
