@@ -56,7 +56,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info(f"Reading config from {self.cfgid}...")
 
         cfg = config.read(self.cfgid)
-        self.prefix = cfg["prefix"]
+        self.prefix = cfg['meta']['prefix']
 
         self.logger.info(f"Prefix set as '{self.prefix}'")
 
@@ -65,20 +65,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.commands.setup(self)
 
         # Import commands from config
-        for command in cfg["commands"]:
-            # Evaluate modonly/hidden flags
-            for i in range(2):
-                i += 2  # Match indices
-                if command[i] == "False":
-                    command[i] = False
-                elif command[i] == "True":
-                    command[i] = True
-                else:
-                    self.logger.error(
-                        f"Command {command[0]} might have imported incorrectly: invalid flag?")
-
-            self.commands.command_modify(command[0], command[1], " ".join(
-                command[4:]), command[2], command[3])
+        for name, command in cfg["commands"].items():
+            self.commands.command_modify(
+                name, command['cooldown'], command['response'], command['requires_mod'], command['hidden'])
 
         self.logger.info(f"Imported {len(cfg['commands'])} custom command(s)")
 

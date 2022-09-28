@@ -1,4 +1,5 @@
 from definitions import BUILTIN_COMMANDS, DEFAULT_PREFIX
+import json
 
 
 def read(cfgid) -> dict:
@@ -9,31 +10,19 @@ def read(cfgid) -> dict:
     # Attempt to read config
     try:
         with open(cfgid, 'r') as cfg:
-            lines = cfg.readlines()
+            config = json.loads(cfg.read())
 
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
         create_default(cfgid)
         config = {
-            "prefix": DEFAULT_PREFIX,
-            "commands": []
+            'meta': {
+                'prefix': DEFAULT_PREFIX
+            },
+            'commands': {},
+            'modules': [],
         }
-        return config
-
-    # Removing newlines
-    for i, line in enumerate(lines):
-        lines[i] = line[:-1]
-
-    # Append prefix to dict
-    config = dict()
-    config["prefix"] = lines.pop(0)
-
-    # Create list of commands and append to dict
-    commands = list()
-    for line in lines:
-        commands.append(line.split(" "))
-    config["commands"] = commands
 
     return config
 
@@ -46,23 +35,28 @@ def write(bot):
     bot.log_debug(f"Writing configuration to {bot.cfgid}")
 
     # Append prefix to lines
-    lines = list()
-    lines.append(bot.prefix)
+    data = {
+        'meta': {
+            'prefix': bot.prefix
+        },
+        'commands': {},
+        'modules': [],
+    }
 
     # Adding commands
     for name, command in bot.commands.commands.items():
         # The builtins are already added each init
         if name not in BUILTIN_COMMANDS:
-            lines.append(
-                f"{name} {command.cooldown} {command.requires_mod} {command.hidden} {command.response}")
-
-    # Adding newlines
-    for i, line in enumerate(lines):
-        lines[i] = line+"\n"
+            data['commands'][name] = {
+                'cooldown': command.cooldown,
+                'requires_mod': command.requires_mod,
+                'hidden': command.hidden,
+                'response': command.response,
+            }
 
     # Writing config
     with open(bot.cfgid, 'w') as cfg:
-        cfg.writelines(lines)
+        cfg.write(json.dumps(data, indent=4))
 
 
 def create_default(cfgid):
@@ -70,5 +64,12 @@ def create_default(cfgid):
 
     :param cfgid: The path to the channel's config.
     """
+    data = {
+        'meta': {
+            'prefix': DEFAULT_PREFIX
+        },
+        'commands': {},
+        'modules': [],
+    }
     with open(cfgid, 'w') as cfg:
-        cfg.writelines([f'{DEFAULT_PREFIX}\n'])
+        cfg.write(json.dumps(data, indent=4))
