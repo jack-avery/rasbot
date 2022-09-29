@@ -2,12 +2,12 @@
 # Definitions
 ##
 
-BUILTIN_COMMAND_MODULES = ['help', 'uptime', 'cmdadd', 'cmddel',
-                           'prefix', 'debugechofull', 'debugmsgcount', 'target', 'caller']
+BUILTIN_MODULES = ['help', 'uptime', 'cmdadd', 'cmddel',
+                           'prefix', 'target', 'caller']
 """Built-in command modules. Used for the autoupdate function."""
 
-BUILTIN_MODULES = ['authentication', 'bot', 'commands', 'config',
-                   'definitions', 'refresh_oauth', 'update', 'setup']
+RASBOT_BASE = ['authentication', 'bot', 'commands', 'config',
+               'definitions', 'refresh_oauth', 'update', 'setup']
 """Built-in modules. Used for the autoupdate function."""
 
 VALID_COMMAND_REGEX = r'[a-z0-9_]+'

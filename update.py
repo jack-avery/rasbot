@@ -3,7 +3,7 @@ import sys
 import requests
 import click
 import semantic_version
-from definitions import BUILTIN_COMMAND_MODULES, BUILTIN_MODULES
+from definitions import BUILTIN_MODULES, RASBOT_BASE
 
 
 @click.command()
@@ -96,7 +96,7 @@ def update_first():
 
 def update_inner():
     # Update commands
-    for command in BUILTIN_COMMAND_MODULES:
+    for command in BUILTIN_MODULES:
         print(f"Updating built-in method {command}...")
         text = requests.get(
             f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/modules/{command}.py").text
@@ -106,7 +106,7 @@ def update_inner():
     print("Finished updating modules.\n")
 
     # Update modules
-    for module in BUILTIN_MODULES:
+    for module in RASBOT_BASE:
         if module not in ['definitions', 'update']:
             print(f"Updating built-in module {module}...")
             text = requests.get(
