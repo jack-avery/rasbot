@@ -13,7 +13,7 @@ RASBOT_BASE = ['authentication', 'bot', 'commands', 'config',
 VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 """Regex to compare given command names to for validation."""
 
-MODULE_MENTION_REGEX = r'&([a-z0-9_]+)&'
+MODULE_MENTION_REGEX = r'&([\/a-z0-9_]+)&'
 """Regex to compare command responses to for finding any mentioned modules."""
 
 DEFAULT_CONFIG = {
