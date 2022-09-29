@@ -25,31 +25,31 @@ DEFAULT_CONFIG = {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "&caller& > &help&"
+            "response": "@&caller& > &help&"
         },
         "uptime": {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "&caller& > &uptime&"
+            "response": "@&caller& > &uptime&"
         },
         "cmdadd": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "&caller& > &cmdadd&"
+            "response": "@&caller& > &cmdadd&"
         },
         "cmddel": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "&caller& > &cmddel&"
+            "response": "@&caller& > &cmddel&"
         },
         "prefix": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "&caller& > &prefix&"
+            "response": "@&caller& > &prefix&"
         },
     }
 }
