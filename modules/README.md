@@ -18,3 +18,5 @@ Otherwise, you're free to add whatever you want to the module, as long as you kn
 
 **Be very careful as this can be abused!**<br/>
 *A sample module is available as `sample.py`.*
+
+![firefox_p0K7PPEJBs](https://user-images.githubusercontent.com/47289484/193102564-6245c687-6e25-4f90-a1a8-37d6d2fb91da.png)
