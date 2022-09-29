@@ -4,7 +4,6 @@
 from commands import BaseModule
 from definitions import VALID_COMMAND_REGEX,\
     CommandDoesNotExistError,\
-    CommandIsBuiltInError,\
     CommandGivenInvalidNameError
 import config
 
@@ -20,9 +19,6 @@ class Module(BaseModule):
             config.write(bot)
 
             return f'Command {cmd[0]} removed successfully.'
-
-        except CommandIsBuiltInError:
-            return 'You cannot modify built-in commands.'
 
         except CommandDoesNotExistError:
             return f'Command {cmd[0]} does not exist.'

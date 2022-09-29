@@ -7,7 +7,6 @@ from definitions import VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
     CommandDoesNotExistError,\
     CommandGivenInvalidNameError,\
-    CommandIsBuiltInError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
     CommandStillOnCooldownError
