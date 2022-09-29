@@ -49,7 +49,7 @@ class Module(BaseModule):
             try:
                 req = bot.cmdargs[0].lower()
             except:
-                return
+                return "Provide a map to request."
 
             # Resolve ID
             if self.beatmapset_re.match(req):
@@ -57,7 +57,7 @@ class Module(BaseModule):
             elif self.b_re.match(req):
                 id = self.b_re.findall(req)[0]
             else:
-                return
+                return "Could not resolve beatmap link format."
 
             # Retrieve beatmap information
             req = requests.get(
@@ -68,10 +68,12 @@ class Module(BaseModule):
             # See the possible information from the 'map' dict at https://github.com/ppy/osu-api/wiki#response
             message = f"({map['bpm']} BPM, {map['difficultyrating']} Stars)"
 
-            self.send_message(
+            self.send_osu_message(
                 f"{bot.author_name} requested: [https://osu.ppy.sh/b/{id} {map['artist']} - {map['title']} [{map['version']}]] {message}")
 
-    def send_message(self, msg):
+            return "Request sent!"
+
+    def send_osu_message(self, msg):
         self.irc.send(bytes("USER " + self.username + " " + self.username +
                       " " + self.username + " " + self.username + "\n", "UTF-8"))
         self.irc.send(bytes("PASS " + OSU_IRC_PASSWORD + "\n", "UTF-8"))

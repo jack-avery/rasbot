@@ -46,10 +46,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Initialize authentication
         self.auth = auth
-        self.authkeys = self.auth.get_auth()
         self.channel_id = channel_id
+        authkeys = self.auth.get_auth()
 
-        self.logger.info(f"Starting as {self.authkeys['user_id']}...")
+        self.logger.info(f"Starting as {authkeys['user_id']}...")
 
         # Import channel info
         self.cfgid = cfgid
@@ -80,7 +80,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info('Connecting to ' + server +
                          ' on port ' + str(port) + '...')
         irc.bot.SingleServerIRCBot.__init__(self, [(
-            server, port, f"oauth:{self.authkeys['irc_oauth']}")], self.authkeys['user_id'], self.authkeys['user_id'])
+            server, port, f"oauth:{authkeys['irc_oauth']}")], authkeys['user_id'], authkeys['user_id'])
 
     def on_welcome(self, c, e):
         # You must request specific capabilities before you can use them
@@ -130,7 +130,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             cmd = self.msg_split[0][len(self.prefix):].lower()
             if cmd not in self.commands.commands:
                 self.logger.debug(
-                    f"Ignoring invalid command call '{cmd}' from {self.author_name} (mod:{self.author_ismod})")
+                    f"Ignoring invalid command call '{cmd}' from {name} (mod: {ismod})")
                 return
 
             # Isolate command arguments from command
@@ -139,7 +139,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             try:
                 # Run the command and string result message
                 self.logger.info(
-                    f"Running command call '{cmd}' from {self.author_name} (mod:{self.author_ismod}) (args:{self.cmdargs})")
+                    f"Running command call '{cmd}' from {name} (mod: {ismod}) (args:{self.cmdargs})")
                 cmdresult = self.commands.commands[cmd].run(self)
 
                 # If there is a string result message, print it to chat
@@ -214,17 +214,19 @@ def run(channel=None, auth=None, cfg=None, debug=False):
 
     # Resolve ID from channel name
     channel_id = False
+    url = f"https://api.twitch.tv/helix/users?login={channel}"
     while not channel_id:
-        url = f"https://api.twitch.tv/helix/users?login={channel}"
         r = requests.get(url, headers=auth.get_headers()).json()
         try:
             channel_id = int(f"{r['data'][0]['id']}")
         except KeyError:
+            # If it errors with a 401 we try to refresh the oauth key
             if r['status'] == 401:
                 print("OAuth key is invalid or expired. Attempting a refresh...")
                 try:
                     auth.refresh_oauth()
                 except AuthenticationDeniedError as err:
+                    # If THAT fails, we throw our hands in the air and tell them to restart.
                     print(f"Authentication Denied: {err}")
                     print("Please ensure that your credentials are valid.")
                     print("You may need to re-run setup.py.\n")

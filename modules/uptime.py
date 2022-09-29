@@ -38,4 +38,4 @@ class Module(BaseModule):
         mins = round((secs-secs % 60)/60)
         hrs = round((mins-mins % 60)/60)
 
-        return f'Uptime: {hrs} hours {mins%60} minutes {round(secs%60)} seconds.'
+        return f'Uptime: {hrs}h{mins%60}m{round(secs%60)}s.'
