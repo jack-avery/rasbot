@@ -51,7 +51,8 @@ DEFAULT_CONFIG = {
             "hidden": False,
             "response": "@&caller& > &prefix&"
         },
-    }
+    },
+    "modules": []
 }
 """Default channel config."""
 
