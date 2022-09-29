@@ -84,10 +84,6 @@ class CommandStillOnCooldownError(Exception):
     pass
 
 
-class CommandIsBuiltInError(Exception):
-    pass
-
-
 class CommandDoesNotExistError(Exception):
     pass
 
