@@ -1,6 +1,6 @@
 # 'np' code for a Now Playing function. To get this to work:
-# Create an output pattern in osu!StreamCompanion with the info you want
-# Point the path in definitions.py to the file
+# Create an output pattern in osu!StreamCompanion with the info you want (default is for a pattern called np)
+# Replace the path below with the path to the file (below is default, might not need to change it)
 # Create a command using cmdadd with &np& as the response.
 
 from commands import BaseModule

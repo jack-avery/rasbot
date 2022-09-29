@@ -28,10 +28,10 @@ class Command:
         :param hidden: Whether the command should be hidden from help.
         '''
         self.name = name.lower()
-        self.cooldown = int(cooldown)
+        self.cooldown = cooldown
         self.response = response
-        self.requires_mod = bool(requires_mod)
-        self.hidden = bool(hidden)
+        self.requires_mod = requires_mod
+        self.hidden = hidden
 
         self.__last_used = 0
 
@@ -91,7 +91,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
         f'Importing command "{name} {cooldown} {requires_mod} {hidden} {response}"')
 
     # Command cannot have a negative cooldown
-    if int(cooldown) < 0:
+    if cooldown < 0:
         raise CommandMustHavePositiveCooldownError(
             f"command {name} provided invalid cooldown length {cooldown}")
 
@@ -161,18 +161,22 @@ class BaseModule(threading.Thread):
 
 
 def module_add(name: str):
-    '''Creates a new module and appends it to the modules dict.
+    '''Imports a new module and appends it to the modules dict.
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
     refs['bot'].log_debug(f"Importing module {name}.py")
 
     try:
+        # Create spec and import from directory.
         spec = importlib.util.spec_from_file_location(
             f"{name}", f"modules/{name}.py")
         module = importlib.util.module_from_spec(spec)
+
+        # Execute it to fully import
         spec.loader.exec_module(module)
 
+        # Give it its' own thread and start it up
         modules[name] = module.Module()
         modules[name].start()
     except FileNotFoundError:

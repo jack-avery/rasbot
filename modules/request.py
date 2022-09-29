@@ -1,3 +1,7 @@
+# 'request' code for osu! requests. To get this to work:
+# Fill out the fields below with the strings found at the websites
+# Create a command using cmdadd with &request& as the response.
+
 import socket
 import requests
 import re
