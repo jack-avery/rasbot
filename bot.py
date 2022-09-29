@@ -71,6 +71,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         self.logger.info(f"Imported {len(cfg['commands'])} command(s)")
 
+        # Import additional modules
+        for module in cfg["modules"]:
+            self.commands.module_add(module)
+
+        self.logger.debug(f"Imported {len(cfg['modules'])} module(s)")
+
         # Set channel name
         self.channel = f"#{channel}"
 
