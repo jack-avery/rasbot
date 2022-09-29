@@ -96,24 +96,24 @@ def update_first():
 
 def update_inner():
     # Update commands
-    for command in BUILTIN_MODULES:
-        print(f"Updating built-in method {command}...")
+    for module in BUILTIN_MODULES:
+        print(f"Updating built-in module {module}...")
         text = requests.get(
-            f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/modules/{command}.py").text
+            f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/modules/{module}.py").text
 
-        with open(f"modules/{command}.py", 'w') as commandfile:
-            commandfile.write(text)
+        with open(f"modules/{module}.py", 'w') as modulefile:
+            modulefile.write(text)
     print("Finished updating modules.\n")
 
     # Update modules
-    for module in RASBOT_BASE:
-        if module not in ['definitions', 'update']:
-            print(f"Updating built-in module {module}...")
+    for base in RASBOT_BASE:
+        if base not in ['definitions', 'update']:
+            print(f"Updating base file {base}...")
             text = requests.get(
-                f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{module}.py").text
+                f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{base}.py").text
 
-            with open(f"{module}.py", 'w') as modulefile:
-                modulefile.write(text)
+            with open(f"{base}.py", 'w') as basefile:
+                basefile.write(text)
     print("Finished updating modules.\n")
 
     # Check for new requirements
