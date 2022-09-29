@@ -74,9 +74,8 @@ class Module(BaseModule):
             return "Request sent!"
 
     def send_osu_message(self, msg):
-        self.irc.send(bytes("USER " + self.username + " " + self.username +
-                      " " + self.username + " " + self.username + "\n", "UTF-8"))
-        self.irc.send(bytes("PASS " + OSU_IRC_PASSWORD + "\n", "UTF-8"))
-        self.irc.send(bytes("NICK " + self.username + "\n", "UTF-8"))
-        self.irc.send(bytes("PRIVMSG " + self.username +
-                      " " + msg + "\n", "UTF-8"))
+        self.irc.send(bytes(
+            f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
+        self.irc.send(bytes(f"PASS {OSU_IRC_PASSWORD}\n", "UTF-8"))
+        self.irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
+        self.irc.send(bytes(f"PRIVMSG {self.username} {msg}\n", "UTF-8"))
