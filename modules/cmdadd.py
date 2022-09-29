@@ -8,7 +8,6 @@ from definitions import VALID_COMMAND_REGEX,\
     MODONLY_ARG,\
     HIDDEN_ARG,\
     CommandGivenInvalidNameError,\
-    CommandIsBuiltInError,\
     CommandMustHavePositiveCooldownError
 
 
@@ -47,9 +46,6 @@ class Module(BaseModule):
             config.write(bot)
 
             return f'Command {cmd_name} added successfully.'
-
-        except CommandIsBuiltInError:
-            return 'You cannot modify built-in commands.'
 
         except CommandMustHavePositiveCooldownError:
             return 'Command must have a positive cooldown.'

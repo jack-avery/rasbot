@@ -164,6 +164,9 @@ def module_add(name: str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
+    if name in modules:
+        return
+
     refs['bot'].log_debug(f"Importing module {name}.py")
 
     try:
