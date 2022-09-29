@@ -105,11 +105,10 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
 
     # Resolve any modules the command mentions and import new ones
     for m in module_re.findall(response):
-        if m not in modules.keys():
-            try:
-                module_add(m)
-            except ModuleNotFoundError as err:
-                raise err
+        try:
+            module_add(m)
+        except ModuleNotFoundError as err:
+            raise err
 
     commands[name] = Command(name, cooldown, response, requires_mod, hidden)
 
@@ -164,6 +163,7 @@ def module_add(name: str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
+    # Don't reimport a module already imported
     if name in modules:
         return
 
