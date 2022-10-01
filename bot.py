@@ -60,6 +60,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         self.logger.info(f"Prefix set as '{self.prefix}'")
 
+        # Set channel name
+        self.channel = f"#{channel}"
+
         # Instantiate commands module
         self.commands = commands
         self.commands.setup(self)
@@ -77,9 +80,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 self.commands.module_add(module)
 
             self.logger.info(f"Imported {len(cfg['modules'])} module(s)")
-
-        # Set channel name
-        self.channel = f"#{channel}"
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
