@@ -44,10 +44,10 @@ class Module(BaseModule):
             print(
                 "An error occurred trying to resolve your osu! username. Your API key may be invalid.")
 
-    def main(self, bot):
+    def main(self):
         if self.username:
             try:
-                req = bot.cmdargs[0].lower()
+                req = self.bot.cmdargs[0].lower()
             except:
                 return "Provide a map to request."
 
@@ -69,7 +69,7 @@ class Module(BaseModule):
             message = f"({map['bpm']} BPM, {map['difficultyrating']} Stars)"
 
             self.send_osu_message(
-                f"{bot.author_name} requested: [https://osu.ppy.sh/b/{id} {map['artist']} - {map['title']} [{map['version']}]] {message}")
+                f"{self.bot.author_name} requested: [https://osu.ppy.sh/b/{id} {map['artist']} - {map['title']} [{map['version']}]] {message}")
 
             return "Request sent!"
 
