@@ -1,5 +1,9 @@
 # This is a sample module. Feel free to fiddle with this to learn how rasbot modules work.
-# It's important to note that modules are only imported (and have on_pubmsg run) if they are referenced in a command.
+#
+# It's important to note that modules are only imported (and have on_pubmsg run) if they are referenced in a command,
+# or if they are added to the "modules" array in your config as a string,
+# e.g. "modules": ["sample"]
+#
 # You can test out this module by adding it in a command as &sample&
 # e.g. "r!cmdadd sample &sample&"
 
