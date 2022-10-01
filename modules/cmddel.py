@@ -11,12 +11,12 @@ import config
 class Module(BaseModule):
     helpmsg = 'Deletes an existing command. Usage: cmddel <name>.'
 
-    def main(self, bot):
-        cmd = bot.cmdargs
+    def main(self):
+        cmd = self.bot.cmdargs
 
         try:
-            bot.commands.command_del(cmd[0].lower())
-            config.write(bot)
+            self.bot.commands.command_del(cmd[0].lower())
+            config.write(self.bot)
 
             return f'Command {cmd[0]} removed successfully.'
 

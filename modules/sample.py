@@ -7,16 +7,15 @@ from commands import BaseModule
 
 
 class Module(BaseModule):
-    def __init__(self):
+    def __init__(self, bot):
         # Make sure you call BaseModule init if overriding __init__!
-        BaseModule.__init__(self)
-
+        BaseModule.__init__(self, bot)
         self.count = 0
 
     # This runs if the module is part of a command which gets called.
-    def main(self, bot):
+    def main(self):
         return f"Sample! {self.count} messages have been sent so far."
 
     # This runs on all messages regardless of whether the command is called.
-    def on_pubmsg(self, bot):
+    def on_pubmsg(self):
         self.count += 1

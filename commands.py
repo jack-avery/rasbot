@@ -55,8 +55,7 @@ class Command:
             try:
                 returned_response = returned_response.replace(
                     f'&{m}&',
-                    str(modules[m].main(
-                        bot))
+                    str(modules[m].main())
                 )
             except KeyError:
                 raise KeyError(
@@ -136,10 +135,11 @@ class BaseModule(threading.Thread):
     """
     helpmsg = 'No help message available for module.'
 
-    def __init__(self):
+    def __init__(self, bot):
         threading.Thread.__init__(self)
+        self.bot = bot
 
-    def main(self, bot):
+    def main(self):
         """Code to be run for the modules' && code.
         """
         pass
@@ -150,7 +150,7 @@ class BaseModule(threading.Thread):
         return self.helpmsg
 
     # Default per-message function.
-    def on_pubmsg(self, bot):
+    def on_pubmsg(self):
         """Code to be run for every message received.
 
         By default, does nothing.
@@ -179,17 +179,17 @@ def module_add(name: str):
         spec.loader.exec_module(module)
 
         # Give it its' own thread and start it up
-        modules[name] = module.Module()
+        modules[name] = module.Module(refs['bot'])
         modules[name].start()
     except FileNotFoundError:
         raise ModuleNotFoundError(f"{name} does not exist in modules folder")
 
 
-def do_on_pubmsg_methods(bot):
+def do_on_pubmsg_methods():
     """Runs the on_pubmsg() of every Module imported from `./modules`.
     """
     for module in modules.values():
-        module.on_pubmsg(bot)
+        module.on_pubmsg()
 
 
 def setup(bot):

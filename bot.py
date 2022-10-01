@@ -126,7 +126,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         try:
             # Do per-message methods
-            self.commands.do_on_pubmsg_methods(self)
+            self.commands.do_on_pubmsg_methods()
 
             # Don't continue if the message doesn't start with the prefix.
             if not self.msg.startswith(self.prefix):

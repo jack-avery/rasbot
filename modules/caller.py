@@ -7,5 +7,5 @@ from commands import BaseModule
 class Module(BaseModule):
     helpmsg = "Returns the display name of the last messages' author."
 
-    def main(self, bot):
-        return bot.author_name
+    def main(self):
+        return self.bot.author_name

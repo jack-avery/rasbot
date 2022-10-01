@@ -12,7 +12,7 @@ PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/
 class Module(BaseModule):
     helpmsg = 'Prints "Now Playing" information from a configured file. Usage: np'
 
-    def main(self, bot):
+    def main(self):
         try:
             with open(PATH_TO_STREAMCOMPANION_NP_FILE, 'r') as file:
                 return f'{file.readlines()[0]}'

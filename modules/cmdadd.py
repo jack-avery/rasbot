@@ -14,9 +14,9 @@ from definitions import VALID_COMMAND_REGEX,\
 class Module(BaseModule):
     helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <mod-only?> <hidden?> <response>.'
 
-    def main(self, bot):
+    def main(self):
         try:
-            cmd = bot.cmdargs[:]
+            cmd = self.bot.cmdargs[:]
 
             cmd_name = cmd.pop(0).lower()
 
@@ -38,12 +38,12 @@ class Module(BaseModule):
             else:
                 hidden = False
 
-            bot.commands.command_modify(cmd_name,
-                                        cmd_cooldown,
-                                        " ".join(cmd),
-                                        modonly,
-                                        hidden)
-            config.write(bot)
+            self.bot.commands.command_modify(cmd_name,
+                                             cmd_cooldown,
+                                             " ".join(cmd),
+                                             modonly,
+                                             hidden)
+            config.write(self.bot)
 
             return f'Command {cmd_name} added successfully.'
 

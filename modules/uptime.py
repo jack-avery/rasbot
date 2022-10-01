@@ -10,13 +10,13 @@ import time
 class Module(BaseModule):
     helpmsg = 'Returns the current stream uptime. Usage: uptime'
 
-    def main(self, bot):
+    def main(self):
         r = requests.get(
-            f"https://api.twitch.tv/helix/streams?user_id={bot.channel_id}", headers=bot.auth.get_headers()).json()
+            f"https://api.twitch.tv/helix/streams?user_id={self.bot.channel_id}", headers=self.bot.auth.get_headers()).json()
         try:
             time_start = r['data'][0]['started_at']
         except IndexError:
-            return f'{bot.channel} is not currently live.'
+            return f'{self.bot.channel} is not currently live.'
 
         time_start = datetime.datetime.strptime(
             f'{time_start[:-1]}', "%Y-%m-%dT%H:%M:%S")
