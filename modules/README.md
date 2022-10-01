@@ -8,8 +8,12 @@ Name the file after your module: `sample.py`.<br/>
 You can then reference your module as the response of a command, for example, `r!cmdadd sample &sample&`.
 
 Your module must have a `Module` class that extends `commands.BaseModule`.<br/>
-The code that replaces `&sample&` in the response goes in a method called `main` that accepts **one** argument: the TwitchBot instance.<br/>
-You can use this TwitchBot instance to get command arguments and information about the commanding user.<br/>
+> If you're overriding \_\_init__, be sure to call BaseModule.\_\_init__(self, bot).
+
+The code that replaces `&sample&` in the response goes in a method called `main`.<br/>
+You can find the `TwitchBot` instance as `self.bot`.<br/>
+
+> Wiki page containing useful information about this coming soon!
 
 Your module can have a help message, stored in the `helpmsg` static variable.
 Whatever it contains will be shown if the method is provided as an argument for the `help` command.<br/>
