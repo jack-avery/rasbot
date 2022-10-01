@@ -86,15 +86,29 @@ class Module(BaseModule):
             res = cs.fetchone()
             return res[0] if res else 0
 
+    def get_top(self):
+        """Return the top 3 XP holders.
+        """
+        with self.db as db:
+            cs = db.cursor()
+            cs.execute(f"SELECT user,amt FROM xp ORDER BY amt DESC")
+            res = cs.fetchmany(3)
+
+            return " | ".join([f"{r[0]}: {r[1]}" for r in res])
+
     def main(self):
         if not self.bot.cmdargs:
             return
 
-        user = self.bot.cmdargs[0]
-        if user.startswith('@'):
-            user = user[1:]
+        arg = self.bot.cmdargs[0]
 
-        return f"{user} has {self.get_xp(user)} XP."
+        if arg == "top":
+            return self.get_top()
+
+        if arg.startswith('@'):
+            arg = arg[1:]
+
+        return f"{arg} has {self.get_xp(arg)} XP."
 
     def on_pubmsg(self):
         # Add this user to the active users list.
