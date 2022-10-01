@@ -86,6 +86,19 @@ class Module(BaseModule):
             res = cs.fetchone()
             return res[0] if res else 0
 
+    def get_pos(self, user) -> int:
+        """Return the position of `user` as an int.
+        Returns -1 if the user does not exist.cccccccccccccccccc
+        """
+        with self.db as db:
+            cs = db.cursor()
+            all = tuple(map(lambda x: x[0], cs.execute(
+                'SELECT user FROM xp ORDER BY amt DESC').fetchall()))
+            try:
+                return all.index(user) + 1
+            except ValueError:
+                return -1
+
     def get_top(self):
         """Return the top 3 XP holders.
         """
@@ -95,6 +108,16 @@ class Module(BaseModule):
             res = cs.fetchmany(3)
 
             return " | ".join([f"{r[0]}: {r[1]}" for r in res])
+
+    def get_user(self, user):
+        """Return the user, their XP, and position.
+        """
+        pos = self.get_pos(user)
+        if pos == -1:
+            return f"User {user} has no tracked XP."
+
+        xp = self.get_xp(user)
+        return f"{user} is #{pos} with {xp} XP."
 
     def main(self):
         if not self.bot.cmdargs:
@@ -108,7 +131,7 @@ class Module(BaseModule):
         if arg.startswith('@'):
             arg = arg[1:]
 
-        return f"{arg} has {self.get_xp(arg)} XP."
+        return self.get_user(arg)
 
     def on_pubmsg(self):
         # Add this user to the active users list.
