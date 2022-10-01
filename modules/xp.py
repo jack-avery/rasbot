@@ -7,14 +7,11 @@ import threading
 XP_GRANT_FREQUENCY = 180.0
 """Amount of seconds between each grant. Default is 180 (3 minutes)."""
 
-XP_GRANT_BASE = 2
-"""Base amount of XP to grant per grant. Default is 2."""
+XP_INACTIVE_RANGE = (2, 2)
+"""Amount (min, max) to grant to inactive users."""
 
-XP_GRANT_REWARD_ACTIVITY = True
-"""Whether the XP granted should be increased for active chatters. Default is True."""
-
-XP_GRANT_REWARD_AMOUNT = 3
-"""Maximum amount of extra XP to give to active users. Default is 3."""
+XP_ACTIVE_RANGE = (2, 5)
+"""Amount (min, max) to grant to active users."""
 
 
 class RepeatTimer(threading.Timer):
@@ -59,9 +56,12 @@ class Module(BaseModule):
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
                 # Resolve how much XP to grant to this user
-                amt = XP_GRANT_BASE
-                if (user in self.active_users) and XP_GRANT_REWARD_ACTIVITY:
-                    amt += random.randint(1, XP_GRANT_REWARD_AMOUNT)
+                if (user in self.active_users):
+                    amt = random.randint(
+                        XP_ACTIVE_RANGE[0], XP_ACTIVE_RANGE[1])
+                else:
+                    amt = random.randint(
+                        XP_INACTIVE_RANGE[0], XP_INACTIVE_RANGE[1])
 
                 # Grant it to the user
                 self.grant_xp(tdb, user, amt)
