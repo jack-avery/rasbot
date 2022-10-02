@@ -8,10 +8,10 @@ XP_GRANT_FREQUENCY = 180.0
 """Amount of seconds between each grant. Default is 180 (3 minutes)."""
 
 XP_INACTIVE_RANGE = (2, 2)
-"""Amount (min, max) to grant to inactive users."""
+"""Amount (min, max) to grant to inactive users. Default is (2, 2)."""
 
 XP_ACTIVE_RANGE = (2, 5)
-"""Amount (min, max) to grant to active users."""
+"""Amount (min, max) to grant to active users. Default is (2, 5)."""
 
 
 class RepeatTimer(threading.Timer):
@@ -88,7 +88,7 @@ class Module(BaseModule):
 
     def get_pos(self, user) -> int:
         """Return the position of `user` as an int.
-        Returns -1 if the user does not exist.cccccccccccccccccc
+        Returns -1 if the user does not exist.
         """
         with self.db as db:
             cs = db.cursor()
@@ -125,12 +125,13 @@ class Module(BaseModule):
 
         arg = self.bot.cmdargs[0]
 
+        # Show top 3
         if arg == "top":
             return self.get_top()
 
+        # Resolve user and show stats
         if arg.startswith('@'):
             arg = arg[1:]
-
         return self.get_user(arg)
 
     def on_pubmsg(self):
