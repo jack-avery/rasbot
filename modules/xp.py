@@ -1,3 +1,7 @@
+# Chatter watchtime XP module.
+# You can tweak the frequency of granting XP and the ranges to grant below.
+# "Levels" may be implemented eventually, but assume it will be left as-is.
+
 from commands import BaseModule
 import random
 import requests
@@ -15,13 +19,14 @@ XP_ACTIVE_RANGE = (2, 5)
 
 
 class RepeatTimer(threading.Timer):
+    # See https://stackoverflow.com/a/48741004
     def run(self):
         while not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
 
 
 class Module(BaseModule):
-    helpmsg = "Get how many points a user has. Usage: xp <username>"
+    helpmsg = "Get how much XP a user has or see the top 3. Usage: xp <username/top>"
 
     def __init__(self, bot):
         BaseModule.__init__(self, bot)
@@ -45,10 +50,10 @@ class Module(BaseModule):
         timer = RepeatTimer(XP_GRANT_FREQUENCY, self.tick)
         timer.start()
 
-    # Get viewerlist and do XP gain stuff here
+    # Get viewerlist and do XP gain logic
     def tick(self):
         # Create a new connection for this thread
-        tdb = sqlite3.connect(f"modules/_xp/{self.bot.channel_id}.db")
+        thread_db = sqlite3.connect(f"modules/_xp/{self.bot.channel_id}.db")
 
         users = requests.get(
             f"https://tmi.twitch.tv/group/user/{self.bot.channel[1:]}/chatters", headers=self.bot.auth.get_headers()).json()
@@ -64,40 +69,13 @@ class Module(BaseModule):
                         XP_INACTIVE_RANGE[0], XP_INACTIVE_RANGE[1])
 
                 # Grant it to the user
-                self.grant_xp(tdb, user, amt)
+                thread_db.execute(
+                    "INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
+                thread_db.execute(
+                    f"UPDATE xp SET amt = amt + {amt} WHERE user = \"{user}\"")
 
         # Clear active users for this window.
         self.active_users.clear()
-
-    def grant_xp(self, tdb, user, amt):
-        """Grant `amt` xp to `user`, creating their entry if it doesn't exist.
-        """
-        with tdb as db:
-            db.execute("INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
-            db.execute(
-                f"UPDATE xp SET amt = amt + {amt} WHERE user = \"{user}\"")
-
-    def get_xp(self, user) -> int:
-        """Return the amount of xp `user` has, or `0` if the user doesn't exist.
-        """
-        with self.db as db:
-            cs = db.cursor()
-            cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
-            res = cs.fetchone()
-            return res[0] if res else 0
-
-    def get_pos(self, user) -> int:
-        """Return the position of `user` as an int.
-        Returns -1 if the user does not exist.
-        """
-        with self.db as db:
-            cs = db.cursor()
-            all = tuple(map(lambda x: x[0], cs.execute(
-                'SELECT user FROM xp ORDER BY amt DESC').fetchall()))
-            try:
-                return all.index(user) + 1
-            except ValueError:
-                return -1
 
     def get_top(self):
         """Return the top 3 XP holders.
@@ -112,16 +90,26 @@ class Module(BaseModule):
     def get_user(self, user):
         """Return the user, their XP, and position.
         """
-        pos = self.get_pos(user)
-        if pos == -1:
-            return f"User {user} has no tracked XP."
+        with self.db as db:
+            cs = db.cursor()
 
-        xp = self.get_xp(user)
+            # Getting their position
+            all = tuple(map(lambda x: x[0], cs.execute(
+                'SELECT user FROM xp ORDER BY amt DESC').fetchall()))
+            try:
+                pos = all.index(user) + 1
+            except ValueError:
+                # If finding their index in the sorted list fails assume they don't exist.
+                return f"User {user} has no tracked XP."
+
+            cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
+            xp = cs.fetchone()[0]
+
         return f"{user} is #{pos} with {xp} XP."
 
     def main(self):
         if not self.bot.cmdargs:
-            return
+            return "Please provide a user, or 'top' to see the top 3."
 
         arg = self.bot.cmdargs[0]
 
@@ -132,6 +120,7 @@ class Module(BaseModule):
         # Resolve user and show stats
         if arg.startswith('@'):
             arg = arg[1:]
+
         return self.get_user(arg)
 
     def on_pubmsg(self):
