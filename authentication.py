@@ -1,3 +1,4 @@
+import json
 import requests
 
 import setup
@@ -37,45 +38,32 @@ class Authentication:
         Assigns the read values to this `Authentication` objects' `auth` field.
         """
         # Attempting to read the auth file
-        authlines = False
-        while not authlines:
+        auth = False
+        while not auth:
             try:
                 with open(self.file, 'r') as authfile:
-                    authlines = authfile.readlines()
+                    auth = json.loads(authfile.read())
 
             # If not found, write the default and return
             except FileNotFoundError:
                 print("Authfile is missing. Running setup...")
                 setup.main(self.file)
 
-        # Parsing the auth file into the auth dict
-        self.auth = dict()
-        for line in authlines:
-            # Remove newline...
-            line = line[:-1]
-            # Split by delim : (see format)...
-            line = line.split(':')
-            # Append to dict
-            self.auth[line[0]] = line[1]
-
         # Verify the auth has everything it needs...
-        if [k for k in self.auth.keys()] != ['user_id', 'client_id', 'client_secret', 'irc_oauth', 'oauth']:
+        if [k for k in auth.keys()] != ['user_id', 'client_id', 'client_secret', 'irc_oauth', 'oauth']:
             print("Your authfile is missing crucial elements.")
             print("You may need to re-run setup.py.")
             input("rasbot cannot continue, exiting.")
             exit()
 
+        self.auth = auth
+
     def write_authfile(self):
         """Writes to the authfile set by self.file.
         """
-        # Parsing the auth dict into lines for writing
-        authlines = list()
-        for key, value in self.auth.items():
-            authlines.append(f"{key}:{value}\n")
-
         # Writing the auth file
         with open(self.file, 'w') as authfile:
-            authfile.writelines(authlines)
+            authfile.write(json.dumps(self.auth, indent=4))
 
     def get_auth(self):
         """Returns this `Authentication` objects' `auth` dict.
