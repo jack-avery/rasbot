@@ -2,6 +2,8 @@
 # Fill out the fields below with the strings found at the websites
 # Create a command using cmdadd with &request& as the response.
 
+# TODO refactor this to use new osu! API v2 once it drops with Lazer
+
 import socket
 import requests
 import re

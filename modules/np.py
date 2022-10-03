@@ -3,6 +3,8 @@
 # Replace the path below with the path to the file (below is default, might not need to change it)
 # Create a command using cmdadd with &np& as the response.
 
+# TODO refactor this to use new osu! API v2 once it drops with Lazer
+
 from commands import BaseModule
 
 PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/np.txt"

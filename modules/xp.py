@@ -55,6 +55,7 @@ class Module(BaseModule):
         # Create a new connection for this thread
         thread_db = sqlite3.connect(f"modules/_xp/{self.bot.channel_id}.db")
 
+        # TODO replace this if the API ever becomes outdated
         users = requests.get(
             f"https://tmi.twitch.tv/group/user/{self.bot.channel[1:]}/chatters", headers=self.bot.auth.get_headers()).json()
 
