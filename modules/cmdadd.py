@@ -12,32 +12,33 @@ from definitions import VALID_COMMAND_REGEX,\
 
 
 class Module(BaseModule):
-    helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <mod-only?> <hidden?> <response>.'
+    helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <params?> <response>.'
 
     def main(self):
+        if not self.bot.cmdargs:
+            return "No command information given."
+
+        cmd = self.bot.cmdargs
+
+        cmd_name = cmd.pop(0).lower()
+
         try:
-            cmd = self.bot.cmdargs[:]
+            cmd_cooldown = int(cmd[0])
+            cmd.pop(0)
+        except ValueError:
+            cmd_cooldown = DEFAULT_COOLDOWN
 
-            cmd_name = cmd.pop(0).lower()
+        modonly = False
+        if (cmd[0].lower() == MODONLY_ARG):
+            modonly = True
+            cmd.pop(0)
 
-            try:
-                cmd_cooldown = int(cmd[0])
-                cmd.pop(0)
-            except ValueError:
-                cmd_cooldown = DEFAULT_COOLDOWN
+        hidden = False
+        if (cmd[0].lower() == HIDDEN_ARG):
+            hidden = True
+            cmd.pop(0)
 
-            if (cmd[0].lower() == MODONLY_ARG):
-                modonly = True
-                cmd.pop(0)
-            else:
-                modonly = False
-
-            if (cmd[0].lower() == HIDDEN_ARG):
-                hidden = True
-                cmd.pop(0)
-            else:
-                hidden = False
-
+        try:
             self.bot.commands.command_modify(cmd_name,
                                              cmd_cooldown,
                                              " ".join(cmd),
@@ -52,12 +53,6 @@ class Module(BaseModule):
 
         except CommandGivenInvalidNameError:
             return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
-
-        except IndexError:
-            return f'Invalid usage.'
-
-        except ValueError:
-            return 'Cooldown must be a positive integer.'
 
         except ModuleNotFoundError as err:
             return f'Module {err} does not exist.'
