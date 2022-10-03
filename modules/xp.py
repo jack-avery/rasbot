@@ -17,6 +17,9 @@ XP_INACTIVE_RANGE = (2, 2)
 XP_ACTIVE_RANGE = (2, 5)
 """Amount (min, max) to grant to active users. Default is (2, 5)."""
 
+XP_NAME = "XP"
+"""What to call your form of XP."""
+
 
 class RepeatTimer(threading.Timer):
     # See https://stackoverflow.com/a/48741004
@@ -26,7 +29,7 @@ class RepeatTimer(threading.Timer):
 
 
 class Module(BaseModule):
-    helpmsg = "Get how much XP a user has or see the top 3. Usage: xp <username/top>"
+    helpmsg = f"Get how much {XP_NAME} a user has or see the top 3. Usage: {XP_NAME.lower()} <username/top>"
 
     def __init__(self, bot):
         BaseModule.__init__(self, bot)
@@ -106,12 +109,12 @@ class Module(BaseModule):
                 pos = all.index(user) + 1
             except ValueError:
                 # If finding their index in the sorted list fails assume they don't exist.
-                return f"User {user} has no tracked XP."
+                return f"User {user} has no tracked {XP_NAME}."
 
             cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
             xp = cs.fetchone()[0]
 
-        return f"{user} is #{pos} with {xp} XP."
+        return f"{user} is #{pos} with {xp} {XP_NAME}."
 
     def main(self):
         if not self.bot.cmdargs:
