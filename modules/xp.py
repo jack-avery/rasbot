@@ -74,7 +74,9 @@ class Module(BaseModule):
                 thread_db.execute(
                     f"UPDATE xp SET amt = amt + {amt} WHERE user = \"{user}\"")
 
-        # Clear active users for this window.
+        # Commit XP modifications and clear active users for the next window.
+        thread_db.commit()
+
         self.active_users.clear()
 
     def get_top(self):
@@ -109,9 +111,9 @@ class Module(BaseModule):
 
     def main(self):
         if not self.bot.cmdargs:
-            return "Please provide a user, or 'top' to see the top 3."
-
-        arg = self.bot.cmdargs[0]
+            arg = self.bot.author_name
+        else:
+            arg = self.bot.cmdargs[0]
 
         # Show top 3
         if arg == "top":
