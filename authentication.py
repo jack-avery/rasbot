@@ -65,10 +65,10 @@ class Authentication:
         with open(self.file, 'w') as authfile:
             authfile.write(json.dumps(self.auth, indent=4))
 
-    def get_auth(self):
-        """Returns this `Authentication` objects' `auth` dict.
+    def get(self, key):
+        """Return the item with the given `key`.
         """
-        return self.auth
+        return self.auth[key]
 
     def get_headers(self):
         """Returns headers.

@@ -15,7 +15,7 @@ from definitions import CommandIsModOnlyError,\
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, auth, channel_id: int, channel: str, cfgid: int = None, debug: bool = False):
+    def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgid: int = None, debug: bool = False):
         """Create a new instance of a Twitch bot.
 
         :param auth: The Authentication object to use.
@@ -47,9 +47,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Initialize authentication
         self.auth = auth
         self.channel_id = channel_id
-        authkeys = self.auth.get_auth()
 
-        self.logger.info(f"Starting as {authkeys['user_id']}...")
+        self.logger.info(f"Starting as {self.auth.get('user_id')}...")
 
         # Import channel info
         self.cfgid = cfgid
@@ -87,7 +86,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info('Connecting to ' + server +
                          ' on port ' + str(port) + '...')
         irc.bot.SingleServerIRCBot.__init__(self, [(
-            server, port, f"oauth:{authkeys['irc_oauth']}")], authkeys['user_id'], authkeys['user_id'])
+            server, port, f"oauth:{self.auth.get('irc_oauth')}")], self.auth.get('user_id'), self.auth.get('user_id'))
 
     def on_welcome(self, c, e):
         # You must request specific capabilities before you can use them
@@ -217,7 +216,7 @@ def run(channel=None, auth=None, cfg=None, debug=False):
     auth = Authentication(auth)
 
     if not channel:
-        channel = auth.get_auth()['user_id']
+        channel = auth.get('user_id')
 
     # Resolve ID from channel name
     channel_id = False
