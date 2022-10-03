@@ -31,8 +31,11 @@ class Module(BaseModule):
     def __init__(self, bot):
         BaseModule.__init__(self, bot)
 
+        # resolve path
+        self.db_path = f"modules/xp_store/{self.bot.channel_id}.db"
+
         # init the sqlite3 connection
-        self.db = sqlite3.connect(f"modules/_xp/{self.bot.channel_id}.db")
+        self.db = sqlite3.connect(self.db_path)
 
         # Create the table if it doesn't exist
         self.db.execute("""
@@ -53,8 +56,7 @@ class Module(BaseModule):
     # Get viewerlist and do XP gain logic
     def tick(self):
         # Create a new connection for this thread
-        thread_db = sqlite3.connect(
-            f"modules/xp_store/{self.bot.channel_id}.db")
+        thread_db = sqlite3.connect(self.db_path)
 
         # TODO replace this if the API ever becomes outdated
         users = requests.get(
