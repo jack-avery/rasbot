@@ -46,10 +46,10 @@ class Module(BaseModule):
 
     def main(self):
         if self.username:
-            try:
-                req = self.bot.cmdargs[0].lower()
-            except IndexError:
+            if not self.bot.cmdargs:
                 return "Provide a map to request."
+
+            req = self.bot.cmdargs[0].lower()
 
             # Resolve ID
             if self.beatmapset_re.match(req):
@@ -76,6 +76,9 @@ class Module(BaseModule):
                 f"{self.bot.author_name} requested: [https://osu.ppy.sh/b/{id} {map['artist']} - {map['title']} [{map['version']}]] {message}")
 
             return "Request sent!"
+
+        else:
+            return "Username could not be resolved. Please check/fix configuration."
 
     def send_osu_message(self, msg):
         self.irc.send(bytes(
