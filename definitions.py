@@ -7,7 +7,7 @@ BUILTIN_MODULES = ['help', 'uptime', 'cmdadd', 'cmddel',
 """Built-in command modules. Used for the autoupdate function."""
 
 RASBOT_BASE = ['authentication', 'bot', 'commands', 'config',
-               'definitions', 'refresh_oauth', 'update', 'setup']
+               'definitions', 'update', 'setup']
 """Built-in modules. Used for the autoupdate function."""
 
 VALID_COMMAND_REGEX = r'[a-z0-9_]+'

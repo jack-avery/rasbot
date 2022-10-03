@@ -1,9 +1,12 @@
+import io
 import subprocess
 import sys
 import requests
 import click
 import semantic_version
 from definitions import BUILTIN_MODULES, RASBOT_BASE
+
+BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main"
 
 
 @click.command()
@@ -53,8 +56,7 @@ def check(silent=False, force=False, l=False):
     if not silent:
         print(f"You are running on rasbot version: {current}")
 
-    latest = semantic_version.Version(requests.get(
-        "https://raw.githubusercontent.com/jack-avery/rasbot/master/version").text)
+    latest = semantic_version.Version(requests.get(f"{BASE_URL}/version").text)
 
     if current < latest:
         prompt()
@@ -83,7 +85,7 @@ def update_first():
     for module in ['definitions', 'update']:
         print(f"Updating {module}.py...")
         text = requests.get(
-            f"https://raw.githubusercontent.com/jack-avery/rasbot/master/{module}.py").text
+            f"{BASE_URL}/{module}.py").text
 
         with open(f"{module}.py", 'w') as commandfile:
             commandfile.write(text)
@@ -99,7 +101,7 @@ def update_inner():
     for module in BUILTIN_MODULES:
         print(f"Updating built-in module {module}...")
         text = requests.get(
-            f"https://raw.githubusercontent.com/jack-avery/rasbot/master/modules/{module}.py").text
+            f"{BASE_URL}/modules/{module}.py").text
 
         with open(f"modules/{module}.py", 'w') as modulefile:
             modulefile.write(text)
@@ -110,34 +112,41 @@ def update_inner():
         if base not in ['definitions', 'update']:
             print(f"Updating base file {base}...")
             text = requests.get(
-                f"https://raw.githubusercontent.com/jack-avery/rasbot/master/{base}.py").text
+                f"{BASE_URL}/{base}.py").text
 
             with open(f"{base}.py", 'w') as basefile:
                 basefile.write(text)
-    print("Finished updating modules.\n")
+    print("Finished updating base.\n")
 
     # Check for new requirements
     print("Running requirements.txt...")
     requirements = requests.get(
-        "https://raw.githubusercontent.com/jack-avery/rasbot/master/requirements.txt").text
+        f"{BASE_URL}/requirements.txt").text
     with open("requirements.txt", 'w') as requirementsfile:
         requirementsfile.write(requirements)
 
     check_requirements()
     print("All requirements checked.\n")
 
-    # Update readme
+    # Update README files
     print("Updating README.md...")
     readme = requests.get(
-        "https://raw.githubusercontent.com/jack-avery/rasbot/master/README.md").text
-    with open("README.md", 'w') as readmemd:
+        f"{BASE_URL}/README.md").text
+    with io.open("README.md", 'w', encoding="utf8") as readmemd:
         readmemd.write(readme)
     print("Finished updating README.md.\n")
+
+    print("Updating modules README.md...")
+    modreadme = requests.get(
+        f"{BASE_URL}/modules/README.md").text
+    with open("modules/README.md", 'w') as modreadmemd:
+        modreadmemd.write(modreadme)
+    print("Finished updating modules README.md.\n")
 
     # Increment version
     print("Incrementing version...")
     version = requests.get(
-        "https://raw.githubusercontent.com/jack-avery/rasbot/master/version").text
+        f"{BASE_URL}/version").text
     with open("version", 'w') as versionfile:
         versionfile.write(version)
 
