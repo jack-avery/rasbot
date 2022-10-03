@@ -48,7 +48,7 @@ class Module(BaseModule):
         if self.username:
             try:
                 req = self.bot.cmdargs[0].lower()
-            except:
+            except IndexError:
                 return "Provide a map to request."
 
             # Resolve ID
@@ -62,7 +62,11 @@ class Module(BaseModule):
             # Retrieve beatmap information
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={OSU_API_KEY}")
-            map = req.json()[0]
+
+            try:
+                map = req.json()[0]
+            except IndexError:
+                return "Could not retrieve beatmap information."
 
             # Anything can go in here, this is intended to be customizable.
             # See the possible information from the 'map' dict at https://github.com/ppy/osu-api/wiki#response
