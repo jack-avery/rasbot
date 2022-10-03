@@ -1,4 +1,10 @@
+# config files or otherwise private
 _*
+
+# xp storage dbs
+/modules/xp_store
+
+# compiler generated
 *.spec
 /build
 /dist

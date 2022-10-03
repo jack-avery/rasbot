@@ -53,7 +53,8 @@ class Module(BaseModule):
     # Get viewerlist and do XP gain logic
     def tick(self):
         # Create a new connection for this thread
-        thread_db = sqlite3.connect(f"modules/_xp/{self.bot.channel_id}.db")
+        thread_db = sqlite3.connect(
+            f"modules/xp_store/{self.bot.channel_id}.db")
 
         # TODO replace this if the API ever becomes outdated
         users = requests.get(
