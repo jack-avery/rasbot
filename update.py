@@ -54,7 +54,7 @@ def check(silent=False, force=False, l=False):
         print(f"You are running on rasbot version: {current}")
 
     latest = semantic_version.Version(requests.get(
-        "https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text)
+        "https://raw.githubusercontent.com/jack-avery/rasbot/master/version").text)
 
     if current < latest:
         prompt()
@@ -83,7 +83,7 @@ def update_first():
     for module in ['definitions', 'update']:
         print(f"Updating {module}.py...")
         text = requests.get(
-            f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{module}.py").text
+            f"https://raw.githubusercontent.com/jack-avery/rasbot/master/{module}.py").text
 
         with open(f"{module}.py", 'w') as commandfile:
             commandfile.write(text)
@@ -99,7 +99,7 @@ def update_inner():
     for module in BUILTIN_MODULES:
         print(f"Updating built-in module {module}...")
         text = requests.get(
-            f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/modules/{module}.py").text
+            f"https://raw.githubusercontent.com/jack-avery/rasbot/master/modules/{module}.py").text
 
         with open(f"modules/{module}.py", 'w') as modulefile:
             modulefile.write(text)
@@ -110,7 +110,7 @@ def update_inner():
         if base not in ['definitions', 'update']:
             print(f"Updating base file {base}...")
             text = requests.get(
-                f"https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/{base}.py").text
+                f"https://raw.githubusercontent.com/jack-avery/rasbot/master/{base}.py").text
 
             with open(f"{base}.py", 'w') as basefile:
                 basefile.write(text)
@@ -119,7 +119,7 @@ def update_inner():
     # Check for new requirements
     print("Running requirements.txt...")
     requirements = requests.get(
-        "https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/requirements.txt").text
+        "https://raw.githubusercontent.com/jack-avery/rasbot/master/requirements.txt").text
     with open("requirements.txt", 'w') as requirementsfile:
         requirementsfile.write(requirements)
 
@@ -129,7 +129,7 @@ def update_inner():
     # Update readme
     print("Updating README.md...")
     readme = requests.get(
-        "https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/README.md").text
+        "https://raw.githubusercontent.com/jack-avery/rasbot/master/README.md").text
     with open("README.md", 'w') as readmemd:
         readmemd.write(readme)
     print("Finished updating README.md.\n")
@@ -137,7 +137,7 @@ def update_inner():
     # Increment version
     print("Incrementing version...")
     version = requests.get(
-        "https://raw.githubusercontent.com/raspy-on-osu/rasbot/master/version").text
+        "https://raw.githubusercontent.com/jack-avery/rasbot/master/version").text
     with open("version", 'w') as versionfile:
         versionfile.write(version)
 

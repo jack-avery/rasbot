@@ -13,7 +13,7 @@ rasbot is intended to run locally on your account so it has access to your Twitc
 # How to Use ✍️
 1. Download and install [Python version 3.10.0+](https://www.python.org/downloads/), ensuring you add it to the Path.
 2. Download the Source Code:
-> Using [git](https://git-scm.com/downloads): `git clone https://github.com/raspy-on-osu/rasbot` <br/>
+> Using [git](https://git-scm.com/downloads): `git clone https://github.com/jack-avery/rasbot` <br/>
 > Or, click on **Code** at the top right and **Download ZIP**.
 3. Run `setup.py` and follow the steps to set up your authentication.
 4. Run `bot.py`.
@@ -45,4 +45,4 @@ To include a module as part of a command, encompass the module name in `&`, e.g.
 r!cmdadd np &np&
 ```
 
-*For documentation on creating your own modules, see [this](https://github.com/raspy-on-osu/rasbot/blob/master/modules/README.md).*
+*For documentation on creating your own modules, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*
