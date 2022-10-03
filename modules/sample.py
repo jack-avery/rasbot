@@ -18,7 +18,9 @@ class Module(BaseModule):
 
     # This runs if the module is part of a command which gets called.
     def main(self):
-        return f"Sample! {self.count} messages have been sent so far."
+        # You can get the author's name, UID, and mod status like so!
+        return (f"@{self.bot.author_name} ({self.bot.author_uid}, {self.bot.author_ismod}),"
+                + f"{self.count} messages have been sent so far.")
 
     # This runs on all messages regardless of whether the command is called.
     def on_pubmsg(self):
