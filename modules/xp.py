@@ -8,14 +8,14 @@ import requests
 import sqlite3
 import threading
 
-XP_GRANT_FREQUENCY = 180.0
-"""Amount of seconds between each grant. Default is 180 (3 minutes)."""
+XP_GRANT_FREQUENCY = 60.0
+"""Amount of seconds between each grant. Default is 60 (1 minute)."""
 
-XP_INACTIVE_RANGE = (2, 2)
-"""Amount (min, max) to grant to inactive users. Default is (2, 2)."""
+XP_INACTIVE_RANGE = (1, 1)
+"""Amount (min, max) to grant to inactive users. Default is (1, 1)."""
 
-XP_ACTIVE_RANGE = (2, 5)
-"""Amount (min, max) to grant to active users. Default is (2, 5)."""
+XP_ACTIVE_RANGE = (2, 3)
+"""Amount (min, max) to grant to active users. Default is (2, 3)."""
 
 XP_NAME = "XP"
 """What to call your form of XP."""
@@ -65,6 +65,10 @@ class Module(BaseModule):
         users = requests.get(
             f"https://tmi.twitch.tv/group/user/{self.bot.channel[1:]}/chatters", headers=self.bot.auth.get_headers()).json()
 
+        # Prevent streamer from earning watchtime XP on their own stream
+        users['chatters'].pop('broadcaster')
+
+        # Give XP to each user
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
                 # Resolve how much XP to grant to this user
