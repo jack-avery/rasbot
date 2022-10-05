@@ -43,8 +43,9 @@ class Module(BaseModule):
             self.db = sqlite3.connect(self.db_path)
 
         except sqlite3.OperationalError:
-            # Assume the folder doesn't exist
+            # Make folder and reattempt init
             os.mkdir("modules/xp_store")
+            self.db = sqlite3.connect(self.db_path)
 
         # Create the table if it doesn't exist
         self.db.execute("""
