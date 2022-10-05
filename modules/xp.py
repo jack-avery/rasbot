@@ -3,6 +3,7 @@
 # "Levels" may be implemented eventually, but assume it will be left as-is.
 
 from commands import BaseModule
+import os
 import random
 import requests
 import sqlite3
@@ -38,7 +39,12 @@ class Module(BaseModule):
         self.db_path = f"modules/xp_store/{self.bot.channel_id}.db"
 
         # init the sqlite3 connection
-        self.db = sqlite3.connect(self.db_path)
+        try:
+            self.db = sqlite3.connect(self.db_path)
+
+        except sqlite3.OperationalError:
+            # Assume the folder doesn't exist
+            os.mkdir("modules/xp_store")
 
         # Create the table if it doesn't exist
         self.db.execute("""

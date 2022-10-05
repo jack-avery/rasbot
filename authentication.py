@@ -46,7 +46,7 @@ class Authentication:
         # If not found, do nothing. Assume set-up
         except FileNotFoundError:
             self.auth = {}
-            pass
+            return
 
             # Verify the auth has everything it needs...
         if [k for k in auth.keys()] != ['user_id', 'client_id', 'client_secret', 'irc_oauth', 'oauth']:
