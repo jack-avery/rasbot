@@ -4,7 +4,7 @@ import subprocess
 from definitions import AuthenticationDeniedError
 
 
-def main(authpath: str):
+def main():
     # Check for new requirements
     print("Running local requirements.txt...")
     subprocess.check_call([sys.executable, "-m", "pip",
@@ -12,9 +12,9 @@ def main(authpath: str):
     print("All requirements installed.\n")
 
     # We don't want people to accidentally overwrite their current auth
-    if os.path.isfile(authpath):
-        print(f"You already have an authfile at {authpath}!")
-        print(f"Running this tool will overwrite {authpath}.")
+    if os.path.isfile("_AUTH.py"):
+        print(f"You already have an authfile at _AUTH.py!")
+        print(f"Running this tool will overwrite _AUTH.py.")
         print("If you want to save it, please rename it to something else, then restart this tool.\n")
         if input("Are you sure you want to continue? (y/Y for yes): ").lower() != 'y':
             exit()
@@ -22,7 +22,6 @@ def main(authpath: str):
     # Set up
     # Import auth here as it uses requests and will error out otherwise
     from authentication import Authentication
-    auth = Authentication()
 
     # Getting Twitch username
     user_id = input("Your Twitch username: ").lower()
@@ -56,6 +55,7 @@ def main(authpath: str):
         irc_oauth = irc_oauth[irc_oauth.find(":")+1:]
 
     # Adding all the info to the auth
+    auth = Authentication()
     auth.auth['user_id'] = user_id
     auth.auth['client_id'] = client_id
     auth.auth['client_secret'] = client_secret

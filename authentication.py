@@ -39,17 +39,16 @@ class Authentication:
         """
         # Attempting to read the auth file
         auth = False
-        while not auth:
-            try:
-                with open(self.file, 'r') as authfile:
-                    auth = json.loads(authfile.read())
+        try:
+            with open(self.file, 'r') as authfile:
+                auth = json.loads(authfile.read())
 
-            # If not found, write the default and return
-            except FileNotFoundError:
-                print("Authfile is missing. Running setup...")
-                setup.main(self.file)
+        # If not found, do nothing. Assume set-up
+        except FileNotFoundError:
+            self.auth = {}
+            pass
 
-        # Verify the auth has everything it needs...
+            # Verify the auth has everything it needs...
         if [k for k in auth.keys()] != ['user_id', 'client_id', 'client_secret', 'irc_oauth', 'oauth']:
             print("Your authfile is missing crucial elements.")
             print("You may need to re-run setup.py.")
