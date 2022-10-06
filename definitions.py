@@ -2,8 +2,8 @@
 # Definitions
 ##
 
-BUILTIN_MODULES = ['help', 'uptime', 'cmdadd', 'cmddel',
-                           'prefix', 'target', 'caller']
+BUILTIN_MODULES = ['caller', 'cmdadd', 'cmddel', 'help', 'np',
+                   'prefix', 'request', 'sample', 'target', 'uptime', 'xp']
 """Built-in command modules. Used for the autoupdate function."""
 
 RASBOT_BASE = ['authentication', 'bot', 'commands', 'config',
