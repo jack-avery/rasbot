@@ -193,7 +193,7 @@ class Module(BaseModule):
                 return self.mod_user(action, user, arg)
 
             except IndexError:
-                return "Please provide an action and a user. Valid actions are: purge, set <amount>."
+                return "Please provide an action and a user. Valid actions are: purge, set <amount>, ban, unban."
 
         # Resolve user and show stats
         if arg.startswith('@'):
