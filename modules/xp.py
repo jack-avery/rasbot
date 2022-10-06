@@ -21,6 +21,9 @@ XP_ACTIVE_RANGE = (2, 3)
 XP_NAME = "XP"
 """What to call your form of XP."""
 
+XP_OMIT_USERS = [""]
+"""A list of users to omit from gaining XP."""
+
 
 class RepeatTimer(threading.Timer):
     # See https://stackoverflow.com/a/48741004
@@ -78,6 +81,9 @@ class Module(BaseModule):
         # Give XP to each user
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
+                if user in XP_OMIT_USERS:
+                    continue
+
                 # Resolve how much XP to grant to this user
                 if (user in self.active_users):
                     amt = random.randint(
@@ -127,6 +133,27 @@ class Module(BaseModule):
 
         return f"{user} is #{pos} with {xp} {XP_NAME}."
 
+    def mod_user(self, action, user, arg):
+        """Perform an action on a user.
+        """
+        with self.db as db:
+            if action == "purge":
+                db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
+                msg = f"User {user} reset."
+
+            elif action == "set":
+                try:
+                    arg = int(arg)
+                except ValueError:
+                    return f"Please provide an amount to set the user's {XP_NAME} to."
+
+                db.execute(
+                    f"UPDATE xp SET amt = {arg} WHERE user = \"{user}\"")
+                msg = f"Set {user}'s {XP_NAME} to {arg}."
+
+            db.commit()
+        return msg
+
     def main(self):
         if not self.bot.cmdargs:
             arg = self.bot.author_name
@@ -136,6 +163,31 @@ class Module(BaseModule):
         # Show top 3
         if arg == "top":
             return self.get_top()
+
+        # XP moderation tools
+        if arg == "mod":
+            if not self.bot.author_ismod:
+                return "You must be a moderator to do that."
+
+            try:
+                args = self.bot.cmdargs[1:]
+
+                action = args[0]
+                user = args[1]
+
+                try:
+                    arg = args[2]
+                except IndexError:
+                    arg = None
+
+                # Resolve user
+                if user.startswith('@'):
+                    user = user[1:]
+
+                return self.mod_user(action, user, arg)
+
+            except IndexError:
+                return "Please provide an action and a user. Valid actions are: purge, set <amount>."
 
         # Resolve user and show stats
         if arg.startswith('@'):
