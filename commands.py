@@ -138,6 +138,9 @@ class BaseModule(threading.Thread):
     helpmsg = 'No help message available for module.'
 
     def __init__(self, bot, name, cfgdefault=None):
+        """Initialize a module. If a `cfgdefault` is given,
+        it will drop the given default into the user's config directory.
+        """
         threading.Thread.__init__(self)
         self.bot = bot
         self.__name = name
@@ -146,21 +149,26 @@ class BaseModule(threading.Thread):
         if not os.path.exists("modules/config"):
             os.mkdir("modules/config")
 
+        if not os.path.exists(f"modules/config/{self.bot.channel_id}"):
+            os.mkdir(f"modules/config/{self.bot.channel_id}")
+
+        self.__cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
+
         # If no config found and a default provided, create it
-        if not os.path.exists(f"modules/config/{name}.txt"):
+        if not os.path.exists(self.__cfg_path):
             if cfgdefault:
-                with open(f"modules/config/{name}.txt", 'w') as cfg:
+                with open(self.__cfg_path, 'w') as cfg:
                     cfg.write(json.dumps(cfgdefault, indent=4))
 
         # Load config
-        if os.path.exists(f"modules/config/{name}.txt"):
-            with open(f"modules/config/{name}.txt", 'r') as cfg:
+        if os.path.exists(self.__cfg_path):
+            with open(self.__cfg_path, 'r') as cfg:
                 self.cfg = json.loads(cfg.read())
 
     def save_config(self):
         """Save the current form of this module's `self.cfg` attribute to file.
         """
-        with open(f"modules/config/{self.__name}.txt", 'w') as cfg:
+        with open(f"modules/config/{self.bot.channel_id}/{self.__name}.txt", 'w') as cfg:
             cfg.write(json.dumps(self.cfg, indent=4))
 
     def main(self):

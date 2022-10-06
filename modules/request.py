@@ -15,7 +15,9 @@ DEFAULT_CONFIG = {
     # Your osu! API key. Get this from https://osu.ppy.sh/p/api.
     "osu_api_key": "",
     # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
-    "osu_irc_pwd": "",
+    "osu_irc_pass": "",
+    # ID of the user that the request should go to.
+    "osu_trgt_id": ""
 }
 
 OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
@@ -36,15 +38,21 @@ class Module(BaseModule):
         self.beatmapset_re = re.compile(OSU_BEATMAPSET_RE)
         self.b_re = re.compile(OSU_B_RE)
 
-        # Resolve username
-        self.username = False
+        # Resolve usernames
+        self.username = self.resolve_username(self.cfg['osu_user_id'])
+        self.target = self.resolve_username(self.cfg['osu_trgt_id'])
+
+    def resolve_username(self, id):
+        """Resolves a users' osu! username from their ID.
+        """
         try:
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_user?u={self.cfg['osu_user_id']}&k={self.cfg['osu_api_key']}")
-            self.username = req.json()[0]['username'].replace(" ", "_")
+                f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg['osu_api_key']}")
+            return req.json()[0]['username'].replace(" ", "_")
         except:
             print(
-                "An error occurred trying to resolve your osu! username. Your API key may be invalid.")
+                f"An error occurred trying to resolve osu! username for ID {id}. Your API key may be invalid.")
+            return None
 
     def main(self):
         if self.username:
@@ -87,4 +95,4 @@ class Module(BaseModule):
             f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
         self.irc.send(bytes(f"PASS {self.cfg['osu_irc_pwd']}\n", "UTF-8"))
         self.irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
-        self.irc.send(bytes(f"PRIVMSG {self.username} {msg}\n", "UTF-8"))
+        self.irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
