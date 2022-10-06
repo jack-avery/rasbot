@@ -7,16 +7,21 @@
 
 from commands import BaseModule
 
-PATH_TO_STREAMCOMPANION_NP_FILE = "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
+DEFAULT_CONFIG = {
+    "path": "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
+}
 """Path to osu!StreamCompanion NP info file, for use in `methods/np.py`."""
 
 
 class Module(BaseModule):
     helpmsg = 'Prints "Now Playing" information from a configured file. Usage: np'
 
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+
     def main(self):
         try:
-            with open(PATH_TO_STREAMCOMPANION_NP_FILE, 'r') as file:
+            with open(self.cfg['path'], 'r') as file:
                 return f'{file.readlines()[0]}'
         except (FileNotFoundError, IndexError):
             return 'No NP data found.'
