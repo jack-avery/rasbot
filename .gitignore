@@ -4,6 +4,9 @@ _*
 # xp storage dbs
 /modules/xp_store
 
+# modules configuration
+/modules/config
+
 # compiler generated
 *.spec
 /build
