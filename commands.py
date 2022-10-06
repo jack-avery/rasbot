@@ -36,7 +36,7 @@ class Command:
 
         self.__last_used = 0
 
-    def run(self, bot, name):
+    def run(self, bot):
         """Code to be run when this command is called from chat.
 
         Runs all && codes found in the command and returns the result.

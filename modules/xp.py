@@ -76,7 +76,7 @@ class Module(BaseModule):
         # Give XP to each user
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
-                if user in self.cfg["omit_users"]:
+                if user.lower() in self.cfg["omit_users"]:
                     continue
 
                 # Resolve how much XP to grant to this user
@@ -145,6 +145,17 @@ class Module(BaseModule):
                 db.execute(
                     f"UPDATE xp SET amt = {arg} WHERE user = \"{user}\"")
                 msg = f"Set {user}'s XP to {arg}."
+
+            elif action == "ban":
+                db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
+                self.cfg["omit_users"].append(user.lower())
+                self.save_config()
+                msg = f"Set {user}'s XP to 0 and banished from earning."
+
+            elif action == "unban":
+                self.cfg["omit_users"].remove(user.lower())
+                self.save_config()
+                msg = f"Removed {user} from XP banished users."
 
             db.commit()
         return msg
