@@ -11,9 +11,9 @@ from commands import BaseModule
 
 
 class Module(BaseModule):
-    def __init__(self, bot):
+    def __init__(self, bot, name):
         # Make sure you call BaseModule init if overriding __init__!
-        BaseModule.__init__(self, bot)
+        BaseModule.__init__(self, bot, name)
         self.count = 0
 
     # This runs if the module is part of a command which gets called.

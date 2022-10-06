@@ -11,8 +11,8 @@ from definitions import MODULE_MENTION_REGEX
 class Module(BaseModule):
     helpmsg = 'Prints all available commands, or, if provided a method, prints the help message for that method. Usage: help <method?>'
 
-    def __init__(self, bot):
-        BaseModule.__init__(self, bot)
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name)
         self.module_re = re.compile(MODULE_MENTION_REGEX)
 
     def main(self):

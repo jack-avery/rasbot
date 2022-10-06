@@ -26,8 +26,8 @@ OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b\/(\d+)$'
 class Module(BaseModule):
     helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link>'
 
-    def __init__(self, bot):
-        BaseModule.__init__(self, bot)
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name)
 
         # Create IRC socket and connect to irc.ppy.sh
         self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

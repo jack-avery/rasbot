@@ -1,4 +1,6 @@
 import importlib.util
+import json
+import os
 import re
 import threading
 import time
@@ -34,7 +36,7 @@ class Command:
 
         self.__last_used = 0
 
-    def run(self, bot):
+    def run(self, bot, name):
         """Code to be run when this command is called from chat.
 
         Runs all && codes found in the command and returns the result.
@@ -135,9 +137,31 @@ class BaseModule(threading.Thread):
     """
     helpmsg = 'No help message available for module.'
 
-    def __init__(self, bot):
+    def __init__(self, bot, name, cfgdefault=None):
         threading.Thread.__init__(self)
         self.bot = bot
+        self.__name = name
+
+        # Persistent config loading: create base folder.
+        if not os.path.exists("modules/config"):
+            os.mkdir("modules/config")
+
+        # If no config found and a default provided, create it
+        if not os.path.exists(f"modules/config/{name}.txt"):
+            if cfgdefault:
+                with open(f"modules/config/{name}.txt", 'w') as cfg:
+                    cfg.write(json.dumps(cfgdefault, indent=4))
+
+        # Load config
+        if os.path.exists(f"modules/config/{name}.txt"):
+            with open(f"modules/config/{name}.txt", 'r') as cfg:
+                self.cfg = json.loads(cfg.read())
+
+    def save_config(self):
+        """Save the current form of this module's `self.cfg` attribute to file.
+        """
+        with open(f"modules/config/{self.__name}.txt", 'w') as cfg:
+            cfg.write(json.dumps(self.cfg, indent=4))
 
     def main(self):
         """Code to be run for the modules' && code.
@@ -179,7 +203,7 @@ def module_add(name: str):
         spec.loader.exec_module(module)
 
         # Give it its' own thread and start it up
-        modules[name] = module.Module(refs['bot'])
+        modules[name] = module.Module(refs['bot'], name)
         modules[name].start()
     except FileNotFoundError:
         raise ModuleNotFoundError(f"{name} does not exist in modules folder")

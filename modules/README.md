@@ -8,7 +8,7 @@ Name the file after your module: `sample.py`.<br/>
 You can then reference your module as the response of a command, for example, `r!cmdadd sample &sample&`.
 
 Your module must have a `Module` class that extends `commands.BaseModule`.<br/>
-> If you're overriding \_\_init__, be sure to call BaseModule.\_\_init__(self, bot).
+> If you're overriding \_\_init__, be sure to call BaseModule.\_\_init__(self, bot, name).
 
 The code that replaces `&sample&` in the response goes in a method called `main`.<br/>
 You can find the `TwitchBot` instance as `self.bot`.<br/>

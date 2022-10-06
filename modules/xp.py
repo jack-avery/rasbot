@@ -9,20 +9,15 @@ import requests
 import sqlite3
 import threading
 
-XP_GRANT_FREQUENCY = 60.0
-"""Amount of seconds between each grant. Default is 60 (1 minute)."""
-
-XP_INACTIVE_RANGE = (1, 1)
-"""Amount (min, max) to grant to inactive users. Default is (1, 1)."""
-
-XP_ACTIVE_RANGE = (2, 3)
-"""Amount (min, max) to grant to active users. Default is (2, 3)."""
-
-XP_NAME = "XP"
-"""What to call your form of XP."""
-
-XP_OMIT_USERS = [""]
-"""A list of users to omit from gaining XP."""
+DEFAULT_CONFIG = {
+    # Amount of seconds between each grant. Default is 60 (1 minute).
+    "xp_grant_frequency": 60,
+    # Amount (min, max) to grant to inactive users. Default is (1, 1).
+    "xp_inactive_range": [1, 1],
+    # Amount (min, max) to grant to active users. Default is (2, 3).
+    "xp_active_range": [2, 3],
+    "omit_users": []
+}
 
 
 class RepeatTimer(threading.Timer):
@@ -33,10 +28,10 @@ class RepeatTimer(threading.Timer):
 
 
 class Module(BaseModule):
-    helpmsg = f"Get how much {XP_NAME} a user has or see the top 3. Usage: {XP_NAME.lower()} <username/top>"
+    helpmsg = f"Get how much XP a user has or see the top 3. Usage: xp <username/top>"
 
-    def __init__(self, bot):
-        BaseModule.__init__(self, bot)
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
 
         # resolve path
         self.db_path = f"modules/xp_store/{self.bot.channel_id}.db"
@@ -63,7 +58,7 @@ class Module(BaseModule):
         self.active_users = []
 
         # Tick XP every XP_GRANT_FREQUENCY seconds
-        timer = RepeatTimer(XP_GRANT_FREQUENCY, self.tick)
+        timer = RepeatTimer(self.cfg["xp_grant_frequency"], self.tick)
         timer.start()
 
     # Get viewerlist and do XP gain logic
@@ -81,16 +76,16 @@ class Module(BaseModule):
         # Give XP to each user
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
-                if user in XP_OMIT_USERS:
+                if user in self.cfg["omit_users"]:
                     continue
 
                 # Resolve how much XP to grant to this user
                 if (user in self.active_users):
                     amt = random.randint(
-                        XP_ACTIVE_RANGE[0], XP_ACTIVE_RANGE[1])
+                        self.cfg['xp_active_range'][0], self.cfg['xp_active_range'][1])
                 else:
                     amt = random.randint(
-                        XP_INACTIVE_RANGE[0], XP_INACTIVE_RANGE[1])
+                        self.cfg['xp_inactive_range'][0], self.cfg['xp_inactive_range'][1])
 
                 # Grant it to the user
                 thread_db.execute(
@@ -126,12 +121,12 @@ class Module(BaseModule):
                 pos = all.index(user) + 1
             except ValueError:
                 # If finding their index in the sorted list fails assume they don't exist.
-                return f"User {user} has no tracked {XP_NAME}."
+                return f"User {user} has no tracked XP."
 
             cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
             xp = cs.fetchone()[0]
 
-        return f"{user} is #{pos} with {xp} {XP_NAME}."
+        return f"{user} is #{pos} with {xp} XP."
 
     def mod_user(self, action, user, arg):
         """Perform an action on a user.
@@ -139,17 +134,17 @@ class Module(BaseModule):
         with self.db as db:
             if action == "purge":
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
-                msg = f"User {user} reset."
+                msg = f"Reset {user}'s to 0."
 
             elif action == "set":
                 try:
                     arg = int(arg)
                 except ValueError:
-                    return f"Please provide an amount to set the user's {XP_NAME} to."
+                    return f"Please provide an amount to set the user's XP to."
 
                 db.execute(
                     f"UPDATE xp SET amt = {arg} WHERE user = \"{user}\"")
-                msg = f"Set {user}'s {XP_NAME} to {arg}."
+                msg = f"Set {user}'s XP to {arg}."
 
             db.commit()
         return msg
