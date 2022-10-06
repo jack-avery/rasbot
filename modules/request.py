@@ -1,5 +1,5 @@
 # 'request' code for osu! requests. To get this to work:
-# Fill out the fields below with the strings found at the websites
+# Fill out the fields in the config file with the strings found at the websites
 # Create a command using cmdadd with &request& as the response.
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
@@ -9,14 +9,14 @@ import requests
 import re
 from commands import BaseModule
 
-OSU_USER_ID = "6578827"
-"""Your osu! ID. Go to your profile on the website and this should be in the URL."""
-
-OSU_API_KEY = ""
-"""Your osu! API key. Get this from https://osu.ppy.sh/p/api."""
-
-OSU_IRC_PASSWORD = ""
-"""Your osu! IRC password. Get this from https://old.ppy.sh/p/irc."""
+DEFAULT_CONFIG = {
+    # Your osu! ID. Go to your profile on the website and this should be in the URL.
+    "osu_user_id": "",
+    # Your osu! API key. Get this from https://osu.ppy.sh/p/api.
+    "osu_api_key": "",
+    # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
+    "osu_irc_pwd": "",
+}
 
 OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 
@@ -27,7 +27,7 @@ class Module(BaseModule):
     helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link>'
 
     def __init__(self, bot, name):
-        BaseModule.__init__(self, bot, name)
+        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
 
         # Create IRC socket and connect to irc.ppy.sh
         self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -40,7 +40,7 @@ class Module(BaseModule):
         self.username = False
         try:
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_user?u={OSU_USER_ID}&k={OSU_API_KEY}")
+                f"https://osu.ppy.sh/api/get_user?u={self.cfg['osu_user_id']}&k={self.cfg['osu_api_key']}")
             self.username = req.json()[0]['username'].replace(" ", "_")
         except:
             print(
@@ -63,7 +63,7 @@ class Module(BaseModule):
 
             # Retrieve beatmap information
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={OSU_API_KEY}")
+                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg['osu_api_key']}")
 
             try:
                 map = req.json()[0]
@@ -85,6 +85,6 @@ class Module(BaseModule):
     def send_osu_message(self, msg):
         self.irc.send(bytes(
             f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
-        self.irc.send(bytes(f"PASS {OSU_IRC_PASSWORD}\n", "UTF-8"))
+        self.irc.send(bytes(f"PASS {self.cfg['osu_irc_pwd']}\n", "UTF-8"))
         self.irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
         self.irc.send(bytes(f"PRIVMSG {self.username} {msg}\n", "UTF-8"))
