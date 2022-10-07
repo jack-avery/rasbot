@@ -31,10 +31,6 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
 
-        # Create IRC socket and connect to irc.ppy.sh
-        self.irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.irc.connect(('irc.ppy.sh', 6667))
-
         self.beatmapset_re = re.compile(OSU_BEATMAPSET_RE)
         self.b_re = re.compile(OSU_B_RE)
 
@@ -91,8 +87,14 @@ class Module(BaseModule):
             return "Username could not be resolved. Please check/fix configuration."
 
     def send_osu_message(self, msg):
-        self.irc.send(bytes(
+        # Create IRC socket and connect to irc.ppy.sh
+        irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        irc.connect(('irc.ppy.sh', 6667))
+
+        irc.send(bytes(
             f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
-        self.irc.send(bytes(f"PASS {self.cfg['osu_irc_pwd']}\n", "UTF-8"))
-        self.irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
-        self.irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
+        irc.send(bytes(f"PASS {self.cfg['osu_irc_pwd']}\n", "UTF-8"))
+        irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
+        irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
+
+        irc.close()
