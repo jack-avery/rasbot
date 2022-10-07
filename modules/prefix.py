@@ -2,7 +2,6 @@
 # Please do not modify this unless you really know what you're doing.
 
 from commands import BaseModule
-import config
 from definitions import DEFAULT_CONFIG
 
 
@@ -19,5 +18,5 @@ class Module(BaseModule):
             return f'Prefix cannot start with Twitch reserved character /.'
 
         self.bot.prefix = newprefix
-        config.write(self.bot)
+        self.bot.write_config()
         return f'Prefix updated to {newprefix}.'

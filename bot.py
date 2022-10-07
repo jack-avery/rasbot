@@ -47,6 +47,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Initialize authentication
         self.auth = auth
         self.channel_id = channel_id
+        self.channel_name = channel
 
         self.logger.info(f"Starting as {self.auth.get('user_id')}...")
 
@@ -64,7 +65,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Instantiate commands module
         self.commands = commands
-        self.commands.setup(self)
+        self.commands.pass_bot_ref(self)
 
         # Import commands from config
         for name, command in cfg["commands"].items():
@@ -189,6 +190,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         :param message: The debug info to log.
         """
         self.logger.debug(f'{message}')
+
+    def write_config(self):
+        """Write this bots' config file. For easy use within modules.
+        """
+        config.write(self)
 
 
 @click.command()

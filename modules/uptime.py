@@ -16,7 +16,7 @@ class Module(BaseModule):
         try:
             time_start = r['data'][0]['started_at']
         except IndexError:
-            return f'{self.bot.channel} is not currently live.'
+            return f'{self.bot.channel_name} is not currently live.'
 
         time_start = datetime.datetime.strptime(
             f'{time_start[:-1]}', "%Y-%m-%dT%H:%M:%S")

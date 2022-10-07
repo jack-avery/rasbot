@@ -68,7 +68,7 @@ class Module(BaseModule):
 
         # TODO replace this if the API ever becomes outdated
         users = requests.get(
-            f"https://tmi.twitch.tv/group/user/{self.bot.channel[1:]}/chatters", headers=self.bot.auth.get_headers()).json()
+            f"https://tmi.twitch.tv/group/user/{self.bot.channel_name}/chatters", headers=self.bot.auth.get_headers()).json()
 
         # Prevent streamer from earning watchtime XP on their own stream
         users['chatters'].pop('broadcaster')

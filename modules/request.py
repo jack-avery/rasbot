@@ -41,6 +41,7 @@ class Module(BaseModule):
     def resolve_username(self, id):
         """Resolves a users' osu! username from their ID.
         """
+        self.bot.log_debug(f"Resolving osu! username for ID {id}")
         try:
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg['osu_api_key']}")

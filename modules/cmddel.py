@@ -5,7 +5,6 @@ from commands import BaseModule
 from definitions import VALID_COMMAND_REGEX,\
     CommandDoesNotExistError,\
     CommandGivenInvalidNameError
-import config
 
 
 class Module(BaseModule):
@@ -19,7 +18,7 @@ class Module(BaseModule):
 
         try:
             self.bot.commands.command_del(cmd)
-            config.write(self.bot)
+            self.bot.write_config()
 
             return f'Command {cmd} removed successfully.'
 

@@ -2,7 +2,6 @@
 # Please do not modify this unless you really know what you're doing.
 
 from commands import BaseModule
-import config
 from definitions import VALID_COMMAND_REGEX,\
     DEFAULT_COOLDOWN,\
     MODONLY_ARG,\
@@ -44,7 +43,7 @@ class Module(BaseModule):
                                              " ".join(cmd),
                                              modonly,
                                              hidden)
-            config.write(self.bot)
+            self.bot.write_config()
 
             return f'Command {cmd_name} added successfully.'
 

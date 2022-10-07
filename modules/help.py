@@ -2,7 +2,6 @@
 # Please do not modify this unless you really know what you're doing.
 
 import re
-import threading
 
 from commands import BaseModule
 from definitions import MODULE_MENTION_REGEX

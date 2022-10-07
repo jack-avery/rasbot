@@ -1,7 +1,7 @@
 import os
 import sys
 import subprocess
-from definitions import AuthenticationDeniedError
+from definitions import AuthenticationDeniedError, DEFAULT_AUTHFILE
 
 
 def main():
@@ -12,9 +12,9 @@ def main():
     print("All requirements installed.\n")
 
     # We don't want people to accidentally overwrite their current auth
-    if os.path.isfile("_AUTH.py"):
-        print(f"You already have an authfile at _AUTH.py!")
-        print(f"Running this tool will overwrite _AUTH.py.")
+    if os.path.isfile(DEFAULT_AUTHFILE):
+        print(f"You already have an authfile at {DEFAULT_AUTHFILE}!")
+        print(f"Running this tool will overwrite {DEFAULT_AUTHFILE}.")
         print("If you want to save it, please rename it to something else, then restart this tool.\n")
         if input("Are you sure you want to continue? (y/Y for yes): ").lower() != 'y':
             exit()
@@ -36,7 +36,7 @@ def main():
     # Getting Client ID and Secret
     print("\nNow, go to dev.twitch.tv and log in:")
     print("1. Click on 'Your Console' in the top right.")
-    print("2. On the right sidepane, click Register Your Application.")
+    print("2. On the right side pane, click Register Your Application.")
     print("3. Give it a name. Doesn't matter what.")
     print("4. Create an OAuth redirect for http://localhost and click 'Add'.")
     print("5. Set the Category to Chat Bot.")
@@ -51,8 +51,8 @@ def main():
 
     # Making sure the key is stripped
     irc_oauth = input("Enter the text it gives you: ")
-    if "oauth:" in irc_oauth:
-        irc_oauth = irc_oauth[irc_oauth.find(":")+1:]
+    if irc_oauth.startswith("oauth:"):
+        irc_oauth = irc_oauth[6:]
 
     # Adding all the info to the auth
     auth = Authentication()

@@ -5,6 +5,7 @@ import re
 import threading
 import time
 
+from bot import TwitchBot
 from definitions import VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
     CommandDoesNotExistError,\
@@ -34,7 +35,7 @@ class Command:
         self.requires_mod = requires_mod
         self.hidden = hidden
 
-        self.__last_used = 0
+        self._last_used = 0
 
     def run(self, bot):
         """Code to be run when this command is called from chat.
@@ -42,7 +43,7 @@ class Command:
         Runs all && codes found in the command and returns the result.
         """
         # Make sure the command is not on cooldown before doing anything
-        if not time.time()-self.__last_used > self.cooldown:
+        if not time.time()-self._last_used > self.cooldown:
             raise CommandStillOnCooldownError(
                 f"Command {self.name} called by {bot.author_name} while still on cooldown")
 
@@ -64,7 +65,7 @@ class Command:
                     f'Command {self.name} calls unimported/nonexistent module {m}')
 
         # Update the last usage time and return the response
-        self.__last_used = time.time()
+        self._last_used = time.time()
 
         return returned_response
 
@@ -87,7 +88,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
 
     :param ignore_builtin_check: Whether to ignore the built-in module check. Use at your own risk!
     '''
-    refs['bot'].log_debug(
+    bot.log_debug(
         f'Importing command "{name} {cooldown} {requires_mod} {hidden} {response}"')
 
     # Command cannot have a negative cooldown
@@ -101,7 +102,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
             f"command provided invalid name {name}")
 
     if not response:
-        refs['bot'].log_error(
+        bot.log_error(
             f"Command {name} might have imported incorrectly: empty response?")
 
     # Resolve any modules the command mentions and import new ones
@@ -137,13 +138,13 @@ class BaseModule(threading.Thread):
     """
     helpmsg = 'No help message available for module.'
 
-    def __init__(self, bot, name, cfgdefault=None):
+    def __init__(self, bot: TwitchBot, name, cfgdefault=None):
         """Initialize a module. If a `cfgdefault` is given,
         it will drop the given default into the user's config directory.
         """
         threading.Thread.__init__(self)
         self.bot = bot
-        self.__name = name
+        self._name = name
 
         # Persistent config loading: create base folder.
         if not os.path.exists("modules/config"):
@@ -152,23 +153,23 @@ class BaseModule(threading.Thread):
         if not os.path.exists(f"modules/config/{self.bot.channel_id}"):
             os.mkdir(f"modules/config/{self.bot.channel_id}")
 
-        self.__cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
+        self._cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
 
         # If no config found and a default provided, create it
-        if not os.path.exists(self.__cfg_path):
+        if not os.path.exists(self._cfg_path):
             if cfgdefault:
-                with open(self.__cfg_path, 'w') as cfg:
+                with open(self._cfg_path, 'w') as cfg:
                     cfg.write(json.dumps(cfgdefault, indent=4))
 
         # Load config
-        if os.path.exists(self.__cfg_path):
-            with open(self.__cfg_path, 'r') as cfg:
+        if os.path.exists(self._cfg_path):
+            with open(self._cfg_path, 'r') as cfg:
                 self.cfg = json.loads(cfg.read())
 
     def save_config(self):
         """Save the current form of this module's `self.cfg` attribute to file.
         """
-        with open(f"modules/config/{self.bot.channel_id}/{self.__name}.txt", 'w') as cfg:
+        with open(f"modules/config/{self.bot.channel_id}/{self._name}.txt", 'w') as cfg:
             cfg.write(json.dumps(self.cfg, indent=4))
 
     def main(self):
@@ -199,7 +200,7 @@ def module_add(name: str):
     if name in modules:
         return
 
-    refs['bot'].log_debug(f"Importing module {name}.py")
+    bot.log_debug(f"Importing module {name}.py")
 
     try:
         # Create spec and import from directory.
@@ -211,7 +212,7 @@ def module_add(name: str):
         spec.loader.exec_module(module)
 
         # Give it its' own thread and start it up
-        modules[name] = module.Module(refs['bot'], name)
+        modules[name] = module.Module(bot, name)
         modules[name].start()
     except FileNotFoundError:
         raise ModuleNotFoundError(f"{name} does not exist in modules folder")
@@ -224,15 +225,16 @@ def do_on_pubmsg_methods():
         module.on_pubmsg()
 
 
-def setup(bot):
+def pass_bot_ref(ref: TwitchBot):
+    global bot
     """Set up this instance of commands
     """
-    refs['bot'] = bot
+    bot = ref
 
 
 commands = dict()
 commands_modules = list()
 modules = dict()
-refs = dict()
+bot = TwitchBot
 command_re = re.compile(VALID_COMMAND_REGEX)
 module_re = re.compile(MODULE_MENTION_REGEX)
