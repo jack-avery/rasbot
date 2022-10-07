@@ -63,6 +63,7 @@ class Module(BaseModule):
 
     # Get viewerlist and do XP gain logic
     def tick(self):
+        self.bot.log_debug(f"Running XP grant logic")
         # Create a new connection for this thread
         thread_db = sqlite3.connect(self.db_path)
 
@@ -76,7 +77,8 @@ class Module(BaseModule):
         # Give XP to each user
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
-                if user.lower() in self.cfg["omit_users"]:
+                user = user.lower()
+                if user in self.cfg["omit_users"]:
                     continue
 
                 # Resolve how much XP to grant to this user
@@ -101,6 +103,7 @@ class Module(BaseModule):
     def get_top(self):
         """Return the top 3 XP holders.
         """
+        self.bot.log_debug(f"Retrieving top 3 XP holders")
         with self.db as db:
             cs = db.cursor()
             cs.execute(f"SELECT user,amt FROM xp ORDER BY amt DESC")
@@ -111,6 +114,7 @@ class Module(BaseModule):
     def get_user(self, user):
         """Return the user, their XP, and position.
         """
+        self.bot.log_debug(f"Retrieving XP for {user}")
         with self.db as db:
             cs = db.cursor()
 
@@ -131,6 +135,7 @@ class Module(BaseModule):
     def mod_user(self, action, user, arg):
         """Perform an action on a user.
         """
+        self.bot.log_debug(f"Running XPMod action {action} {arg} on {user}")
         with self.db as db:
             if action == "purge":
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
@@ -151,7 +156,7 @@ class Module(BaseModule):
                     return f"User {user} is already banned from XP."
 
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
-                self.cfg["omit_users"].append(user.lower())
+                self.cfg["omit_users"].append(user)
                 self.save_config()
                 msg = f"Set {user}'s XP to 0 and banished from earning."
 
@@ -159,7 +164,7 @@ class Module(BaseModule):
                 if user not in self.cfg["omit_users"]:
                     return f"User {user} is not banned from XP."
 
-                self.cfg["omit_users"].remove(user.lower())
+                self.cfg["omit_users"].remove(user)
                 self.save_config()
                 msg = f"Removed {user} from XP banished users."
 
@@ -168,9 +173,9 @@ class Module(BaseModule):
 
     def main(self):
         if not self.bot.cmdargs:
-            arg = self.bot.author_name
+            arg = self.bot.author_name.lower()
         else:
-            arg = self.bot.cmdargs[0]
+            arg = self.bot.cmdargs[0].lower()
 
         # Show top 3
         if arg == "top":
@@ -184,8 +189,8 @@ class Module(BaseModule):
             try:
                 args = self.bot.cmdargs[1:]
 
-                action = args[0]
-                user = args[1]
+                action = args[0].lower()
+                user = args[1].lower()
 
                 try:
                     arg = args[2]
@@ -210,4 +215,4 @@ class Module(BaseModule):
     def on_pubmsg(self):
         # Add this user to the active users list.
         if not self.bot.author_name in self.active_users:
-            self.active_users.append(self.bot.author_name)
+            self.active_users.append(self.bot.author_name.lower())

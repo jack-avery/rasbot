@@ -88,6 +88,7 @@ class Module(BaseModule):
             return "Username could not be resolved. Please check/fix configuration."
 
     def send_osu_message(self, msg):
+        self.bot.log_debug(f"Sending osu! message '{msg}' to {self.target}")
         # Create IRC socket and connect to irc.ppy.sh
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         irc.connect(('irc.ppy.sh', 6667))
