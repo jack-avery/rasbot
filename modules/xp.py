@@ -147,12 +147,18 @@ class Module(BaseModule):
                 msg = f"Set {user}'s XP to {arg}."
 
             elif action == "ban":
+                if user in self.cfg["omit_users"]:
+                    return f"User {user} is already banned from XP."
+
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
                 self.cfg["omit_users"].append(user.lower())
                 self.save_config()
                 msg = f"Set {user}'s XP to 0 and banished from earning."
 
             elif action == "unban":
+                if user not in self.cfg["omit_users"]:
+                    return f"User {user} is not banned from XP."
+
                 self.cfg["omit_users"].remove(user.lower())
                 self.save_config()
                 msg = f"Removed {user} from XP banished users."
