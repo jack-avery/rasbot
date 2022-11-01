@@ -1,5 +1,5 @@
 # Chatter watchtime XP module.
-# You can tweak the frequency of granting XP and the ranges to grant below.
+# You can tweak the frequency of granting XP and the ranges to grant in the config file.
 # "Levels" may be implemented eventually, but assume it will be left as-is.
 
 from commands import BaseModule
@@ -111,9 +111,13 @@ class Module(BaseModule):
 
             return " | ".join([f"{r[0]}: {r[1]}" for r in res])
 
-    def get_user(self, user):
-        """Return the user, their XP, and position.
+    def get_user(self, user: str):
+        """Return the user, position, and XP.
         """
+        # Strip @ from mention
+        if user.startswith("@"):
+            user = user[1:]
+
         self.bot.log_debug(f"Retrieving XP for {user}")
         with self.db as db:
             cs = db.cursor()
@@ -125,36 +129,87 @@ class Module(BaseModule):
                 pos = all.index(user) + 1
             except ValueError:
                 # If finding their index in the sorted list fails assume they don't exist.
-                return f"User {user} has no tracked XP."
+                return False
 
             cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
             xp = cs.fetchone()[0]
 
-        return f"{user} is #{pos} with {xp} XP."
+        return (user, pos, xp)
 
-    def mod_user(self, action, user, arg):
+    def mod_user(self, args):
         """Perform an action on a user.
         """
-        self.bot.log_debug(f"Running XPMod action {action} {arg} on {user}")
-        with self.db as db:
-            if action == "purge":
-                db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
-                msg = f"Reset {user}'s to 0."
+        actions = ['set', 'transfer', 'ban', 'unban']
 
-            elif action == "set":
+        try:
+            action = args[0]
+            user = args[1]
+
+            if action not in actions:
+                raise IndexError
+        except IndexError:
+            return f"Please provide a valid action and a user. Valid actions include: {', '.join(actions)}."
+
+        if user.startswith("@"):
+            user = user[1:]
+
+        self.bot.log_debug(f"Running XPMod action {action} {args} on {user}")
+        with self.db as db:
+            if action == "set":
+                # verify needed args exist
                 try:
-                    arg = int(arg)
-                except ValueError:
-                    return f"Please provide an amount to set the user's XP to."
+                    amt = int(args[2])
+                except (ValueError, IndexError):
+                    return "Please provide a number to set the user's XP to."
 
                 db.execute(
-                    f"UPDATE xp SET amt = {arg} WHERE user = \"{user}\"")
-                msg = f"Set {user}'s XP to {arg}."
+                    f"UPDATE xp SET amt = {amt} WHERE user = \"{user}\"")
+                msg = f"Set {user}'s XP to {amt}."
+
+            elif action == "transfer":
+                # verify needed args exist
+                try:
+                    target = args[2]
+                    amount = int(args[3])
+                except (ValueError, IndexError):
+                    return "Please provide a user to transfer the first user's points to, and how many."
+
+                src = self.get_user(user)
+                if not src:
+                    return f"User {user} has no tracked XP."
+                tar = self.get_user(target)
+                if not tar:
+                    if target.startswith("@"):
+                        target = target[1:]
+
+                    tar = (target, 0, 0)
+
+                    db.execute(
+                        "INSERT OR IGNORE INTO xp VALUES(?,?)", (target, 0))
+
+                # Ensure that only the user's total amount is transferred.
+                d = src[2] - amount
+                if d < 0:
+                    s_amt = 0
+                    t_amt = tar[2] + src[2]
+                    amount = src[2]
+                else:
+                    s_amt = d
+                    t_amt = tar[2] + amount
+
+                db.execute(
+                    f"UPDATE xp SET amt = {s_amt} WHERE user = \"{src[0]}\"")
+                db.execute(
+                    f"UPDATE xp SET amt = {t_amt} WHERE user = \"{tar[0]}\"")
+
+                msg = f"Transferred {amount} points from {user} to {tar[0]}."
 
             elif action == "ban":
                 if user in self.cfg["omit_users"]:
                     return f"User {user} is already banned from XP."
 
+                db.execute(
+                    "INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
                 self.cfg["omit_users"].append(user)
                 self.save_config()
@@ -186,31 +241,15 @@ class Module(BaseModule):
             if not self.bot.author_ismod:
                 return "You must be a moderator to do that."
 
-            try:
-                args = self.bot.cmdargs[1:]
+            args = [arg.lower() for arg in self.bot.cmdargs[1:]]
 
-                action = args[0].lower()
-                user = args[1].lower()
+            return self.mod_user(args)
 
-                try:
-                    arg = args[2]
-                except IndexError:
-                    arg = None
-
-                # Resolve user
-                if user.startswith('@'):
-                    user = user[1:]
-
-                return self.mod_user(action, user, arg)
-
-            except IndexError:
-                return "Please provide an action and a user. Valid actions are: purge, set <amount>, ban, unban."
-
-        # Resolve user and show stats
-        if arg.startswith('@'):
-            arg = arg[1:]
-
-        return self.get_user(arg)
+        user = self.get_user(arg)
+        if user:
+            return f"{user[0]} is #{user[1]} with {user[2]} XP."
+        else:
+            return f"{arg} has no tracked XP."
 
     def on_pubmsg(self):
         # Add this user to the active users list.
