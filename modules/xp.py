@@ -162,6 +162,7 @@ class Module(BaseModule):
                 except (ValueError, IndexError):
                     return "Please provide a number to set the user's XP to."
 
+                # perform update
                 db.execute(
                     f"UPDATE xp SET amt = {amt} WHERE user = \"{user}\"")
                 msg = f"Set {user}'s XP to {amt}."
@@ -174,6 +175,7 @@ class Module(BaseModule):
                 except (ValueError, IndexError):
                     return "Please provide a user to transfer the first user's points to, and how many."
 
+                # resolve users and amounts
                 src = self.get_user(user)
                 if not src:
                     return f"User {user} has no tracked XP."
@@ -187,7 +189,7 @@ class Module(BaseModule):
                     db.execute(
                         "INSERT OR IGNORE INTO xp VALUES(?,?)", (target, 0))
 
-                # Ensure that only the user's total amount is transferred.
+                # ensure we don't grant more than the user can afford
                 d = src[2] - amount
                 if d < 0:
                     s_amt = 0
@@ -197,17 +199,18 @@ class Module(BaseModule):
                     s_amt = d
                     t_amt = tar[2] + amount
 
+                # perform updates
                 db.execute(
                     f"UPDATE xp SET amt = {s_amt} WHERE user = \"{src[0]}\"")
                 db.execute(
                     f"UPDATE xp SET amt = {t_amt} WHERE user = \"{tar[0]}\"")
-
                 msg = f"Transferred {amount} points from {user} to {tar[0]}."
 
             elif action == "ban":
                 if user in self.cfg["omit_users"]:
                     return f"User {user} is already banned from XP."
 
+                # create the user if they don't already exist
                 db.execute(
                     "INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
