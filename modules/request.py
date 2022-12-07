@@ -19,11 +19,50 @@ DEFAULT_CONFIG = {
     # ID of the user that the request should go to.
     "osu_trgt_id": "",
     # The format of the message to send alongside. See format_message() for keys.
+    # Enclose keys in & as you would a module in a command.
+    "message_format": "&map& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
 }
 
 OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
+
+# See https://github.com/ppy/osu-api/wiki#response for more info
+OSU_STATUSES = ["Pending", "Ranked", "Approved",
+                "Qualified", "Loved", "Graveyard", "WIP"]
+
+OSU_MODES = ["Standard", "Taiko", "CTB", "Mania"]
+
+OPTIONS = {
+    # web
+    "map": lambda m: f"[https://osu.ppy.sh/b/{m['beatmap_id']} {m['artist']} - {m['title']} [{m['version']}]]",
+    "mapid": lambda m: m['beatmap_id'],
+    "mapsetid": lambda m: m['beatmapset_id'],
+    "mapstatus": lambda m: f"{OSU_STATUSES[int(m['approved'])]}",
+
+    # creator
+    "creator": lambda m: f"[https://osu.ppy.sh/users/{m['creator_id']} {m['creator']}]",
+    "creatorid": lambda m: m['creator_id'],
+    "creatorname": lambda m: m['creator'],
+
+    # beatmap metadata
+    "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
+    "bpm": lambda m: round(float(m['bpm']), 2),
+    "stars": lambda m: round(float(m['difficultyrating']), 2),
+    "cs": lambda m: m['diff_size'],
+    "od": lambda m: m['diff_overall'],
+    "ar": lambda m: m['diff_approach'],
+    "hp": lambda m: m['diff_drain'],
+    "gamemode": lambda m: f"{OSU_MODES[int(m['mode'])]}",
+
+    # song info
+    "song": lambda m: f"{m['artist']} - {m['title']}",
+    "songartist": lambda m: m['artist'],
+    "songartistunicode": lambda m: m['artist_unicode'],
+    "songname": lambda m: m['title'],
+    "songtitleunicode": lambda m: m['title_unicode'],
+    "songsource": lambda m: m['source'],
+}
 
 
 class Module(BaseModule):
@@ -53,43 +92,7 @@ class Module(BaseModule):
             return None
 
     def format_message(self, map):
-        # See https://github.com/ppy/osu-api/wiki#response for more info
-
-        STATUSES = ["Pending", "Ranked", "Approved",
-                    "Qualified", "Loved", "Graveyard", "WIP"]
-
-        MODES = ["Standard", "Taiko", "CTB", "Mania"]
-
-        OPTIONS = {
-            # web
-            "map": lambda m: f"[https://osu.ppy.sh/b/{m['beatmap_id']} {m['artist']} - {m['title']} [{m['version']}]]",
-            "mapid": lambda m: m['beatmap_id'],
-            "mapsetid": lambda m: m['beatmapset_id'],
-            "mapstatus": lambda m: f"{STATUSES[int(m['approved'])]}",
-
-            # creator
-            "creator": lambda m: f"[https://osu.ppy.sh/users/{m['creator_id']} {m['creator']}]",
-            "creatorid": lambda m: m['creator_id'],
-            "creatorname": lambda m: m['creator'],
-
-            # beatmap metadata
-            "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
-            "bpm": lambda m: round(float(m['bpm']), 2),
-            "stars": lambda m: round(float(m['difficultyrating']), 2),
-            "cs": lambda m: m['diff_size'],
-            "od": lambda m: m['diff_overall'],
-            "ar": lambda m: m['diff_approach'],
-            "hp": lambda m: m['diff_drain'],
-            "gamemode": lambda m: f"{MODES[int(m['mode'])]}",
-
-            # song info
-            "song": lambda m: f"{m['artist']} - {m['title']}",
-            "songartist": lambda m: m['artist'],
-            "songartistunicode": lambda m: m['artist_unicode'],
-            "songname": lambda m: m['title'],
-            "songtitleunicode": lambda m: m['title_unicode'],
-            "songsource": lambda m: m['source'],
-        }
+        format = self.cfg['message_format']
 
     def main(self):
         if self.username:
@@ -116,13 +119,10 @@ class Module(BaseModule):
                 return "Could not retrieve beatmap information."
 
             # Customization for this is TODO. Until then this should do just fine.
-            time = f"{int(int(map['total_length']) / 60)}:{int(map['total_length']) % 60}"
-            bpm = round(float(map['bpm']), 2)
-            stars = round(float(map['difficultyrating']), 2)
-            message = f"({time} @ {bpm}BPM, {stars}*, mapset by [https://osu.ppy.sh/users/{map['creator_id']} {map['creator']}])"
+            message = self.format_message(map)
 
             self.send_osu_message(
-                f"{self.bot.author_name} requested: [https://osu.ppy.sh/b/{id} {map['artist']} - {map['title']} [{map['version']}]] {message}")
+                f"{self.bot.author_name} requested: {message}")
 
             return "Request sent!"
 
