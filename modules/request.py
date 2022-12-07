@@ -23,7 +23,7 @@ DEFAULT_CONFIG = {
 
 OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 
-OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b\/(\d+)$'
+OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
 
 
 class Module(BaseModule):
