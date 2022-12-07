@@ -17,7 +17,8 @@ DEFAULT_CONFIG = {
     # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
     "osu_irc_pwd": "",
     # ID of the user that the request should go to.
-    "osu_trgt_id": ""
+    "osu_trgt_id": "",
+    # The format of the message to send alongside. See format_message() for keys.
 }
 
 OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
@@ -51,6 +52,9 @@ class Module(BaseModule):
                 f"An error occurred trying to resolve osu! username for ID {id}. Your API key may be invalid.")
             return None
 
+    def format_message(self, map):
+        pass
+
     def main(self):
         if self.username:
             if not self.bot.cmdargs:
@@ -75,9 +79,11 @@ class Module(BaseModule):
             except IndexError:
                 return "Could not retrieve beatmap information."
 
-            # Anything can go in here, this is intended to be customizable.
-            # See the possible information from the 'map' dict at https://github.com/ppy/osu-api/wiki#response
-            message = f"({map['bpm']} BPM, {map['difficultyrating']} Stars)"
+            # Customization for this is TODO. Until then this should do just fine.
+            time = f"{int(int(map['total_length']) / 60)}:{int(map['total_length']) % 60}"
+            bpm = round(float(map['bpm']), 2)
+            stars = round(float(map['difficultyrating']), 2)
+            message = f"({time} @ {bpm}BPM, {stars}*, mapset by [https://osu.ppy.sh/users/{map['creator_id']} {map['creator']}])"
 
             self.send_osu_message(
                 f"{self.bot.author_name} requested: [https://osu.ppy.sh/b/{id} {map['artist']} - {map['title']} [{map['version']}]] {message}")
