@@ -19,7 +19,7 @@ DEFAULT_CONFIG = {
     "osu_irc_pwd": "",
     # ID of the user that the request should go to.
     "osu_trgt_id": "",
-    # The format of the message to send alongside. See format_message() for keys.
+    # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
     # Enclose keys in & as you would a module in a command.
     "message_format": "&map& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
 }
