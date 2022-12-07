@@ -97,6 +97,18 @@ class Module(BaseModule):
     def format_message(self, map):
         message = self.cfg_get('message_format')
 
+        for m in MESSAGE_OPT_RE.findall(message):
+            try:
+                message = message.replace(
+                    f'&{m}&',
+                    str(MESSAGE_OPTIONS[m](map))
+                )
+            except KeyError:
+                self.bot.log_debug(
+                    f"request - message_format uses invalid key '{m}'")
+
+        return message
+
     def main(self):
         if self.username:
             if not self.bot.cmdargs:
