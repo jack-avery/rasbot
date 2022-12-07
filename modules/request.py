@@ -15,7 +15,7 @@ DEFAULT_CONFIG = {
     # Your osu! API key. Get this from https://osu.ppy.sh/p/api.
     "osu_api_key": "",
     # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
-    "osu_irc_pass": "",
+    "osu_irc_pwd": "",
     # ID of the user that the request should go to.
     "osu_trgt_id": ""
 }
