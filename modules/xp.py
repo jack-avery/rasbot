@@ -58,7 +58,7 @@ class Module(BaseModule):
         self.active_users = []
 
         # Tick XP every XP_GRANT_FREQUENCY seconds
-        timer = RepeatTimer(self.cfg["xp_grant_frequency"], self.tick)
+        timer = RepeatTimer(self.cfg_get("xp_grant_frequency"), self.tick)
         timer.start()
 
     # Get viewerlist and do XP gain logic
@@ -78,16 +78,18 @@ class Module(BaseModule):
         for utype in users['chatters']:
             for user in users['chatters'][utype]:
                 user = user.lower()
-                if user in self.cfg["omit_users"]:
+                if user in self.cfg_get("omit_users"):
                     continue
 
                 # Resolve how much XP to grant to this user
+                active_range = self.cfg_get['xp_active_range']
+                inactive_range = self.cfg_get['xp_inactive_range']
                 if (user in self.active_users):
                     amt = random.randint(
-                        self.cfg['xp_active_range'][0], self.cfg['xp_active_range'][1])
+                        active_range[0], active_range[1])
                 else:
                     amt = random.randint(
-                        self.cfg['xp_inactive_range'][0], self.cfg['xp_inactive_range'][1])
+                        inactive_range[0], inactive_range[1])
 
                 # Grant it to the user
                 thread_db.execute(
@@ -207,23 +209,28 @@ class Module(BaseModule):
                 msg = f"Transferred {amount} points from {user} to {tar[0]}."
 
             elif action == "ban":
-                if user in self.cfg["omit_users"]:
+                omit_users = self.cfg_get("omit_users")
+                if user in omit_users:
                     return f"User {user} is already banned from XP."
 
                 # create the user if they don't already exist
                 db.execute(
                     "INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
                 db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
-                self.cfg["omit_users"].append(user)
-                self.save_config()
+
+                omit_users.append(user)
+                self.cfg_set("omit_users", omit_users)
+
                 msg = f"Set {user}'s XP to 0 and banished from earning."
 
             elif action == "unban":
-                if user not in self.cfg["omit_users"]:
+                omit_users = self.cfg_get("omit_users")
+                if user not in omit_users:
                     return f"User {user} is not banned from XP."
 
-                self.cfg["omit_users"].remove(user)
-                self.save_config()
+                omit_users.remove(user)
+                self.cfg_set("omit_users", omit_users)
+
                 msg = f"Removed {user} from XP banished users."
 
             db.commit()

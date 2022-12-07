@@ -8,6 +8,7 @@ import socket
 import requests
 import re
 from commands import BaseModule
+from definitions import MODULE_MENTION_REGEX
 
 DEFAULT_CONFIG = {
     # Your osu! ID. Go to your profile on the website and this should be in the URL.
@@ -33,7 +34,9 @@ OSU_STATUSES = ["Pending", "Ranked", "Approved",
 
 OSU_MODES = ["Standard", "Taiko", "CTB", "Mania"]
 
-OPTIONS = {
+MESSAGE_OPT_RE = re.compile(MODULE_MENTION_REGEX)
+
+MESSAGE_OPTIONS = {
     # web
     "map": lambda m: f"[https://osu.ppy.sh/b/{m['beatmap_id']} {m['artist']} - {m['title']} [{m['version']}]]",
     "mapid": lambda m: m['beatmap_id'],
@@ -75,8 +78,8 @@ class Module(BaseModule):
         self.b_re = re.compile(OSU_B_RE)
 
         # Resolve usernames
-        self.username = self.resolve_username(self.cfg['osu_user_id'])
-        self.target = self.resolve_username(self.cfg['osu_trgt_id'])
+        self.username = self.resolve_username(self.cfg_get('osu_user_id'))
+        self.target = self.resolve_username(self.cfg_get('osu_trgt_id'))
 
     def resolve_username(self, id):
         """Resolves a users' osu! username from their ID.
@@ -84,7 +87,7 @@ class Module(BaseModule):
         self.bot.log_debug(f"Resolving osu! username for ID {id}")
         try:
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg['osu_api_key']}")
+                f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}")
             return req.json()[0]['username'].replace(" ", "_")
         except:
             print(
@@ -92,7 +95,7 @@ class Module(BaseModule):
             return None
 
     def format_message(self, map):
-        format = self.cfg['message_format']
+        message = self.cfg_get('message_format')
 
     def main(self):
         if self.username:
@@ -111,7 +114,7 @@ class Module(BaseModule):
 
             # Retrieve beatmap information
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg['osu_api_key']}")
+                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}")
 
             try:
                 map = req.json()[0]
@@ -137,7 +140,7 @@ class Module(BaseModule):
 
         irc.send(bytes(
             f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
-        irc.send(bytes(f"PASS {self.cfg['osu_irc_pwd']}\n", "UTF-8"))
+        irc.send(bytes(f"PASS {self.cfg_get('osu_irc_pwd')}\n", "UTF-8"))
         irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
         irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
 

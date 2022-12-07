@@ -145,6 +145,7 @@ class BaseModule(threading.Thread):
         threading.Thread.__init__(self)
         self.bot = bot
         self._name = name
+        self._cfgdefault = cfgdefault
 
         # Persistent config loading: create base folder.
         if not os.path.exists("modules/config"):
@@ -164,13 +165,28 @@ class BaseModule(threading.Thread):
         # Load config
         if os.path.exists(self._cfg_path):
             with open(self._cfg_path, 'r') as cfg:
-                self.cfg = json.loads(cfg.read())
+                self._cfg = json.loads(cfg.read())
 
     def save_config(self):
         """Save the current form of this module's `self.cfg` attribute to file.
         """
-        with open(f"modules/config/{self.bot.channel_id}/{self._name}.txt", 'w') as cfg:
-            cfg.write(json.dumps(self.cfg, indent=4))
+        with open(self._cfg_path, 'w') as cfg:
+            cfg.write(json.dumps(self._cfg, indent=4))
+
+    def cfg_get(self, key: str):
+        """Read the given config dict key. If it fails to read it will fill it in with the default.
+        """
+        try:
+            return self._cfg[key]
+        except KeyError:
+            self.cfg_set(key, self._cfgdefault[key])
+            return self._cfg[key]
+
+    def cfg_set(self, key: str, value):
+        """Set the value of a given config dict key, and save the config.
+        """
+        self._cfg[key] = value
+        self.save_config()
 
     def main(self):
         """Code to be run for the modules' && code.

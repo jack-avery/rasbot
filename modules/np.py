@@ -21,7 +21,7 @@ class Module(BaseModule):
 
     def main(self):
         try:
-            with open(self.cfg['path'], 'r') as file:
+            with open(self.cfg_get('path'), 'r') as file:
                 return f'{file.readlines()[0]}'
         except (FileNotFoundError, IndexError):
             return 'No NP data found.'
