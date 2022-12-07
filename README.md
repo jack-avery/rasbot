@@ -11,7 +11,7 @@ rasbot is intended to run locally on your account so it has access to your Twitc
 ![image](https://cdn.discordapp.com/attachments/488850419301220352/1024615808879579188/unknown.png)
 
 # How to Use ✍️
-1. Download and install [Python version 3.11.0+](https://www.python.org/downloads/), ensuring you add it to the Path.
+1. Download and install [Python version 3.11.0+](https://www.python.org/downloads/), ensuring you tick "Add python.exe to PATH" at the bottom of the first screen.
 2. Download the Source Code:
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/jack-avery/rasbot` <br/>
 > Or, click on **Code** at the top right and **Download ZIP**.
