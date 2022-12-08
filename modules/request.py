@@ -65,6 +65,9 @@ MESSAGE_OPTIONS = {
     "songname": lambda m: m['title'],
     "songtitleunicode": lambda m: m['title_unicode'],
     "songsource": lambda m: m['source'],
+
+    # requests specific additions
+    "mods": lambda m: m['mods']
 }
 
 
@@ -116,6 +119,11 @@ class Module(BaseModule):
 
             req = self.bot.cmdargs[0].lower()
 
+            mods = ''
+            if len(self.bot.cmdargs) > 0:
+                if self.bot.cmdargs[1].startswith("+"):
+                    mods = self.bot.cmdargs[1].upper()
+
             # Resolve ID
             if self.beatmapset_re.match(req):
                 id = self.beatmapset_re.findall(req)[0]
@@ -133,7 +141,7 @@ class Module(BaseModule):
             except IndexError:
                 return "Could not retrieve beatmap information."
 
-            # Customization for this is TODO. Until then this should do just fine.
+            map['mods'] = mods
             message = self.format_message(map)
 
             self.send_osu_message(
