@@ -72,7 +72,7 @@ MESSAGE_OPTIONS = {
 
 
 class Module(BaseModule):
-    helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link>'
+    helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link> <+mods?>'
 
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
@@ -120,7 +120,7 @@ class Module(BaseModule):
             req = self.bot.cmdargs[0].lower()
 
             mods = ''
-            if len(self.bot.cmdargs) > 0:
+            if len(self.bot.cmdargs) > 1:
                 if self.bot.cmdargs[1].startswith("+"):
                     mods = self.bot.cmdargs[1].upper()
 
