@@ -1,8 +1,24 @@
 <div align="center">
 
+# Module Configs
+
+</div>
+
+Modules that use a config store it under `modules/config/[your Twitch ID]`. By default, the only config in here will be for `cmdadd`.
+
+It's recommended you look at the module (it will have the same name in `modules`, just with the `.py` suffix) in your text editor of choice to see a better description of each option before changing anything.
+
+Some modules require configuration before they can work, e.g. the `request` module which requires you to grant it some credentials for interfacing with the osu! API and IRC.
+
+---
+
+<div align="center">
+
 # Creating your own custom module
 
 </div>
+
+*For advanced users, a sample module showing most things with comments is available as `sample.py`.*
 
 Name the file after your module: `sample.py`.<br/>
 You can then reference your module as the response of a command, for example, `r!cmdadd sample &sample&`.
@@ -20,7 +36,6 @@ Whatever it contains will be shown if the method is provided as an argument for 
 
 Otherwise, you're free to add whatever you want to the module, as long as you know how to code it.
 
-**Be very careful as this can be abused!**<br/>
-*A sample module is available as `sample.py`.*
+### **Be very careful as this can be abused!**<br/>
 
 ![firefox_p0K7PPEJBs](https://user-images.githubusercontent.com/47289484/193102564-6245c687-6e25-4f90-a1a8-37d6d2fb91da.png)
