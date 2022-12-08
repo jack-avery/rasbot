@@ -60,9 +60,6 @@ def check(silent=False, force=False, l=False):
 
     if current < latest:
         prompt()
-    else:
-        if not silent:
-            input("\nrasbot is up to date. You may close this window.")
 
 
 def prompt():
@@ -72,6 +69,7 @@ def prompt():
     print(
         f"HEY! Your version of rasbot is running out of date!")
     print("Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with.")
+    print("This does not include anything found in your module config.")
     print("--\n")
 
     if input("Would you like to update? (y/Y for yes): ").lower() == 'y':
@@ -94,6 +92,9 @@ def update_first():
 
     p = subprocess.Popen(["update.py", "-l"], shell=True)
     p.wait()
+
+    input("\nrasbot is up to date. rasbot will now close to apply changes.")
+    sys.exit(0)
 
 
 def update_inner():
