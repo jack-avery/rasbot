@@ -45,4 +45,9 @@ To include a module as part of a command, encompass the module name in `&`, e.g.
 r!cmdadd np &np&
 ```
 
-*For documentation on creating your own modules, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*
+*For documentation on configuring modules or creating your own, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*
+
+# Bug reports & feature suggestions 🐛
+Has something gone **horribly** wrong? *Or do you just think something's missing?*
+
+Feel free to [create a new issue](https://github.com/jack-avery/rasbot/issues), join the [Discord](https://discord.gg/qpyT4zx), or message me directly on Discord about it: `raspy#0292`.
