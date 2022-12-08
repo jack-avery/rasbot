@@ -24,9 +24,10 @@ DEFAULT_CONFIG = {
     "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
 }
 
-OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
-
+OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
+
+OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)$'
 
 # See https://github.com/ppy/osu-api/wiki#response for more info
 OSU_STATUSES = ["Pending", "Ranked", "Approved",
@@ -62,7 +63,7 @@ MESSAGE_OPTIONS = {
     "song": lambda m: f"{m['artist']} - {m['title']}",
     "songartist": lambda m: m['artist'],
     "songartistunicode": lambda m: m['artist_unicode'],
-    "songname": lambda m: m['title'],
+    "songtitle": lambda m: m['title'],
     "songtitleunicode": lambda m: m['title_unicode'],
     "songsource": lambda m: m['source'],
 
@@ -77,8 +78,13 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
 
-        self.beatmapset_re = re.compile(OSU_BEATMAPSET_RE)
-        self.b_re = re.compile(OSU_B_RE)
+        beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)
+        b_re = re.compile(OSU_B_RE)
+
+        beatmapset_re = re.compile(OSU_BEATMAPSET_RE)
+
+        self.beatmap_res = [beatmapsetid_re, b_re]
+        self.beatmapset_res = [beatmapset_re]
 
         # Resolve usernames
         self.username = self.resolve_username(self.cfg_get('osu_user_id'))
@@ -125,19 +131,34 @@ class Module(BaseModule):
                     mods = self.bot.cmdargs[1].upper()
 
             # Resolve ID
-            if self.beatmapset_re.match(req):
-                id = self.beatmapset_re.findall(req)[0]
-            elif self.b_re.match(req):
-                id = self.b_re.findall(req)[0]
-            else:
+            is_id = False
+            id = False
+            for beatmap_re in self.beatmap_res:
+                if beatmap_re.match(req):
+                    id = beatmap_re.findall(req)[0]
+                    is_id = True
+                    break
+
+            if not id:
+                for beatmapset_re in self.beatmapset_res:
+                    if beatmapset_re.match(req):
+                        id = beatmapset_re.findall(req)[0]
+                        break
+
+            if not id:
                 return "Could not resolve beatmap link format."
 
             # Retrieve beatmap information
-            req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}")
+            if is_id:
+                req = requests.get(
+                    f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}").json()
+            else:
+                req = requests.get(
+                    f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
+                req.sort(key=lambda r: r['difficultyrating'], reversed=True)
 
             try:
-                map = req.json()[0]
+                map = req[0]
             except IndexError:
                 return "Could not retrieve beatmap information."
 
