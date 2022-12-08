@@ -62,12 +62,6 @@ DEFAULT_COOLDOWN = 5
 DEFAULT_AUTHFILE = "_AUTH.txt"
 """Default authfile to use if none is provided as a commandline arg."""
 
-MODONLY_ARG = "-modonly"
-"""Mod-only option for command creation"""
-
-HIDDEN_ARG = "-hidden"
-"""Hidden option for command creation"""
-
 ##
 # Errors
 ##

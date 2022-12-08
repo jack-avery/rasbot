@@ -3,15 +3,28 @@
 
 from commands import BaseModule
 from definitions import VALID_COMMAND_REGEX,\
-    DEFAULT_COOLDOWN,\
-    MODONLY_ARG,\
-    HIDDEN_ARG,\
     CommandGivenInvalidNameError,\
     CommandMustHavePositiveCooldownError
+
+DEFAULT_CONFIG = {
+    # The parameters to be given, after cooldown, before response
+    # to indicate this command should be mod-only or hidden from !help
+    "modonly_arg": "-modonly",
+    "hidden_arg": "-hidden",
+    # The default cooldown to apply to a command if none is specified
+    "default_cooldown": 5,
+}
 
 
 class Module(BaseModule):
     helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <params?> <response>.'
+
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+
+        self.MODONLY_ARG = self.cfg_get('modonly_arg')
+        self.HIDDEN_ARG = self.cfg_get('hidden_arg')
+        self.DEFAULT_COOLDOWN = self.cfg_get('default_cooldown')
 
     def main(self):
         if not self.bot.cmdargs:
@@ -25,11 +38,11 @@ class Module(BaseModule):
             cmd_cooldown = int(cmd[0])
             cmd.pop(0)
         except ValueError:
-            cmd_cooldown = DEFAULT_COOLDOWN
+            cmd_cooldown = self.DEFAULT_COOLDOWN
 
         params = {
-            MODONLY_ARG: False,
-            HIDDEN_ARG: False
+            'modonly': False,
+            'hidden': False
         }
         for _ in params:
             for param in params:
@@ -41,8 +54,8 @@ class Module(BaseModule):
             self.bot.commands.command_modify(cmd_name,
                                              cmd_cooldown,
                                              " ".join(cmd),
-                                             params[MODONLY_ARG],
-                                             params[HIDDEN_ARG])
+                                             params['modonly'],
+                                             params['hidden'])
             self.bot.write_config()
 
             return f'Command {cmd_name} added successfully.'
