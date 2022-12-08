@@ -21,7 +21,7 @@ DEFAULT_CONFIG = {
     "osu_trgt_id": "",
     # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
     # Enclose keys in & as you would a module in a command.
-    "message_format": "&map& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
+    "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
 }
 
 OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
