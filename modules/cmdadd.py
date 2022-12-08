@@ -27,22 +27,22 @@ class Module(BaseModule):
         except ValueError:
             cmd_cooldown = DEFAULT_COOLDOWN
 
-        modonly = False
-        if (cmd[0].lower() == MODONLY_ARG):
-            modonly = True
-            cmd.pop(0)
-
-        hidden = False
-        if (cmd[0].lower() == HIDDEN_ARG):
-            hidden = True
-            cmd.pop(0)
+        params = {
+            MODONLY_ARG: False,
+            HIDDEN_ARG: False
+        }
+        for _ in params:
+            for param in params:
+                if (cmd[0].lower() == param):
+                    params[param] = True
+                    cmd.pop(0)
 
         try:
             self.bot.commands.command_modify(cmd_name,
                                              cmd_cooldown,
                                              " ".join(cmd),
-                                             modonly,
-                                             hidden)
+                                             params[MODONLY_ARG],
+                                             params[HIDDEN_ARG])
             self.bot.write_config()
 
             return f'Command {cmd_name} added successfully.'
@@ -53,5 +53,8 @@ class Module(BaseModule):
         except CommandGivenInvalidNameError:
             return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
 
-        except ModuleNotFoundError as err:
-            return f'Module {err} does not exist.'
+        except ModuleNotFoundError as mod:
+            return f'Module {mod} does not exist.'
+
+        except IndexError:
+            return 'Command is missing required information.'
