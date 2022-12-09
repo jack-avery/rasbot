@@ -118,10 +118,9 @@ def update_after_updater():
 
     # Update commands
     do_files('modules/',BUILTIN_MODULES)
-    print("Finished updating modules.\n")
+    print("Finished updating built-in modules.\n")
 
     # Check for new requirements
-    print("Checking requirements...")
     do_files('',['requirements.txt'])
 
     check_requirements()
