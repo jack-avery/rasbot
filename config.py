@@ -40,20 +40,20 @@ DEFAULT = {
 }
 """Default channel config."""
 
-def read(cfgid) -> dict:
+def read(cfg) -> dict:
     """Reads the config file for a given channel ID.
 
     :param cfgid: The path to the channels' config.
     """
     # Attempt to read config
     try:
-        with open(cfgid, 'r') as cfg:
-            config = json.loads(cfg.read())
+        with open(cfg, 'r') as cfgfile:
+            config = json.loads(cfgfile.read())
 
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
-        create_default(cfgid)
+        create_default(cfg)
         config = DEFAULT
 
     return config

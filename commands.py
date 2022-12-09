@@ -88,7 +88,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
 
     :param ignore_builtin_check: Whether to ignore the built-in module check. Use at your own risk!
     '''
-    bot.log_debug(
+    bot.log_debug("commands",
         f'Importing command "{name} {cooldown} {requires_mod} {hidden} {response}"')
 
     # Command cannot have a negative cooldown
@@ -102,8 +102,8 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
             f"command provided invalid name {name}")
 
     if not response:
-        bot.log_error(
-            f"Command {name} might have imported incorrectly: empty response?")
+        bot.log_error("commands",
+            f"command {name} might have imported incorrectly: empty response?")
 
     # Resolve any modules the command mentions and import new ones
     for m in module_re.findall(response):
@@ -133,7 +133,7 @@ class BaseModule(threading.Thread):
     """
     helpmsg = 'No help message available for module.'
 
-    def __init__(self, bot: TwitchBot, name, cfgdefault=None):
+    def __init__(self, bot: TwitchBot, name, cfgdefault: dict = None):
         """Initialize a module. If a `cfgdefault` is given,
         it will drop the given default into the user's config directory.
         """
@@ -159,8 +159,13 @@ class BaseModule(threading.Thread):
 
         # Load config
         if os.path.exists(self._cfg_path):
-            with open(self._cfg_path, 'r') as cfg:
-                self._cfg = json.loads(cfg.read())
+            self.reload_config()
+    
+    def reload_config(self):
+        """Completely reload this module's config from file.
+        """
+        with open(self._cfg_path, 'r') as cfg:
+            self._cfg = json.loads(cfg.read())
 
     def save_config(self):
         """Save the current form of this module's `self.cfg` attribute to file.
@@ -174,7 +179,7 @@ class BaseModule(threading.Thread):
         try:
             return self._cfg[key]
         except KeyError:
-            self.bot.log_error(f'{self._name} - config missing searched key {key}, saving default')
+            self.log_e(f"module {self._name} - config missing searched key '{key}', saving default '{self._cfgdefault[key]}'")
 
             self.cfg_set(key, self._cfgdefault[key])
             return self._cfg[key]
@@ -195,13 +200,27 @@ class BaseModule(threading.Thread):
         """
         return self.helpmsg
 
-    # Default per-message function.
     def on_pubmsg(self):
         """Code to be run for every message received.
 
         By default, does nothing.
         """
         pass
+
+    def log_e(self, msg):
+        """Log an error alongside the module's name to the window.
+        """
+        self.bot.log_error(f"module {self._name}",msg)
+
+    def log_i(self, msg):
+        """Log info alongside the module's name to the window.
+        """
+        self.bot.log_info(f"module {self._name}",msg)
+
+    def log_d(self, msg):
+        """Log a debug message alongside the module's name to the window."""
+        self.bot.log_debug(f"module {self._name}",msg)
+
 
 
 def module_add(name: str):
@@ -211,9 +230,10 @@ def module_add(name: str):
     '''
     # Don't reimport a module already imported
     if name in modules:
+        bot.log_debug("commands",f"ignoring attempted reimport of module {name}.py")
         return
 
-    bot.log_debug(f"Importing module {name}.py")
+    bot.log_debug("commands",f"Importing module {name}.py")
 
     try:
         # Create spec and import from directory.
@@ -232,16 +252,16 @@ def module_add(name: str):
 
 
 def do_on_pubmsg_methods():
-    """Runs the on_pubmsg() of every Module imported from `./modules`.
+    """Runs the on_pubmsg() of every Module imported.
     """
     for module in modules.values():
         module.on_pubmsg()
 
 
 def pass_bot_ref(ref: TwitchBot):
-    global bot
     """Set up this instance of commands
     """
+    global bot
     bot = ref
 
 

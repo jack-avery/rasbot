@@ -93,14 +93,21 @@ class Module(BaseModule):
     def resolve_username(self, id):
         """Resolves a users' osu! username from their ID.
         """
-        self.bot.log_debug(f"Resolving osu! username for ID {id}")
+        self.log_d(f"resolving osu! username for ID {id}")
+        req = None
         try:
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}")
             return req.json()[0]['username'].replace(" ", "_")
         except:
-            self.bot.log_error(
-                f"request - could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code}")
+            if isinstance(req, requests.Response):
+                self.log_e(
+                    f"could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code})"
+                )
+            else:
+                self.log_e(
+                    f"something has gone horribly wrong! 'req' is of type {type(req)} - expected requests.Response"
+                )
             return None
 
     def format_message(self, map):
@@ -113,8 +120,8 @@ class Module(BaseModule):
                     str(MESSAGE_OPTIONS[m](map))
                 )
             except KeyError:
-                self.bot.log_error(
-                    f"request - message_format uses invalid key '{m}'")
+                self.log_e(
+                    f"config error: message_format uses invalid key '{m}'")
 
         return message
 
@@ -174,7 +181,7 @@ class Module(BaseModule):
             
 
     def send_osu_message(self, msg):
-        self.bot.log_debug(f"Sending osu! message '{msg}' as {self.username} to {self.target}")
+        self.log_d(f"sending osu! message '{msg}' as {self.username} to {self.target}")
         # Create IRC socket and connect to irc.ppy.sh
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         irc.connect(('irc.ppy.sh', 6667))

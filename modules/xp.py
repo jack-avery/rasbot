@@ -63,7 +63,7 @@ class Module(BaseModule):
 
     # Get viewerlist and do XP gain logic
     def tick(self):
-        self.bot.log_debug(f"Running XP grant logic")
+        self.log_d(f"running XP grant logic")
         # Create a new connection for this thread
         thread_db = sqlite3.connect(self.db_path)
 
@@ -105,7 +105,7 @@ class Module(BaseModule):
     def get_top(self):
         """Return the top 3 XP holders.
         """
-        self.bot.log_debug(f"Retrieving top 3 XP holders")
+        self.log_d(f"Retrieving top 3 XP holders")
         with self.db as db:
             cs = db.cursor()
             cs.execute(f"SELECT user,amt FROM xp ORDER BY amt DESC")
@@ -120,7 +120,7 @@ class Module(BaseModule):
         if user.startswith("@"):
             user = user[1:]
 
-        self.bot.log_debug(f"Retrieving XP for {user}")
+        self.log_d(f"retrieving XP for {user}")
         with self.db as db:
             cs = db.cursor()
 
@@ -142,6 +142,7 @@ class Module(BaseModule):
         """Perform an action on a user.
         """
         actions = ['set', 'transfer', 'ban', 'unban']
+        msg = f"Please provide a valid action and a user. Valid actions include: {', '.join(actions)}."
 
         try:
             action = args[0]
@@ -150,12 +151,12 @@ class Module(BaseModule):
             if action not in actions:
                 raise IndexError
         except IndexError:
-            return f"Please provide a valid action and a user. Valid actions include: {', '.join(actions)}."
+            return msg
 
         if user.startswith("@"):
             user = user[1:]
 
-        self.bot.log_debug(f"Running XPMod action {action} {args} on {user}")
+        self.log_d(f"running XPMod action {action} {args} on {user}")
         with self.db as db:
             if action == "set":
                 # verify needed args exist

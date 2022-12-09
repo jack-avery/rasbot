@@ -16,7 +16,7 @@ from definitions import CommandIsModOnlyError,\
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgid: int = None, debug: bool = False):
+    def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgpath: str = '', debug: bool = False):
         """Create a new instance of a Twitch bot.
 
         :param auth: The Authentication object to use.
@@ -53,10 +53,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info(f"Starting as {self.auth.get('user_id')}...")
 
         # Import channel info
-        self.cfgid = cfgid
-        self.logger.info(f"Reading config from {self.cfgid}...")
+        self.cfgpath = cfgpath
+        self.logger.info(f"Reading config from {self.cfgpath}...")
 
-        cfg = config.read(self.cfgid)
+        cfg = config.read(self.cfgpath)
         self.prefix = cfg['meta']['prefix']
 
         self.logger.info(f"Prefix set as '{self.prefix}'")
@@ -170,32 +170,34 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         """
         self.connection.privmsg(self.channel, f'{message}')
 
-    def log_error(self, message: str):
+    def log_error(self, src: str, msg: str):
         """Log an error. For easy use within modules.
 
-        :param message: The error to log.
-        """
-        self.logger.error(f'{message}')
+        :param src: The source of the error.
 
-    def log_info(self, message: str):
+        :param msg: The error to log.
+        """
+        self.logger.error(f'{src} - {msg}')
+
+    def log_info(self, src: str, msg: str):
         """Log an info-level string. For easy use within modules.
 
         :param message: The message to log.
         """
-        self.logger.info(f'{message}')
+        self.logger.info(f'{src} - {msg}')
 
-    def log_debug(self, message: str):
+    def log_debug(self, src: str, msg: str):
         """Log debug information. For easy use within modules.
 
         :param message: The debug info to log.
         """
-        self.logger.debug(f'{message}')
+        self.logger.debug(f'{src} - {msg}')
 
     def write_config(self):
         """Write this bots' config file. For easy use within modules.
         """
         config.write(self)
-        self.log_debug("Config written")
+        self.logger.debug("Config written")
 
 
 @click.command()
@@ -205,7 +207,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 )
 @click.option(
     "--auth",
-    help="The path to the auth file."
+    help="The path to the auth file.",
+    default="_AUTH.txt"
 )
 @click.option(
     "--cfg",
@@ -216,7 +219,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     help="Have this instance be verbose about actions.",
     default=False
 )
-def main(channel=None, auth=None, cfg=None, debug=False):
+def main(channel=None, auth="_AUTH.txt", cfg=None, debug=False):
     # Check for updates first!
     update.check(True)
 
