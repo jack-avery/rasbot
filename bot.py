@@ -173,7 +173,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def log_error(self, src: str, msg: str):
         """Log an error. For easy use within modules.
 
-        :param src: The source of the error.
+        :param src: The file/module this is coming from.
 
         :param msg: The error to log.
         """
@@ -182,12 +182,16 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def log_info(self, src: str, msg: str):
         """Log an info-level string. For easy use within modules.
 
+        :param src: The file/module this is coming from.
+
         :param message: The message to log.
         """
         self.logger.info(f'{src} - {msg}')
 
     def log_debug(self, src: str, msg: str):
         """Log debug information. For easy use within modules.
+
+        :param src: The file/module this is coming from.
 
         :param message: The debug info to log.
         """
