@@ -63,6 +63,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # for development: add `"always debug": true,` to your channel config to enable
         if dict.get(cfg, 'always_debug', False):
+            debug = True
             self.logger.removeHandler(stdout_handler)
             self.logger.setLevel(logging.DEBUG)
             stdout_handler.setLevel(logging.DEBUG)
