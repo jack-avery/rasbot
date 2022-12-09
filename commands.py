@@ -89,7 +89,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
     :param ignore_builtin_check: Whether to ignore the built-in module check. Use at your own risk!
     '''
     bot.log_debug("commands",
-                  f'Importing command "{name} {cooldown} {requires_mod} {hidden} {response}"')
+                  f'importing command {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
 
     # Command cannot have a negative cooldown
     if cooldown < 0:
@@ -234,7 +234,7 @@ def module_add(name: str):
             "commands", f"ignoring attempted reimport of module {name}")
         return
 
-    bot.log_debug("commands", f"Importing module {name}")
+    bot.log_debug("commands", f"importing module {name}")
 
     try:
         # Create spec and import from directory.

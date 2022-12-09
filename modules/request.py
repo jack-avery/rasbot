@@ -169,9 +169,11 @@ class Module(BaseModule):
 
         # Retrieve beatmap information
         if is_id:
+            self.log_d(f"retrieving osu map info for beatmap id {id}")
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}").json()
         else:
+            self.log_d(f"retrieving top diff info for beatmapset id {id}")
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
             req.sort(key=lambda r: r['difficultyrating'], reversed=True)
@@ -179,6 +181,7 @@ class Module(BaseModule):
         try:
             map = req[0]
         except IndexError:
+            self.log_d(f"failed!")
             return "Could not retrieve beatmap information."
 
         map['mods'] = mods
@@ -191,7 +194,7 @@ class Module(BaseModule):
 
     def send_osu_message(self, msg):
         self.log_d(
-            f"sending osu! message '{msg}' as {self.username} to {self.target}")
+            f"sending osu! message to {self.target} as {self.username}: '{msg}'")
         # Create IRC socket and connect to irc.ppy.sh
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         irc.connect(('irc.ppy.sh', 6667))

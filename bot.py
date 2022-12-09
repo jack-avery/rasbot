@@ -4,6 +4,7 @@ import irc.bot
 import logging
 import requests
 import sys
+import time
 import traceback
 
 import commands
@@ -14,6 +15,7 @@ from definitions import CommandIsModOnlyError,\
     AuthenticationDeniedError
 
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
+
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgpath: str = '', debug: bool = False):
@@ -30,6 +32,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         :param debug: Whether the bot should be verbose about actions.
         """
         # Set up logging
+        debug_init_time = time.perf_counter()
         if debug:
             logmode = logging.DEBUG
         else:
@@ -81,6 +84,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 self.commands.module_add(module)
 
             self.logger.info(f"Imported {len(cfg['modules'])} module(s)")
+
+        if debug:
+            self.logger.debug(
+                f"init stats: {len(self.commands.modules)} modules, "
+                + f"{len(self.commands.commands)} commands, "
+                + f"{round(time.perf_counter()-debug_init_time,2)}s to init")
 
         # Create IRC bot connection
         server = 'irc.twitch.tv'
