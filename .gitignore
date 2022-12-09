@@ -1,6 +1,9 @@
 # config files or otherwise private
 _*
 
+# ide
+.vscode
+
 # xp storage dbs
 /modules/xp_store
 
