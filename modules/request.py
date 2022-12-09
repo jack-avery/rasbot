@@ -119,59 +119,59 @@ class Module(BaseModule):
         return message
 
     def main(self):
-        if self.username:
-            if not self.bot.cmdargs:
-                return "Provide a map to request."
+        if not self.username or not self.target:
+            return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
-            req = self.bot.cmdargs[0].lower()
+        if not self.bot.cmdargs:
+            return "Provide a map to request."
 
-            mods = ''
-            if len(self.bot.cmdargs) > 1:
-                if self.bot.cmdargs[1].startswith("+"):
-                    mods = self.bot.cmdargs[1].upper()
+        req = self.bot.cmdargs[0].lower()
 
-            # Resolve ID
-            is_id = False
-            id = False
-            for beatmap_re in self.beatmap_res:
-                if beatmap_re.match(req):
-                    id = beatmap_re.findall(req)[0]
-                    is_id = True
+        mods = ''
+        if len(self.bot.cmdargs) > 1:
+            if self.bot.cmdargs[1].startswith("+"):
+                mods = self.bot.cmdargs[1].upper()
+
+        # Resolve ID
+        is_id = False
+        id = False
+        for beatmap_re in self.beatmap_res:
+            if beatmap_re.match(req):
+                id = beatmap_re.findall(req)[0]
+                is_id = True
+                break
+
+        if not id:
+            for beatmapset_re in self.beatmapset_res:
+                if beatmapset_re.match(req):
+                    id = beatmapset_re.findall(req)[0]
                     break
 
-            if not id:
-                for beatmapset_re in self.beatmapset_res:
-                    if beatmapset_re.match(req):
-                        id = beatmapset_re.findall(req)[0]
-                        break
+        if not id:
+            return "Could not resolve beatmap link format."
 
-            if not id:
-                return "Could not resolve beatmap link format."
-
-            # Retrieve beatmap information
-            if is_id:
-                req = requests.get(
-                    f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}").json()
-            else:
-                req = requests.get(
-                    f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
-                req.sort(key=lambda r: r['difficultyrating'], reversed=True)
-
-            try:
-                map = req[0]
-            except IndexError:
-                return "Could not retrieve beatmap information."
-
-            map['mods'] = mods
-            message = self.format_message(map)
-
-            self.send_osu_message(
-                f"{self.bot.author_name} requested: {message}")
-
-            return "Request sent!"
-
+        # Retrieve beatmap information
+        if is_id:
+            req = requests.get(
+                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}").json()
         else:
-            return "Username could not be resolved. Please check/fix configuration."
+            req = requests.get(
+                f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
+            req.sort(key=lambda r: r['difficultyrating'], reversed=True)
+
+        try:
+            map = req[0]
+        except IndexError:
+            return "Could not retrieve beatmap information."
+
+        map['mods'] = mods
+        message = self.format_message(map)
+
+        self.send_osu_message(
+            f"{self.bot.author_name} requested: {message}")
+
+        return "Request sent!"
+            
 
     def send_osu_message(self, msg):
         self.bot.log_debug(f"Sending osu! message '{msg}' as {self.username} to {self.target}")
