@@ -88,7 +88,12 @@ class Module(BaseModule):
 
         # Resolve usernames
         self.username = self.resolve_username(self.cfg_get('osu_user_id'))
-        self.target = self.resolve_username(self.cfg_get('osu_trgt_id'))
+
+        if self.cfg_get('osu_user_id') == self.cfg_get('osu_trgt_id'):
+            self.log_d("username same as target, skipping extra api call")
+            self.target = self.username
+        else:
+            self.target = self.resolve_username(self.cfg_get('osu_trgt_id'))
 
     def resolve_username(self, id):
         """Resolves a users' osu! username from their ID.
@@ -98,7 +103,12 @@ class Module(BaseModule):
         try:
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}")
-            return req.json()[0]['username'].replace(" ", "_")
+
+            name = req.json()[0]['username'].replace(" ", "_")
+            self.log_d(f"resolved to {name}")
+
+            return name
+
         except:
             if isinstance(req, requests.Response):
                 self.log_e(
@@ -178,10 +188,10 @@ class Module(BaseModule):
             f"{self.bot.author_name} requested: {message}")
 
         return "Request sent!"
-            
 
     def send_osu_message(self, msg):
-        self.log_d(f"sending osu! message '{msg}' as {self.username} to {self.target}")
+        self.log_d(
+            f"sending osu! message '{msg}' as {self.username} to {self.target}")
         # Create IRC socket and connect to irc.ppy.sh
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         irc.connect(('irc.ppy.sh', 6667))

@@ -99,9 +99,9 @@ def update():
     """Updates the rasbot updater first, then updates the rest.
     """
     do_files('', [RASBOT_BASE_UPDATER])
-    print("Finished updating updater. Updating rasbot...")
+    print("Finished updating updater. Updating rasbot...\n")
 
-    # TODO: Does not work on Linux (opens python IDLE), untested on Windows
+    # TODO: Does not work on Linux (opens python IDLE)
     # Open a new instance of Python to run the updated file
     p = subprocess.Popen(
         [sys.executable, RASBOT_BASE_UPDATER, "-l"], shell=True)
