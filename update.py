@@ -13,13 +13,16 @@ ALWAYS_OPT_OUT = False
 BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main"
 """The base URL to get raw text from and download rasbot from."""
 
-RASBOT_BASE_UPDATER = 'update'
+RASBOT_BASE_UPDATER = 'update.py'
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE = ['authentication', 'bot', 'commands', 'config', 'definitions', 'setup']
+RASBOT_BASE = ['authentication.py', 'bot.py', 'commands.py', 
+               'config.py', 'definitions.py', 'setup.py']
 """Remaining built-in base files to update after the updater."""
 
-BUILTIN_MODULES = ['caller', 'cmdadd', 'cmddel', 'help', 'np', 'prefix', 'request', 'sample', 'target', 'uptime', 'xp']
+BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
+                   'np.py', 'prefix.py', 'request.py', 'sample.py', 
+                   'target.py', 'uptime.py', 'xp.py']
 """Built-in command modules."""
 
 
@@ -97,16 +100,11 @@ def update():
     """Updates the rasbot updater first, then updates the rest.
     """
     # Update updater first!
-    print(f"Updating {RASBOT_BASE_UPDATER}.py...")
-    text = requests.get(
-        f"{BASE_URL}/{RASBOT_BASE_UPDATER}.py").text
-
-    with open(f"{RASBOT_BASE_UPDATER}.py", 'w') as commandfile:
-        commandfile.write(text)
+    do_files('/',[RASBOT_BASE_UPDATER])
 
     print("Finished updating updater. Updating rasbot...")
 
-    p = subprocess.Popen([sys.executable, f"{RASBOT_BASE_UPDATER}.py", "-l"], shell=True)
+    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"], shell=True)
     p.wait()
 
     input("\nrasbot is up to date. rasbot will now close to apply changes.")
@@ -114,58 +112,43 @@ def update():
 
 
 def update_after_updater():
-    # Update commands
-    for module in BUILTIN_MODULES:
-        print(f"Updating built-in module {module}...")
-        text = requests.get(
-            f"{BASE_URL}/modules/{module}.py").text
-
-        with open(f"modules/{module}.py", 'w') as modulefile:
-            modulefile.write(text)
-    print("Finished updating modules.\n")
-
     # Update base files
-    for base in RASBOT_BASE:
-        print(f"Updating {base}.py...")
-        text = requests.get(
-            f"{BASE_URL}/{base}.py").text
-
-        with open(f"{base}.py", 'w') as basefile:
-            basefile.write(text)
+    do_files('/',RASBOT_BASE)
     print("Finished updating rasbot.\n")
 
+    # Update commands
+    do_files('/modules/',BUILTIN_MODULES)
+    print("Finished updating modules.\n")
+
     # Check for new requirements
-    print("Checking requirements.txt...")
-    requirements = requests.get(
-        f"{BASE_URL}/requirements.txt").text
-    with open("requirements.txt", 'w') as requirementsfile:
-        requirementsfile.write(requirements)
+    print("Checking requirements...")
+    do_files('/',['requirements.txt'])
 
     check_requirements()
     print("All requirements checked.\n")
 
     # Update README files
-    print("Updating README.md...")
-    readme = requests.get(
-        f"{BASE_URL}/README.md").text
-    with io.open("README.md", 'w', encoding="utf8") as readmemd:
-        readmemd.write(readme)
-    print("Finished updating README.md.\n")
-
-    print("Updating modules README.md...")
-    modreadme = requests.get(
-        f"{BASE_URL}/modules/README.md").text
-    with open("modules/README.md", 'w') as modreadmemd:
-        modreadmemd.write(modreadme)
-    print("Finished updating modules README.md.\n")
+    do_files('/',['README.md'])
+    do_files('/modules/',['README.md'])
+    print("Finished updating README files.\n")
 
     # Increment version
-    print("Incrementing version...")
-    version = requests.get(
-        f"{BASE_URL}/version").text
-    with open("version", 'w') as versionfile:
-        versionfile.write(version)
+    do_files('/',['version'])
 
+def do_files(path: str, files: list):
+    """Update multiple files at once.
+
+    :param path: The path to the folder of the files.
+    
+    :param files: The list of files to update, including extensions.
+    """
+    for file in files:
+        print(f"Updating {path}{file}...")
+        text = requests.get(
+            f"{BASE_URL}{path}{file}").text
+
+        with open(f"{path}{file}", 'w') as local:
+            local.write(text)
 
 def check_requirements():
     subprocess.check_call([sys.executable, "-m", "pip",
