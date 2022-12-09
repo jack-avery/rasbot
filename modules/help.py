@@ -25,14 +25,20 @@ class Module(BaseModule):
 
         # If a command is provided, run the help for it.
         else:
-            module = self.bot.cmdargs[0].lower()
+            name = self.bot.cmdargs[0].lower()
 
-            if module in self.bot.commands.modules:
-                return str(self.bot.commands.modules[module].help())
+            if name in self.bot.commands.modules:
+                return str(self.bot.commands.modules[name].help())
 
-            elif module in self.bot.commands.commands:
-                return str(f"Module '{module}' not found, but the matching command uses module(s): "
-                           + f"{', '.join(self.module_re.findall(self.bot.commands.commands[module].response))}")
+            elif name in self.bot.commands.commands:
+                command_modules = self.module_re.findall(self.bot.commands.commands[name].response)
+
+                if command_modules:
+                    return str(f"Module '{name}' not found, but the matching command uses module(s): "
+                            + f"{', '.join(command_modules)}")
+                
+                else:
+                    return str(f"Command {name} does not mention any modules.")
 
             else:
                 return "No matching command or module."

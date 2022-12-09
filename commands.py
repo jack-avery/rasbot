@@ -120,11 +120,6 @@ def command_del(name: str):
 
     :param name: The name of the command.
     '''
-    # Command must match the regex defined by VALID_COMMAND_REGEX
-    if not command_re.match(name):
-        raise CommandGivenInvalidNameError(
-            f"command provided invalid name {name}")
-
     try:
         del (commands[name])
     except KeyError:
@@ -179,6 +174,8 @@ class BaseModule(threading.Thread):
         try:
             return self._cfg[key]
         except KeyError:
+            self.bot.log_error(f'{self._name} - config missing searched key {key}, saving default')
+
             self.cfg_set(key, self._cfgdefault[key])
             return self._cfg[key]
 

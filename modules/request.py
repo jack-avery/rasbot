@@ -99,8 +99,8 @@ class Module(BaseModule):
                 f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}")
             return req.json()[0]['username'].replace(" ", "_")
         except:
-            print(
-                f"An error occurred trying to resolve osu! username for ID {id}. Your API key may be invalid.")
+            self.bot.log_error(
+                f"request - could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code}")
             return None
 
     def format_message(self, map):
@@ -113,7 +113,7 @@ class Module(BaseModule):
                     str(MESSAGE_OPTIONS[m](map))
                 )
             except KeyError:
-                self.bot.log_debug(
+                self.bot.log_error(
                     f"request - message_format uses invalid key '{m}'")
 
         return message
@@ -174,7 +174,7 @@ class Module(BaseModule):
             return "Username could not be resolved. Please check/fix configuration."
 
     def send_osu_message(self, msg):
-        self.bot.log_debug(f"Sending osu! message '{msg}' to {self.target}")
+        self.bot.log_debug(f"Sending osu! message '{msg}' as {self.username} to {self.target}")
         # Create IRC socket and connect to irc.ppy.sh
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         irc.connect(('irc.ppy.sh', 6667))

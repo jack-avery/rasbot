@@ -2,9 +2,7 @@
 # Please do not modify this unless you really know what you're doing.
 
 from commands import BaseModule
-from definitions import VALID_COMMAND_REGEX,\
-    CommandDoesNotExistError,\
-    CommandGivenInvalidNameError
+from definitions import CommandDoesNotExistError
 
 
 class Module(BaseModule):
@@ -24,6 +22,3 @@ class Module(BaseModule):
 
         except CommandDoesNotExistError:
             return f'Command {cmd} does not exist.'
-
-        except CommandGivenInvalidNameError:
-            return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'

@@ -1,7 +1,6 @@
 import json
 import requests
 
-import setup
 from definitions import DEFAULT_AUTHFILE,\
     AuthenticationDeniedError
 
