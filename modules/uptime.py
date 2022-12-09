@@ -11,6 +11,8 @@ class Module(BaseModule):
     helpmsg = 'Returns the current stream uptime. Usage: uptime'
 
     def main(self):
+        # TODO understand what I was doing when I wrote this and document it better...
+
         r = requests.get(
             f"https://api.twitch.tv/helix/streams?user_id={self.bot.channel_id}", headers=self.bot.auth.get_headers()).json()
         try:

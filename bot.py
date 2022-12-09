@@ -13,6 +13,7 @@ from definitions import CommandIsModOnlyError,\
     CommandStillOnCooldownError,\
     AuthenticationDeniedError
 
+# TODO refactor this and on_pubmsg, probably. or at least make it look better
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgid: int = None, debug: bool = False):
@@ -133,15 +134,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 return
 
             # Isolating command and command arguments
-            # Verify that it's actually a command before continuing.
             cmd = self.msg_split[0][len(self.prefix):].lower()
+            self.cmdargs = self.msg_split[1:]
+
+            # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
                 self.logger.debug(
                     f"Ignoring invalid command call '{cmd}' from {name} (mod: {ismod})")
                 return
-
-            # Isolate command arguments from command
-            self.cmdargs = self.msg_split[1:]
 
             try:
                 # Run the command and string result message
