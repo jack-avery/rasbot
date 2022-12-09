@@ -82,8 +82,8 @@ class Module(BaseModule):
                     continue
 
                 # Resolve how much XP to grant to this user
-                active_range = self.cfg_get['xp_active_range']
-                inactive_range = self.cfg_get['xp_inactive_range']
+                active_range = self.cfg_get('xp_active_range')
+                inactive_range = self.cfg_get('xp_inactive_range')
                 if (user in self.active_users):
                     amt = random.randint(
                         active_range[0], active_range[1])
