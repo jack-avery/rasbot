@@ -1,14 +1,6 @@
 ##
-# Definitions
+# Definitions used in multiple files go here.
 ##
-
-BUILTIN_MODULES = ['caller', 'cmdadd', 'cmddel', 'help', 'np',
-                   'prefix', 'request', 'sample', 'target', 'uptime', 'xp']
-"""Built-in command modules. Used for the autoupdate function."""
-
-RASBOT_BASE = ['authentication', 'bot', 'commands', 'config',
-               'definitions', 'update', 'setup']
-"""Built-in modules. Used for the autoupdate function."""
 
 VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 """Regex to compare given command names to for validation."""

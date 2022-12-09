@@ -4,14 +4,23 @@ import sys
 import requests
 import click
 import semantic_version
-from definitions import BUILTIN_MODULES, RASBOT_BASE
-
-BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main"
 
 # Master option to ALWAYS OPT OUT OF UPDATES and ignore any in the future!
 # Set this to True if you want, but things might break eventually.
 # You will need to run the command `update.py --force`, or set this back to False to get updates again.
 ALWAYS_OPT_OUT = False
+
+BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main"
+"""The base URL to get raw text from and download rasbot from."""
+
+RASBOT_BASE_UPDATER = 'update'
+"""The rasbot updater. This needs to be updated first for the update to work fully."""
+
+RASBOT_BASE = ['authentication', 'bot', 'commands', 'config', 'definitions', 'setup']
+"""Remaining built-in base files to update after the updater."""
+
+BUILTIN_MODULES = ['caller', 'cmdadd', 'cmddel', 'help', 'np', 'prefix', 'request', 'sample', 'target', 'uptime', 'xp']
+"""Built-in command modules."""
 
 
 @click.command()
@@ -42,9 +51,9 @@ def check(silent=False, force=False, l=False):
     :param force: Whether or not to force an update.
     """
     if force:
-        update_first()
+        update()
     if l:
-        update_inner()
+        update_after_updater()
 
     if ALWAYS_OPT_OUT:
         return
@@ -81,31 +90,30 @@ def prompt():
     print("--\n")
 
     if input("Would you like to update? (y/Y for yes): ").lower() == 'y':
-        update_first()
+        update()
 
 
-def update_first():
-    """Updates rasbot.
+def update():
+    """Updates the rasbot updater first, then updates the rest.
     """
-    # Update definitions and updater first!
-    for module in ['definitions', 'update']:
-        print(f"Updating {module}.py...")
-        text = requests.get(
-            f"{BASE_URL}/{module}.py").text
+    # Update updater first!
+    print(f"Updating {RASBOT_BASE_UPDATER}.py...")
+    text = requests.get(
+        f"{BASE_URL}/{RASBOT_BASE_UPDATER}.py").text
 
-        with open(f"{module}.py", 'w') as commandfile:
-            commandfile.write(text)
+    with open(f"{RASBOT_BASE_UPDATER}.py", 'w') as commandfile:
+        commandfile.write(text)
 
-    print("Finished updating important modules. Updating remainder...")
+    print("Finished updating updater. Updating rasbot...")
 
-    p = subprocess.Popen(["update.py", "-l"], shell=True)
+    p = subprocess.Popen([sys.executable, f"{RASBOT_BASE_UPDATER}.py", "-l"], shell=True)
     p.wait()
 
     input("\nrasbot is up to date. rasbot will now close to apply changes.")
     sys.exit(0)
 
 
-def update_inner():
+def update_after_updater():
     # Update commands
     for module in BUILTIN_MODULES:
         print(f"Updating built-in module {module}...")
@@ -116,19 +124,18 @@ def update_inner():
             modulefile.write(text)
     print("Finished updating modules.\n")
 
-    # Update modules
+    # Update base files
     for base in RASBOT_BASE:
-        if base not in ['definitions', 'update']:
-            print(f"Updating base file {base}...")
-            text = requests.get(
-                f"{BASE_URL}/{base}.py").text
+        print(f"Updating {base}.py...")
+        text = requests.get(
+            f"{BASE_URL}/{base}.py").text
 
-            with open(f"{base}.py", 'w') as basefile:
-                basefile.write(text)
-    print("Finished updating base.\n")
+        with open(f"{base}.py", 'w') as basefile:
+            basefile.write(text)
+    print("Finished updating rasbot.\n")
 
     # Check for new requirements
-    print("Running requirements.txt...")
+    print("Checking requirements.txt...")
     requirements = requests.get(
         f"{BASE_URL}/requirements.txt").text
     with open("requirements.txt", 'w') as requirementsfile:
