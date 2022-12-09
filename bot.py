@@ -216,7 +216,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     help="Have this instance be verbose about actions.",
     default=False
 )
-def run(channel=None, auth=None, cfg=None, debug=False):
+def main(channel=None, auth=None, cfg=None, debug=False):
     # Check for updates first!
     update.check(True)
 
@@ -255,4 +255,4 @@ def run(channel=None, auth=None, cfg=None, debug=False):
 
 
 if __name__ == "__main__":
-    run()
+    main()

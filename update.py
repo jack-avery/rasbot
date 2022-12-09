@@ -39,10 +39,10 @@ BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
 )
 @click.option(
     "-l/-nl",
-    help="Used in updating, performs the rest of the update after updating itself and definitions.",
+    help="For update order. Probably shouldn't manually set this.",
     default=False
 )
-def check_cli(silent=False, force=False, l=False):
+def main(silent=False, force=False, l=False):
     check(silent, force, l)
 
 
@@ -71,7 +71,7 @@ def check(silent=False, force=False, l=False):
             if not silent:
                 input(
                     "Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
-            exit()
+            sys.exit()
 
     if not silent:
         print(f"You are running on rasbot version: {current}")
@@ -86,8 +86,7 @@ def prompt():
     """Prompts the user to update rasbot.
     """
     print("--")
-    print(
-        f"HEY! Your version of rasbot is running out of date!")
+    print("HEY! Your version of rasbot is running out of date!")
     print("Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with.")
     print("This does not include anything found in your module config.")
     print("--\n")
@@ -99,14 +98,15 @@ def prompt():
 def update():
     """Updates the rasbot updater first, then updates the rest.
     """
-    # Update updater first!
     do_files('',[RASBOT_BASE_UPDATER])
-
     print("Finished updating updater. Updating rasbot...")
 
+    # TODO: Does not work on Linux (opens python IDLE), untested on Windows
+    # Open a new instance of Python to run the updated file
     p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"], shell=True)
     p.wait()
 
+    # Close this process, so we don't use a broken bot.py from autoupdate
     input("\nrasbot is up to date. rasbot will now close to apply changes.")
     sys.exit(0)
 
@@ -155,4 +155,4 @@ def check_requirements():
 
 
 if __name__ == "__main__":
-    check_cli()
+    main()
