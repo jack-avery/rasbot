@@ -8,6 +8,11 @@ from definitions import BUILTIN_MODULES, RASBOT_BASE
 
 BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main"
 
+# Master option to ALWAYS OPT OUT OF UPDATES and ignore any in the future!
+# Set this to True if you want, but things might break eventually.
+# You will need to run the command `update.py --force`, or set this back to False to get updates again.
+ALWAYS_OPT_OUT = False
+
 
 @click.command()
 @click.option(
@@ -40,6 +45,9 @@ def check(silent=False, force=False, l=False):
         update_first()
     if l:
         update_inner()
+
+    if ALWAYS_OPT_OUT:
+        return
 
     if not silent:
         print("Checking for updates...")

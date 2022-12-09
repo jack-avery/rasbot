@@ -4,9 +4,9 @@
 
 </div>
 
-**rasbot** is a Python-based Twitch bot lets you see and modify everything going on behind the scenes.<br/>
+**rasbot** is a Python-based Twitch bot that lets you see and modify **everything** going on behind the scenes.<br/>
 
-rasbot is intended to run locally on your account so it has access to your Twitch emotes and any potential companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion):
+rasbot is intended to run locally on your account, so it has access to *your* Twitch emotes, and any potential game companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion):
 
 ![image](https://cdn.discordapp.com/attachments/488850419301220352/1024615808879579188/unknown.png)
 
@@ -22,6 +22,9 @@ rasbot is intended to run locally on your account so it has access to your Twitc
 ```
 Joined #raspy_on_osu! (57511738)
 ```
+
+> rasbot checks for and performs updates automatically with each start and will let you know if one is ready! <br/>
+> They're recommended, but are easily opted out of. You can disable checking and future notifications in `update.py`.
 
 # Managing Commands 📋
 
