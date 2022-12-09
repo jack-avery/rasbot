@@ -10,7 +10,7 @@ import semantic_version
 # You will need to run the command `update.py --force`, or set this back to False to get updates again.
 ALWAYS_OPT_OUT = False
 
-BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main"
+BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main/"
 """The base URL to get raw text from and download rasbot from."""
 
 RASBOT_BASE_UPDATER = 'update.py'
@@ -100,7 +100,7 @@ def update():
     """Updates the rasbot updater first, then updates the rest.
     """
     # Update updater first!
-    do_files('/',[RASBOT_BASE_UPDATER])
+    do_files('',[RASBOT_BASE_UPDATER])
 
     print("Finished updating updater. Updating rasbot...")
 
@@ -113,27 +113,27 @@ def update():
 
 def update_after_updater():
     # Update base files
-    do_files('/',RASBOT_BASE)
+    do_files('',RASBOT_BASE)
     print("Finished updating rasbot.\n")
 
     # Update commands
-    do_files('/modules/',BUILTIN_MODULES)
+    do_files('modules/',BUILTIN_MODULES)
     print("Finished updating modules.\n")
 
     # Check for new requirements
     print("Checking requirements...")
-    do_files('/',['requirements.txt'])
+    do_files('',['requirements.txt'])
 
     check_requirements()
     print("All requirements checked.\n")
 
     # Update README files
-    do_files('/',['README.md'])
-    do_files('/modules/',['README.md'])
+    do_files('',['README.md'])
+    do_files('modules/',['README.md'])
     print("Finished updating README files.\n")
 
     # Increment version
-    do_files('/',['version'])
+    do_files('',['version'])
 
 def do_files(path: str, files: list):
     """Update multiple files at once.
