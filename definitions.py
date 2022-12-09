@@ -8,46 +8,6 @@ VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 MODULE_MENTION_REGEX = r'&([\/a-z0-9_]+)&'
 """Regex to compare command responses to for finding any mentioned modules."""
 
-DEFAULT_CONFIG = {
-    "meta": {
-        "prefix": "r!"
-    },
-    "commands": {
-        "help": {
-            "cooldown": 10,
-            "requires_mod": False,
-            "hidden": False,
-            "response": "@&caller& > &help&"
-        },
-        "uptime": {
-            "cooldown": 10,
-            "requires_mod": False,
-            "hidden": False,
-            "response": "@&caller& > &uptime&"
-        },
-        "cmdadd": {
-            "cooldown": 0,
-            "requires_mod": True,
-            "hidden": False,
-            "response": "@&caller& > &cmdadd&"
-        },
-        "cmddel": {
-            "cooldown": 0,
-            "requires_mod": True,
-            "hidden": False,
-            "response": "@&caller& > &cmddel&"
-        },
-        "prefix": {
-            "cooldown": 0,
-            "requires_mod": True,
-            "hidden": False,
-            "response": "@&caller& > &prefix&"
-        },
-    },
-    "modules": []
-}
-"""Default channel config."""
-
 DEFAULT_AUTHFILE = "_AUTH.txt"
 """Default authfile to use if none is provided as a commandline arg."""
 

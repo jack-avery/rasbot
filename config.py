@@ -1,6 +1,44 @@
-from definitions import DEFAULT_CONFIG
 import json
 
+DEFAULT = {
+    "meta": {
+        "prefix": "r!"
+    },
+    "commands": {
+        "help": {
+            "cooldown": 10,
+            "requires_mod": False,
+            "hidden": False,
+            "response": "@&caller& > &help&"
+        },
+        "uptime": {
+            "cooldown": 10,
+            "requires_mod": False,
+            "hidden": False,
+            "response": "@&caller& > &uptime&"
+        },
+        "cmdadd": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": False,
+            "response": "@&caller& > &cmdadd&"
+        },
+        "cmddel": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": False,
+            "response": "@&caller& > &cmddel&"
+        },
+        "prefix": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": False,
+            "response": "@&caller& > &prefix&"
+        },
+    },
+    "modules": []
+}
+"""Default channel config."""
 
 def read(cfgid) -> dict:
     """Reads the config file for a given channel ID.
@@ -16,7 +54,7 @@ def read(cfgid) -> dict:
     # and return a basic config dict.
     except FileNotFoundError:
         create_default(cfgid)
-        config = DEFAULT_CONFIG
+        config = DEFAULT
 
     return config
 
@@ -57,4 +95,4 @@ def create_default(cfgid):
     :param cfgid: The path to the channel's config.
     """
     with open(cfgid, 'w') as cfg:
-        cfg.write(json.dumps(DEFAULT_CONFIG, indent=4))
+        cfg.write(json.dumps(DEFAULT, indent=4))
