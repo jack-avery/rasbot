@@ -16,12 +16,12 @@ BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main/"
 RASBOT_BASE_UPDATER = 'update.py'
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE = ['authentication.py', 'bot.py', 'commands.py', 
+RASBOT_BASE = ['authentication.py', 'bot.py', 'commands.py',
                'config.py', 'definitions.py', 'setup.py']
 """Remaining built-in base files to update after the updater."""
 
 BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
-                   'np.py', 'prefix.py', 'request.py', 'sample.py', 
+                   'np.py', 'prefix.py', 'request.py', 'sample.py',
                    'target.py', 'uptime.py', 'xp.py']
 """Built-in command modules."""
 
@@ -98,12 +98,13 @@ def prompt():
 def update():
     """Updates the rasbot updater first, then updates the rest.
     """
-    do_files('',[RASBOT_BASE_UPDATER])
+    do_files('', [RASBOT_BASE_UPDATER])
     print("Finished updating updater. Updating rasbot...")
 
     # TODO: Does not work on Linux (opens python IDLE), untested on Windows
     # Open a new instance of Python to run the updated file
-    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"], shell=True)
+    p = subprocess.Popen(
+        [sys.executable, RASBOT_BASE_UPDATER, "-l"], shell=True)
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
@@ -113,32 +114,33 @@ def update():
 
 def update_after_updater():
     # Update base files
-    do_files('',RASBOT_BASE)
+    do_files('', RASBOT_BASE)
     print("Finished updating rasbot.\n")
 
     # Update commands
-    do_files('modules/',BUILTIN_MODULES)
+    do_files('modules/', BUILTIN_MODULES)
     print("Finished updating built-in modules.\n")
 
     # Check for new requirements
-    do_files('',['requirements.txt'])
+    do_files('', ['requirements.txt'])
 
     check_requirements()
     print("All requirements checked.\n")
 
     # Update README files
-    do_files('',['README.md'])
-    do_files('modules/',['README.md'])
+    do_files('', ['README.md'])
+    do_files('modules/', ['README.md'])
     print("Finished updating README files.\n")
 
     # Increment version
-    do_files('',['version'])
+    do_files('', ['version'])
+
 
 def do_files(path: str, files: list):
     """Update multiple files at once.
 
     :param path: The path to the folder of the files.
-    
+
     :param files: The list of files to update, including extensions.
     """
     for file in files:
@@ -146,8 +148,9 @@ def do_files(path: str, files: list):
         text = requests.get(
             f"{BASE_URL}{path}{file}").text
 
-        with open(f"{path}{file}", 'w') as local:
+        with io.open(f"{path}{file}", 'w', encoding="utf8") as local:
             local.write(text)
+
 
 def check_requirements():
     subprocess.check_call([sys.executable, "-m", "pip",
