@@ -40,6 +40,7 @@ DEFAULT = {
 }
 """Default channel config."""
 
+
 def read(cfg) -> dict:
     """Reads the config file for a given channel ID.
 
