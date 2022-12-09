@@ -60,8 +60,15 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info(f"Reading config from {self.cfgpath}...")
 
         cfg = config.read(self.cfgpath)
-        self.prefix = cfg['meta']['prefix']
 
+        # for development: add `"always debug": true,` to your channel config to enable
+        if dict.get(cfg, 'always_debug', False):
+            self.logger.removeHandler(stdout_handler)
+            self.logger.setLevel(logging.DEBUG)
+            stdout_handler.setLevel(logging.DEBUG)
+            self.logger.addHandler(stdout_handler)
+
+        self.prefix = cfg['meta']['prefix']
         self.logger.info(f"Prefix set as '{self.prefix}'")
 
         # Set channel name
