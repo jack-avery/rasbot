@@ -35,6 +35,10 @@ OSU_STATUSES = ["Pending", "Ranked", "Approved",
 
 OSU_MODES = ["Standard", "Taiko", "CTB", "Mania"]
 
+# TODO update this with lazer mods when the time comes
+OSU_MODS = ["EZ", "NF", "HT", "HR", "SD", "PF",
+            "DT", "NC", "HD", "FL", "RX", "AP", "SO", "V2"]
+
 MESSAGE_OPT_RE = re.compile(MODULE_MENTION_REGEX)
 
 MESSAGE_OPTIONS = {
@@ -120,7 +124,31 @@ class Module(BaseModule):
                 )
             return None
 
+    def generate_mods_string(self, mods: str):
+        """Convert `mods` into a more conventional format, and verify that they are real osu! mods."""
+        self.log_d(f"resolving mods from string {mods}")
+        # strip + for logic
+        if mods.startswith('+'):
+            mods = mods[1:]
+
+        # remove any possible ,
+        mods = mods.replace(',', '')
+
+        # split into separate mods
+        mods = [mods[i:i+2] for i in range(0, len(mods), 2)]
+
+        modstring = '+'
+        for mod in mods:
+            if mod in OSU_MODS:
+                modstring += mod
+
+        self.log_d(modstring)
+        return modstring
+
     def format_message(self, map):
+        """Format map information for `map` using `message_format` from the config.
+
+        :param map: The map object as returned from the osu! API"""
         message = self.cfg_get('message_format')
 
         for m in MESSAGE_OPT_RE.findall(message):
@@ -146,8 +174,7 @@ class Module(BaseModule):
 
         mods = ''
         if len(self.bot.cmdargs) > 1:
-            if self.bot.cmdargs[1].startswith("+"):
-                mods = self.bot.cmdargs[1].upper()
+            mods = self.generate_mods_string(self.bot.cmdargs[1].upper())
 
         # Resolve ID
         is_id = False
