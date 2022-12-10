@@ -82,17 +82,21 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
 
+        # compile mapID regex
         beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)
         b_re = re.compile(OSU_B_RE)
 
+        # compile mapsetID regex
         beatmapset_re = re.compile(OSU_BEATMAPSET_RE)
 
+        # create regex lists for easy iterating
         self.beatmap_res = [beatmapsetid_re, b_re]
         self.beatmapset_res = [beatmapset_re]
 
-        # Resolve usernames
+        # resolve usernames
         self.username = self.resolve_username(self.cfg_get('osu_user_id'))
 
+        # if the target is the same as the user, just copy it over instead of a second call
         if self.cfg_get('osu_user_id') == self.cfg_get('osu_trgt_id'):
             self.log_d("username same as target, skipping extra api call")
             self.target = self.username
@@ -108,6 +112,7 @@ class Module(BaseModule):
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}")
 
+            # replace ' ' with '_'
             name = req.json()[0]['username'].replace(" ", "_")
             self.log_d(f"resolved to {name}")
 
@@ -137,10 +142,11 @@ class Module(BaseModule):
         # split into separate mods
         mods = [mods[i:i+2] for i in range(0, len(mods), 2)]
 
+        # add mods to modstring; prevent duplicates and invalid mods
         modstring = '+'
         for mod in mods:
-            if mod in OSU_MODS:
-                modstring += mod
+            if mod in OSU_MODS and mod not in modstring:
+                modstring += mod + ','
 
         self.log_d(modstring)
         return modstring
@@ -164,19 +170,23 @@ class Module(BaseModule):
         return message
 
     def main(self):
+        # do not continue if either username or target failed to resolve
         if not self.username or not self.target:
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
+        # do not continue if no args are provided
         if not self.bot.cmdargs:
             return "Provide a map to request."
 
+        # use first arg as request
         req = self.bot.cmdargs[0].lower()
 
+        # use second arg as mods
         mods = ''
         if len(self.bot.cmdargs) > 1:
             mods = self.generate_mods_string(self.bot.cmdargs[1].upper())
 
-        # Resolve ID
+        # resolve mapID
         is_id = False
         id = False
         for beatmap_re in self.beatmap_res:
@@ -185,24 +195,29 @@ class Module(BaseModule):
                 is_id = True
                 break
 
+        # if couldn't get mapid from mapID res, use mapsetID
         if not id:
             for beatmapset_re in self.beatmapset_res:
                 if beatmapset_re.match(req):
                     id = beatmapset_re.findall(req)[0]
                     break
 
+        # if couldn't get mapid from either mapID or mapsetID res, give up
         if not id:
             return "Could not resolve beatmap link format."
 
-        # Retrieve beatmap information
+        # retrieve beatmap information
         if is_id:
+            # beatmap
             self.log_d(f"retrieving osu map info for beatmap id {id}")
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}").json()
         else:
+            # beatmapset
             self.log_d(f"retrieving top diff info for beatmapset id {id}")
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
+            # sort mapset descending by difficulty so req[0] gives top diff
             req.sort(key=lambda r: r['difficultyrating'], reversed=True)
 
         try:
@@ -211,9 +226,11 @@ class Module(BaseModule):
             self.log_d(f"failed!")
             return "Could not retrieve beatmap information."
 
+        # add request mods to map dict and format the message
         map['mods'] = mods
         message = self.format_message(map)
 
+        # send message and inform requester
         self.send_osu_message(
             f"{self.bot.author_name} requested: {message}")
 
@@ -222,14 +239,17 @@ class Module(BaseModule):
     def send_osu_message(self, msg):
         self.log_d(
             f"sending osu! message to {self.target} as {self.username}: '{msg}'")
-        # Create IRC socket and connect to irc.ppy.sh
+
+        # create IRC socket and connect to irc.ppy.sh
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         irc.connect(('irc.ppy.sh', 6667))
 
+        # send message headers and message
         irc.send(bytes(
             f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
         irc.send(bytes(f"PASS {self.cfg_get('osu_irc_pwd')}\n", "UTF-8"))
         irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
         irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
 
+        # close socket so we don't leak anything
         irc.close()

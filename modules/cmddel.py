@@ -12,9 +12,11 @@ class Module(BaseModule):
         if not self.bot.cmdargs:
             return "No command provided."
 
+        # convert argument to lower
         cmd = self.bot.cmdargs[0].lower()
 
         try:
+            # try to delete and write config
             self.bot.commands.command_del(cmd)
             self.bot.write_config()
 

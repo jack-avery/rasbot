@@ -32,14 +32,18 @@ class Module(BaseModule):
 
         cmd = self.bot.cmdargs
 
+        # use lower of next item as name
         cmd_name = cmd.pop(0).lower()
 
+        # try to use next item as cooldown in seconds
+        # if it can't convert to int, use default
         try:
             cmd_cooldown = int(cmd[0])
             cmd.pop(0)
         except ValueError:
             cmd_cooldown = self.DEFAULT_COOLDOWN
 
+        # check for parameters and consume if found
         params = {
             'modonly': False,
             'hidden': False
@@ -51,6 +55,7 @@ class Module(BaseModule):
                     cmd.pop(0)
 
         try:
+            # add command and write config
             self.bot.commands.command_modify(cmd_name,
                                              cmd_cooldown,
                                              " ".join(cmd),
