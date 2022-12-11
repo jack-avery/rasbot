@@ -6,21 +6,21 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandGivenInvalidNameError,\
     CommandMustHavePositiveCooldownError
 
-DEFAULT_CONFIG = {
-    # The parameters to be given, after cooldown, before response
-    # to indicate this command should be mod-only or hidden from !help
-    "modonly_arg": "-modonly",
-    "hidden_arg": "-hidden",
-    # The default cooldown to apply to a command if none is specified
-    "default_cooldown": 5,
-}
-
 
 class Module(BaseModule):
     helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <params?> <response>.'
 
+    default_config = {
+        # The parameters to be given, after cooldown, before response
+        # to indicate this command should be mod-only or hidden from !help
+        "modonly_arg": "-modonly",
+        "hidden_arg": "-hidden",
+        # The default cooldown to apply to a command if none is specified
+        "default_cooldown": 5,
+    }
+
     def __init__(self, bot, name):
-        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+        BaseModule.__init__(self, bot, name)
 
         self.MODONLY_ARG = self.cfg_get('modonly_arg')
         self.HIDDEN_ARG = self.cfg_get('hidden_arg')

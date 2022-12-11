@@ -9,17 +9,20 @@
 
 from commands import BaseModule
 
-# You can save parameters for your module using a config.
-# Using a default config requires that you override __init__ and pass it like shown below!
-DEFAULT_CONFIG = {
-    "savedmessage": ""
-}
-
 
 class Module(BaseModule):
+    # You can give your module a special help message when used with !help like this:
+    helpmsg = "Sample module! Usage: sample <message?>"
+
+    # You can save parameters for your module using a config.
+    # Adding a default will let users know what will be stored:
+    default_config = {
+        "savedmessage": ""
+    }
+
     def __init__(self, bot, name):
         # Make sure you call BaseModule init if overriding __init__!
-        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+        BaseModule.__init__(self, bot, name)
         self.count = 0
 
     # This runs if the module is part of a command which gets called.
@@ -27,7 +30,7 @@ class Module(BaseModule):
         # Use self.cfg_get(key) to get items from the module config.
         last_time = self.cfg_get('savedmessage')
 
-        # You can save things using self.cfg_get(key, value):
+        # You can save things using self.cfg_set(key, value):
         self.cfg_set('savedmessage', ' '.join(self.bot.cmdargs))
 
         # You can get the author's name, UID, and mod status like so!

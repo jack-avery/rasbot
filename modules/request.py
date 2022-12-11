@@ -10,20 +10,6 @@ import re
 from commands import BaseModule
 from definitions import MODULE_MENTION_REGEX
 
-DEFAULT_CONFIG = {
-    # Your osu! ID. Go to your profile on the website and this should be in the URL.
-    "osu_user_id": "",
-    # Your osu! API key. Get this from https://osu.ppy.sh/p/api.
-    "osu_api_key": "",
-    # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
-    "osu_irc_pwd": "",
-    # ID of the user that the request should go to.
-    "osu_trgt_id": "",
-    # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
-    # Enclose keys in & as you would a module in a command.
-    "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
-}
-
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
 
@@ -79,8 +65,22 @@ MESSAGE_OPTIONS = {
 class Module(BaseModule):
     helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link> <+mods?>'
 
+    default_config = {
+        # Your osu! ID. Go to your profile on the website and this should be in the URL.
+        "osu_user_id": "",
+        # Your osu! API key. Get this from https://osu.ppy.sh/p/api.
+        "osu_api_key": "",
+        # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
+        "osu_irc_pwd": "",
+        # ID of the user that the request should go to.
+        "osu_trgt_id": "",
+        # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
+        # Enclose keys in & as you would a module in a command.
+        "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
+    }
+
     def __init__(self, bot, name):
-        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+        BaseModule.__init__(self, bot, name)
 
         # compile mapID regex
         beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)

@@ -133,24 +133,24 @@ class BaseModule(threading.Thread):
     Facilitates defaults for a Module so as to prevent errors.
     """
     helpmsg = 'No help message available for module.'
+    default_config = False
 
-    def __init__(self, bot: TwitchBot, name, cfgdefault: dict = None):
+    def __init__(self, bot: TwitchBot, name):
         """Initialize a module. If a `cfgdefault` is given,
         it will drop the given default into the user's config directory.
         """
         threading.Thread.__init__(self)
         self.bot = bot
         self._name = name
-        self._cfgdefault = cfgdefault
 
         self._cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
 
-        # If no config found and a default provided, create it
+        # If no config found and a default is provided, create it
         if not os.path.exists(self._cfg_path):
-            if cfgdefault:
+            if self.default_config:
                 with open(self._cfg_path, 'w') as cfg:
-                    cfg.write(json.dumps(cfgdefault, indent=4))
-                    self._cfg = cfgdefault
+                    cfg.write(json.dumps(self.default_config, indent=4))
+                    self._cfg = self.default_config
 
         # If config found, load it
         else:

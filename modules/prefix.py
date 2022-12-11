@@ -3,15 +3,13 @@
 
 from commands import BaseModule
 
-DEFAULT_CONFIG = {
-    "default": "r!"
-}
 
 class Module(BaseModule):
     helpmsg = f'Sets a new prefix for the bot. Usage: prefix <prefix?>'
 
-    def __init__(self, bot, name):
-        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+    default_config = {
+        "default": "r!"
+    }
 
     def main(self):
         if not self.bot.cmdargs:

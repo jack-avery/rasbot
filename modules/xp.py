@@ -9,16 +9,6 @@ import requests
 import sqlite3
 import threading
 
-DEFAULT_CONFIG = {
-    # Amount of seconds between each grant. Default is 60 (1 minute).
-    "xp_grant_frequency": 60,
-    # Amount (min, max) to grant to inactive users. Default is (1, 1).
-    "xp_inactive_range": [1, 1],
-    # Amount (min, max) to grant to active users. Default is (2, 3).
-    "xp_active_range": [2, 3],
-    "omit_users": []
-}
-
 
 class RepeatTimer(threading.Timer):
     # See https://stackoverflow.com/a/48741004
@@ -30,8 +20,18 @@ class RepeatTimer(threading.Timer):
 class Module(BaseModule):
     helpmsg = f"Get how much XP a user has or see the top 3. Usage: xp <username/top>"
 
+    default_config = {
+        # Amount of seconds between each grant. Default is 60 (1 minute).
+        "xp_grant_frequency": 60,
+        # Amount (min, max) to grant to inactive users. Default is (1, 1).
+        "xp_inactive_range": [1, 1],
+        # Amount (min, max) to grant to active users. Default is (2, 3).
+        "xp_active_range": [2, 3],
+        "omit_users": []
+    }
+
     def __init__(self, bot, name):
-        BaseModule.__init__(self, bot, name, DEFAULT_CONFIG)
+        BaseModule.__init__(self, bot, name)
 
         # resolve path
         self.db_path = f"modules/xp_store/{self.bot.channel_id}.db"
