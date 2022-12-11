@@ -23,7 +23,7 @@ RASBOT_BASE_UPDATER = 'update.py'
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
 RASBOT_BASE = ['authentication.py', 'bot.py', 'commands.py',
-               'config.py', 'definitions.py', 'setup.py']
+               'config.py', 'definitions.py', 'setup.py', 'motd.txt']
 """Remaining built-in base files to update after the updater."""
 
 BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
