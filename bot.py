@@ -269,7 +269,7 @@ def main(channel=None, auth=None, cfg=None, debug=False):
                     exit(1)
 
     if not cfg:
-        cfg = channel_id
+        cfg = f"config/{channel_id}.txt"
 
     # Start the bot
     tb = TwitchBot(auth, channel_id, channel, cfg, debug)
