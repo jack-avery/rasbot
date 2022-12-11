@@ -1,4 +1,5 @@
-This update (2.22.0) introduces breaking changes that requires you to:
-- Move _AUTH.txt and all channel configs into a folder called 'config'
-- Rename _AUTH.txt to auth.txt.
-- Remove all leading underscores (_) in other files.
+This update (2.23.0) does not include any breaking changes:
+- Optimized some parts of commands.py
+- Fixed multiple broken parts of config saving
+- Introduced global config @ config/rasbot.txt
+- Fixed updating on Linux clients
