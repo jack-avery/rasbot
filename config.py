@@ -89,7 +89,9 @@ def write_channel(bot):
 
     :param bot: The TwitchBot to write the config for.
     """
-    bot.log_debug("config", f"writing configuration to {bot.cfgid}")
+    bot.log_debug("config", f"writing for {bot.channel_id}")
+
+    path = f"config/{bot.cfgpath}"
 
     # Append prefix to lines
     data = {
@@ -110,5 +112,5 @@ def write_channel(bot):
         }
 
     # Writing config
-    with open(bot.cfgid, 'w') as cfg:
+    with open(path, 'w') as cfg:
         cfg.write(json.dumps(data, indent=4))

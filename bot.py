@@ -210,7 +210,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         """Write this bots' config file. For easy use within modules.
         """
         config.write_channel(self)
-        self.logger.debug("Config written")
 
 
 @click.command()
