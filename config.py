@@ -1,4 +1,5 @@
 import json
+import os
 
 DEFAULT_CHANNEL = {
     "meta": {
@@ -51,6 +52,10 @@ DEFAULT_GLOBAL = {
 def read_global() -> dict:
     """Reads the global config file.
     """
+    # verify config folder exists
+    if not os.path.exists("config"):
+        os.mkdir("config")
+
     return read("config/rasbot.txt", DEFAULT_GLOBAL)
 
 
