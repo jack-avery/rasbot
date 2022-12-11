@@ -78,8 +78,6 @@ def check(silent=False, force=False, l=False):
     if not silent:
         print("Checking for updates...")
         print(f"You are running on rasbot version: {current}")
-        show_motd()
-        input()
 
     latest = semantic_version.Version(requests.get(f"{BASE_URL}/version").text)
 
