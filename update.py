@@ -68,12 +68,10 @@ def check(silent=False, force=False, l=False):
     if ALWAYS_OPT_OUT:
         return
 
-    if not silent:
-        print("Checking for updates...")
-
     current = get_current_version()
 
     if not silent:
+        print("Checking for updates...")
         print(f"You are running on rasbot version: {current}")
         show_motd()
         input()
