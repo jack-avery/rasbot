@@ -109,7 +109,8 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
     # Resolve any modules the command mentions and import new ones
     for m in MODULE_MENTION_RE.findall(response):
         try:
-            module_add(m)
+            if m not in modules:
+                module_add(m)
         except ModuleNotFoundError as err:
             raise err
 
@@ -223,12 +224,6 @@ def module_add(name: str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     '''
-    # Don't reimport a module already imported
-    if name in modules:
-        bot.log_debug(
-            "commands", f"ignoring attempted reimport of module {name}")
-        return
-
     bot.log_debug("commands", f"importing module {name}")
 
     try:
