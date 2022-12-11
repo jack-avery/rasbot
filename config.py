@@ -75,6 +75,12 @@ def read(path: str, default: dict) -> dict:
             config = json.loads(cfgfile.read())
             return config
 
+    # If the json fails to load...
+    except json.decoder.JSONDecodeError as err:
+        print(f"\nFailed to read config file at path {path}: {err.msg}\n")
+        print("The file likely has a formatting error somewhere.")
+        input("Find and fix the error, then re-launch rasbot.")
+
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
