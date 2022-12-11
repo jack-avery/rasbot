@@ -245,8 +245,7 @@ class Module(BaseModule):
         irc.connect(('irc.ppy.sh', 6667))
 
         # send message headers and message
-        irc.send(bytes(
-            f"USER {self.username} {self.username} {self.username} {self.username}\n", "UTF-8"))
+        irc.send(bytes(f"USER {self.username}\n", "UTF-8"))
         irc.send(bytes(f"PASS {self.cfg_get('osu_irc_pwd')}\n", "UTF-8"))
         irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
         irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
