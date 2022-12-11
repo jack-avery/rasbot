@@ -77,7 +77,8 @@ def read(path: str, default: dict) -> dict:
 
     # If the json fails to load...
     except json.decoder.JSONDecodeError as err:
-        print(f"\nFailed to read config file at path {path}: {err.msg}\n")
+        print(f"\nFailed to read config file at path {path}:")
+        print(f"{err.msg} (line {err.lineno}, column {err.colno})\n")
         print("The file likely has a formatting error somewhere.")
         input("Find and fix the error, then re-launch rasbot.")
 
