@@ -4,6 +4,7 @@ import sys
 import requests
 import click
 import semantic_version
+import time
 
 # Master option to ALWAYS OPT OUT OF UPDATES and ignore any in the future!
 # Set this to True if you want, but things might break eventually.
@@ -24,6 +25,12 @@ BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
                    'np.py', 'prefix.py', 'request.py', 'sample.py',
                    'target.py', 'uptime.py', 'xp.py']
 """Built-in command modules."""
+
+MOTD = "This update (2.22.0) introduces breaking changes that requires you to:\n"\
+    + "- Move _AUTH.txt and all channel configs into a folder called 'config'.\n"\
+    + "- Rename _AUTH.txt to auth.txt. \n"\
+    + "- Remove all leading underscores (_) in other files."
+"""MOTD to notify of any breaking changes."""
 
 
 @click.command()
@@ -64,22 +71,38 @@ def check(silent=False, force=False, l=False):
     if not silent:
         print("Checking for updates...")
 
-    with open('version', 'r') as verfile:
-        try:
-            current = semantic_version.Version(verfile.read())
-        except ValueError:
-            if not silent:
-                input(
-                    "Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
-            sys.exit()
+    current = get_current_version()
 
     if not silent:
         print(f"You are running on rasbot version: {current}")
+        show_motd()
+        input()
 
     latest = semantic_version.Version(requests.get(f"{BASE_URL}/version").text)
 
     if current < latest:
         prompt()
+
+
+def get_current_version():
+    """Read the version file and return the contents.
+    """
+    with open('version', 'r') as verfile:
+        try:
+            return semantic_version.Version(verfile.read())
+        except ValueError:
+            input("Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
+            sys.exit()
+
+
+def show_motd():
+    """Show the message of the day and wait a second.dd
+    """
+    current = get_current_version()
+    print(f"\nMessage of the day ({current}):\n")
+    print(MOTD)
+    print("\nPlease take note of anything that the MOTD says may be breaking.")
+    time.sleep(3)
 
 
 def prompt():
@@ -108,7 +131,8 @@ def update():
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
-    input("\nrasbot is up to date. rasbot will now close to apply changes.")
+    show_motd()
+    input("rasbot is now up to date, and will close to apply changes.")
     sys.exit(0)
 
 

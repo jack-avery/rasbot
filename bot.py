@@ -220,8 +220,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 )
 @click.option(
     "--auth",
-    help="The path to the auth file.",
-    default="_AUTH.txt"
+    help="The path to the auth file."
 )
 @click.option(
     "--cfg",
@@ -232,15 +231,19 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     help="Have this instance be verbose about actions.",
     default=False
 )
-def main(channel=None, auth="_AUTH.txt", cfg=None, debug=False):
+def main(channel=None, auth=None, cfg=None, debug=False):
     # Check for updates first!
     update.check(True)
 
     cfg_global = config.read_global()
+
     if cfg_global['always_debug']:
         debug = True
 
-    auth = Authentication(cfg_global['default_authfile'])
+    if not auth:
+        auth = cfg_global['default_authfile']
+
+    auth = Authentication(auth)
 
     if not channel:
         channel = auth.get('user_id')
@@ -267,7 +270,7 @@ def main(channel=None, auth="_AUTH.txt", cfg=None, debug=False):
                     exit(1)
 
     if not cfg:
-        cfg = f"_{channel_id}.txt"
+        cfg = channel_id
 
     # Start the bot
     tb = TwitchBot(auth, channel_id, channel, cfg, debug)

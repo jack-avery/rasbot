@@ -4,6 +4,9 @@ _*
 # ide
 .vscode
 
+# auth & global/private config
+/config
+
 # xp storage dbs
 /modules/xp_store
 

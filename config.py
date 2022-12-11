@@ -1,8 +1,5 @@
 import json
 
-GLOBAL_PATH = "_config.txt"
-"""Path to the rasbot global config."""
-
 DEFAULT_CHANNEL = {
     "meta": {
         "prefix": "r!"
@@ -45,7 +42,7 @@ DEFAULT_CHANNEL = {
 
 DEFAULT_GLOBAL = {
     "always_debug": False,
-    "default_authfile": "_AUTH.txt",
+    "default_authfile": "auth.txt",
     "channels": [],
 }
 
@@ -53,7 +50,7 @@ DEFAULT_GLOBAL = {
 def read_global() -> dict:
     """Reads the global config file.
     """
-    return read(GLOBAL_PATH, DEFAULT_GLOBAL)
+    return read("rasbot.txt", DEFAULT_GLOBAL)
 
 
 def read_channel(cfg: str) -> dict:
@@ -61,7 +58,7 @@ def read_channel(cfg: str) -> dict:
 
     :param cfgid: The path to the channels' config.
     """
-    return read(cfg, DEFAULT_CHANNEL)
+    return read(f"{cfg}.txt", DEFAULT_CHANNEL)
 
 
 def read(cfg: str, default: dict) -> dict:
@@ -71,16 +68,17 @@ def read(cfg: str, default: dict) -> dict:
 
     :param default: Default to write to file if the path does not exist.
     """
+    path = f"config/{cfg}"
     # Attempt to read config
     try:
-        with open(cfg, 'r') as cfgfile:
+        with open(path, 'r') as cfgfile:
             config = json.loads(cfgfile.read())
             return config
 
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
-        with open(cfg, 'w') as cfgfile:
+        with open(path, 'w') as cfgfile:
             cfgfile.write(json.dumps(default, indent=4))
             return default
 
@@ -90,7 +88,7 @@ def write_channel(bot):
 
     :param bot: The TwitchBot to write the config for.
     """
-    bot.log_debug(f"Writing configuration to {bot.cfgid}")
+    bot.log_debug("config", f"writing configuration to {bot.cfgid}")
 
     # Append prefix to lines
     data = {
