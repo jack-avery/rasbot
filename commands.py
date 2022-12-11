@@ -149,7 +149,7 @@ class BaseModule(threading.Thread):
         if not os.path.exists(f"modules/config/{self.bot.channel_id}"):
             os.mkdir(f"modules/config/{self.bot.channel_id}")
 
-        self._cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
+        self._cfg_path = f"modules/config/{self.bot.channel_id}/{name}"
 
         # If no config found and a default provided, create it
         if not os.path.exists(self._cfg_path):
