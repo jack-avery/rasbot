@@ -54,3 +54,6 @@ r!cmdadd np &np&
 Has something gone **horribly** wrong? *Or do you just think something's missing?*
 
 Feel free to [create a new issue](https://github.com/jack-avery/rasbot/issues), join the [Discord](https://discord.gg/qpyT4zx), or message me directly on Discord about it: `raspy#0292`.
+
+> If you're reporting a bug, it's most useful to me if you can get what the console outputs for me.
+> If rasbot is crashing instantly on launch, you'll need to start it from Command Prompt / another terminal.
