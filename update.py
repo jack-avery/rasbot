@@ -6,12 +6,17 @@ import click
 import semantic_version
 import time
 
+import config
+
 # Master option to ALWAYS OPT OUT OF UPDATES and ignore any in the future!
 # Set this to True if you want, but things might break eventually.
 # You will need to run the command `update.py --force`, or set this back to False to get updates again.
 ALWAYS_OPT_OUT = False
 
-BASE_URL = "https://raw.githubusercontent.com/jack-avery/rasbot/main/"
+cfg = config.read_global()
+branch = cfg['release_branch']
+
+BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
 RASBOT_BASE_UPDATER = 'update.py'

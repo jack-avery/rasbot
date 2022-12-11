@@ -43,6 +43,7 @@ DEFAULT_CHANNEL = {
 DEFAULT_GLOBAL = {
     "always_debug": False,
     "default_authfile": "auth.txt",
+    "release_branch": "main",
     "channels": [],
 }
 
