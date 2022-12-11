@@ -14,6 +14,9 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandMustHavePositiveCooldownError,\
     CommandStillOnCooldownError
 
+COMMAND_VALIDATE_RE = re.compile(VALID_COMMAND_REGEX)
+MODULE_MENTION_RE = re.compile(MODULE_MENTION_REGEX)
+
 
 class Command:
     def __init__(self, name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
@@ -54,7 +57,7 @@ class Command:
 
         # Apply any methods encased in &&
         returned_response = self.response
-        for m in module_re.findall(returned_response):
+        for m in MODULE_MENTION_RE.findall(returned_response):
             try:
                 returned_response = returned_response.replace(
                     f'&{m}&',
@@ -70,7 +73,7 @@ class Command:
         return returned_response
 
 
-def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False, ignore_builtin_check: bool = False):
+def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
     '''Creates a new command (or modifies an existing one),
     and appends it to the commands dict.
 
@@ -85,8 +88,6 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
     :param requires_mod: Whether this command requires moderator access to use.
 
     :param hidden: Whether to hide this command from the 'help' module.
-
-    :param ignore_builtin_check: Whether to ignore the built-in module check. Use at your own risk!
     '''
     bot.log_debug("commands",
                   f'adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
@@ -97,7 +98,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
             f"command {name} provided invalid cooldown length {cooldown}")
 
     # Command must match the regex defined by VALID_COMMAND_REGEX
-    if not command_re.match(name):
+    if not COMMAND_VALIDATE_RE.match(name):
         raise CommandGivenInvalidNameError(
             f"command provided invalid name {name}")
 
@@ -106,7 +107,7 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
                       f"command {name} might have imported incorrectly: empty response?")
 
     # Resolve any modules the command mentions and import new ones
-    for m in module_re.findall(response):
+    for m in MODULE_MENTION_RE.findall(response):
         try:
             module_add(m)
         except ModuleNotFoundError as err:
@@ -142,13 +143,6 @@ class BaseModule(threading.Thread):
         self._name = name
         self._cfgdefault = cfgdefault
 
-        # Persistent config loading: create base folder.
-        if not os.path.exists("modules/config"):
-            os.mkdir("modules/config")
-
-        if not os.path.exists(f"modules/config/{self.bot.channel_id}"):
-            os.mkdir(f"modules/config/{self.bot.channel_id}")
-
         self._cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
 
         # If no config found and a default provided, create it
@@ -156,9 +150,10 @@ class BaseModule(threading.Thread):
             if cfgdefault:
                 with open(self._cfg_path, 'w') as cfg:
                     cfg.write(json.dumps(cfgdefault, indent=4))
+                    self._cfg = cfgdefault
 
-        # Load config
-        if os.path.exists(self._cfg_path):
+        # If config found, load it
+        else:
             self.reload_config()
 
     def reload_config(self):
@@ -265,10 +260,14 @@ def pass_bot_ref(ref: TwitchBot):
     global bot
     bot = ref
 
+    # Persistent config loading: create base folder.
+    if not os.path.exists("modules/config"):
+        os.mkdir("modules/config")
+
+    if not os.path.exists(f"modules/config/{bot.channel_id}"):
+        os.mkdir(f"modules/config/{bot.channel_id}")
+
 
 commands = dict()
-commands_modules = list()
 modules = dict()
 bot = TwitchBot
-command_re = re.compile(VALID_COMMAND_REGEX)
-module_re = re.compile(MODULE_MENTION_REGEX)
