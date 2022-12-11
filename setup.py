@@ -1,10 +1,12 @@
 import os
 import sys
 import subprocess
-from definitions import AuthenticationDeniedError, DEFAULT_AUTHFILE
+
+import config
+from definitions import AuthenticationDeniedError
 
 
-def main():
+def main(file: str):
     # Check for new requirements
     print("Running local requirements.txt...")
     subprocess.check_call([sys.executable, "-m", "pip",
@@ -12,9 +14,9 @@ def main():
     print("All requirements installed.\n")
 
     # We don't want people to accidentally overwrite their current auth
-    if os.path.isfile(DEFAULT_AUTHFILE):
-        print(f"You already have an authfile at {DEFAULT_AUTHFILE}!")
-        print(f"Running this tool will overwrite {DEFAULT_AUTHFILE}.")
+    if os.path.isfile(file):
+        print(f"You already have an authfile at {file}!")
+        print(f"Running this tool will overwrite {file}.")
         print("If you want to save it, please rename it to something else, then restart this tool.\n")
         if input("Are you sure you want to continue? (y/Y for yes): ").lower() != 'y':
             exit()
@@ -55,7 +57,7 @@ def main():
         irc_oauth = irc_oauth[6:]
 
     # Adding all the info to the auth
-    auth = Authentication()
+    auth = Authentication(file)
     auth.auth['user_id'] = user_id
     auth.auth['client_id'] = client_id
     auth.auth['client_secret'] = client_secret
@@ -76,4 +78,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    cfg_global = config.read_global()
+
+    file = cfg_global['default_authfile']
+
+    main(file)

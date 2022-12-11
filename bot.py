@@ -59,15 +59,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.cfgpath = cfgpath
         self.logger.info(f"Reading config from {self.cfgpath}...")
 
-        cfg = config.read(self.cfgpath)
-
-        # for development: add `"always debug": true,` to your channel config to enable
-        if dict.get(cfg, 'always_debug', False):
-            debug = True
-            self.logger.removeHandler(stdout_handler)
-            self.logger.setLevel(logging.DEBUG)
-            stdout_handler.setLevel(logging.DEBUG)
-            self.logger.addHandler(stdout_handler)
+        cfg = config.read_channel(self.cfgpath)
 
         self.prefix = cfg['meta']['prefix']
         self.logger.info(f"Prefix set as '{self.prefix}'")
@@ -217,7 +209,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def write_config(self):
         """Write this bots' config file. For easy use within modules.
         """
-        config.write(self)
+        config.write_channel(self)
         self.logger.debug("Config written")
 
 
@@ -244,7 +236,11 @@ def main(channel=None, auth="_AUTH.txt", cfg=None, debug=False):
     # Check for updates first!
     update.check(True)
 
-    auth = Authentication(auth)
+    cfg_global = config.read_global()
+    if cfg_global['always_debug']:
+        debug = True
+
+    auth = Authentication(cfg_global['default_authfile'])
 
     if not channel:
         channel = auth.get('user_id')

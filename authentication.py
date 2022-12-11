@@ -1,12 +1,11 @@
 import json
 import requests
 
-from definitions import DEFAULT_AUTHFILE,\
-    AuthenticationDeniedError
+from definitions import AuthenticationDeniedError
 
 
 class Authentication:
-    def __init__(self, file: str = DEFAULT_AUTHFILE):
+    def __init__(self, file: str):
         """Create a new authentication identity.
         Automatically pulls and parses from the _AUTH file.
 

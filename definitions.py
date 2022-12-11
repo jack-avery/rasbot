@@ -8,9 +8,6 @@ VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 MODULE_MENTION_REGEX = r'&([\/a-z0-9_]+)&'
 """Regex to compare command responses to for finding any mentioned modules."""
 
-DEFAULT_AUTHFILE = "_AUTH.txt"
-"""Default authfile to use if none is provided as a commandline arg."""
-
 ##
 # Errors
 ##
