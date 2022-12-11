@@ -31,12 +31,6 @@ BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
                    'target.py', 'uptime.py', 'xp.py']
 """Built-in command modules."""
 
-MOTD = "This update (2.22.0) introduces breaking changes that requires you to:\n"\
-    + "- Move _AUTH.txt and all channel configs into a folder called 'config'.\n"\
-    + "- Rename _AUTH.txt to auth.txt. \n"\
-    + "- Remove all leading underscores (_) in other files."
-"""MOTD to notify of any breaking changes."""
-
 
 @click.command()
 @click.option(
@@ -100,8 +94,12 @@ def show_motd():
     """Show the message of the day and wait a second.dd
     """
     current = get_current_version()
+
+    with open('motd.txt', 'r') as motdfile:
+        motd = motdfile.read()
+
     print(f"\nMessage of the day ({current}):\n")
-    print(MOTD)
+    print(motd)
     print("\nPlease take note of anything that the MOTD says may be breaking.")
     time.sleep(3)
 

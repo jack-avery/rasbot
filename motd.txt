@@ -1,0 +1,4 @@
+This update (2.22.0) introduces breaking changes that requires you to:
+- Move _AUTH.txt and all channel configs into a folder called 'config'
+- Rename _AUTH.txt to auth.txt.
+- Remove all leading underscores (_) in other files.
