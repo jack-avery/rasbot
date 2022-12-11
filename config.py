@@ -91,7 +91,7 @@ def write_channel(bot):
     """
     bot.log_debug("config", f"writing for {bot.channel_id}")
 
-    path = f"config/{bot.cfgpath}"
+    path = f"config/{bot.cfgpath}.txt"
 
     # Append prefix to lines
     data = {
