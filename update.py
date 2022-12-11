@@ -123,7 +123,6 @@ def update():
     do_files('', [RASBOT_BASE_UPDATER])
     print("Finished updating updater. Updating rasbot...\n")
 
-    # TODO: Does not work on Linux (opens python IDLE)
     # Open a new instance of Python to run the updated file
     p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"])
     p.wait()
