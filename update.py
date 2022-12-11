@@ -125,8 +125,7 @@ def update():
 
     # TODO: Does not work on Linux (opens python IDLE)
     # Open a new instance of Python to run the updated file
-    p = subprocess.Popen(
-        [sys.executable, RASBOT_BASE_UPDATER, "-l"], shell=True)
+    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"])
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
