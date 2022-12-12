@@ -29,9 +29,9 @@ RASBOT_BASE = ['authentication.py', 'bot.py', 'commands.py',
                'config.py', 'definitions.py', 'setup.py', 'motd.txt']
 """Remaining built-in base files to update after the updater."""
 
-BUILTIN_MODULES = ['caller.py', 'cmdadd.py', 'cmddel.py', 'help.py',
-                   'np.py', 'prefix.py', 'request.py', 'sample.py',
-                   'target.py', 'uptime.py', 'xp.py']
+BUILTIN_MODULES = ['admin.py', 'caller.py', 'cmdadd.py', 'cmddel.py',
+                   'help.py',  'np.py', 'prefix.py', 'request.py',
+                   'sample.py', 'target.py', 'uptime.py', 'xp.py']
 """Built-in command modules."""
 
 
