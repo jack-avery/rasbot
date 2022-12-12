@@ -6,5 +6,6 @@ The previous update (2.24.0) does not include any breaking changes.
 
 This update (2.25.0) does not include any breaking changes.
 
+- Fixed shutting down the bot with Ctrl+C not working with the XP module imported.
 For module developers, modules now should declare 'consumes' and use self.get_args(), instead of accessing or modifying self.bot.cmdargs.
 This helps multiple modules in one command (if it ever happens) interact more predictably.
