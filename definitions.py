@@ -1,6 +1,93 @@
 ##
+# Helper classes.
+##
+
+class Author:
+    name = str
+    """The display name of the author."""
+    uid = str
+    """The ID of the author."""
+    mod = bool
+    """Whether the author is a moderator."""
+    sub = bool
+    """Whether the author is a subscriber."""
+    vip = bool
+    """Whether the author is a VIP."""
+    host = bool
+    """Whether the author is the channel owner."""
+
+    def __init__(self, name: str, uid: str, mod: bool = False, sub: bool = False, vip: bool = False, host: bool = False):
+        """Create a new `Author`.
+        """
+        self.name = name
+        self.uid = uid
+        self.mod = mod
+        self.sub = sub
+        self.vip = vip
+        self.host = host
+
+    def user_status(self):
+        """Returns the highest privilege this user has.
+        host > mod > vip > sub > none
+        """
+        if self.host:
+            return "Host"
+
+        if self.mod:
+            return "Mod"
+
+        if self.vip:
+            return "VIP"
+
+        if self.sub:
+            return "Sub"
+
+
+class Message:
+    author = Author
+    """The `Author` object of the message."""
+    text_raw = str
+    """The raw text of the message."""
+    cmd = str
+    """The command used, if applicable, in this message."""
+    args = list
+    """The list of arguments in the message."""
+
+    def __init__(self, author: Author, text_raw: str = ''):
+        self.author = author
+        self.text_raw = text_raw
+
+    def attach_command(self, cmd: str = '', args: list = []):
+        self.cmd = cmd
+        self.args = args
+
+    def consume(self, amount: int = 0):
+        """Consume `amount` arguments, removing them from `self.args` and returning them.
+        """
+        ret = []
+        remaining = len(self.args)
+
+        # return false if no arguments remain or not consuming anything
+        if not remaining or amount == 0:
+            return False
+
+        # consume all if negative
+        if amount < 0:
+            amount = remaining
+
+        # don't consume more than in the list
+        elif amount > remaining:
+            amount = remaining
+
+        # consume and return consumed args
+        ret = self.args[:amount]
+        self.args = self.args[amount:]
+        return ret
+
+##
 # Definitions used in multiple files go here.
 ##
+
 
 VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 """Regex to compare given command names to for validation."""

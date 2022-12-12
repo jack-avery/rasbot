@@ -48,12 +48,12 @@ class Command:
         # Make sure the command is not on cooldown before doing anything
         if not time.time()-self._last_used > self.cooldown:
             raise CommandStillOnCooldownError(
-                f"Command {self.name} called by {bot.author['name']} while still on cooldown")
+                f"Command {self.name} called by {bot.author.name} while still on cooldown")
 
         # Do not allow non-moderators to use mod-only commands
-        if not bot.author['ismod'] and self.requires_mod:
+        if not bot.author.mod and self.requires_mod:
             raise CommandIsModOnlyError(
-                f"Mod-only command {self.name} called by non-mod {bot.author['name']}")
+                f"Mod-only command {self.name} called by non-mod {bot.author.name}")
 
         # Apply any methods encased in &&
         returned_response = self.response
@@ -240,26 +240,7 @@ class BaseModule(threading.Thread):
         """
         self.log_d(f"consuming {self.consumes} argument(s)")
 
-        ret = []
-        consume = self.consumes
-        remaining = len(self.bot.cmdargs)
-
-        # return false if no arguments remain or not consuming anything
-        if not remaining or self.consumes == 0:
-            return False
-
-        # consume all if negative
-        if self.consumes < 0:
-            consume = remaining
-
-        # don't consume more than in the list
-        elif consume > remaining:
-            consume = remaining
-
-        # consume and return consumed args
-        ret = self.bot.cmdargs[:consume]
-        self.bot.cmdargs = self.bot.cmdargs[consume:]
-        return ret
+        return self.bot.message.consume(self.consumes)
 
     def get_args_lower(self) -> list:
         """Consume `self.consumes` arguments for use as command arguments.

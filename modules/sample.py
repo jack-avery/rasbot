@@ -20,8 +20,7 @@ class Module(BaseModule):
         "savedmessage": ""
     }
 
-    # Don't access self.bot.cmdargs directly!
-    # Set "consumes" instead for more predictable interactions with other modules.
+    # Set "consumes" to how many arguments your module intends to consume for more predictable interactions with other modules.
     # You can set it to a negative value to consume ALL (remaining) arguments.
     consumes = -1
 
@@ -42,7 +41,7 @@ class Module(BaseModule):
         self.cfg_set('savedmessage', ' '.join(args))
 
         # You can get the author's name, UID, and mod status like so!
-        return (f"@{self.bot.author['name']} ({self.bot.author['uid']}, mod: {self.bot.author['ismod']}), "
+        return (f"@{self.bot.author.name} ({self.bot.author.uid}, mod: {self.bot.author.mod}), "
                 + f"{self.count} messages have been sent so far, "
                 + f"and last time you also said '{last_time}'.")
 

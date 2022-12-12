@@ -246,7 +246,7 @@ class Module(BaseModule):
         args = self.get_args_lower()
 
         if not args:
-            arg = self.bot.author['name'].lower()
+            arg = self.bot.author.name.lower()
         else:
             arg = args[0]
 
@@ -256,7 +256,7 @@ class Module(BaseModule):
 
         # XP moderation tools
         if arg == "mod":
-            if not self.bot.author['ismod']:
+            if not self.bot.author.mod:
                 return "You must be a moderator to do that."
 
             return self.mod_user(args[1:])
@@ -269,5 +269,5 @@ class Module(BaseModule):
 
     def on_pubmsg(self):
         # Add this user to the active users list.
-        if not self.bot.author['name'] in self.active_users:
-            self.active_users.append(self.bot.author['name'].lower())
+        if not self.bot.author.name in self.active_users:
+            self.active_users.append(self.bot.author.name.lower())

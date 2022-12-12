@@ -60,7 +60,8 @@ MESSAGE_OPTIONS = {
     "songsource": lambda m: m['source'],
 
     # requests specific additions
-    "requester": lambda m: m['sender']['name'],
+    "requester": lambda m: m['sender'].name,
+    "requesterstatus": lambda m: m['sender'].user_status(),
     "mods": lambda m: m['mods']
 }
 
@@ -79,7 +80,7 @@ class Module(BaseModule):
         "osu_trgt_id": "",
         # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
         # Enclose keys in & as you would a module in a command.
-        "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)",
+        "message_format": "&requester& (&requesterstatus&) requested: &map& &mods& (&length& @ &bpm&BPM, &stars&*, by &creator&)",
         # Per-user cooldown for requests (in seconds)
         "cd_per_user": 0,
         # Whether or not requests should be for Subscribers, VIPs, and Mods only
@@ -160,6 +161,9 @@ class Module(BaseModule):
             if mod in OSU_MODS and mod not in modstring:
                 modstring += mod + ','
 
+        if modstring == '+':
+            return ''
+
         self.log_d(modstring)
         return modstring
 
@@ -187,15 +191,15 @@ class Module(BaseModule):
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
         # prevent normal users from requesting in submode
-        if self.cfg_get('submode') and not (self.bot.author['ismod'] or self.bot.author['issub'] or self.bot.author['isvip']):
+        if self.cfg_get('submode') and not (self.bot.author.mod or self.bot.author.sub or self.bot.author.vip):
             return NO_MESSAGE_SIGNAL
 
         # exit early if user requested within cooldown
-        if self.bot.author['uid'] in self.author_cds:
-            time_passed = time.time() - self.author_cds[self.bot.author['uid']]
+        if self.bot.author.uid in self.author_cds:
+            time_passed = time.time() - self.author_cds[self.bot.author.uid]
             if time_passed < self.cooldown:
                 self.log_d(
-                    f"uid {self.bot.author['uid']} requested while still on cd; ignoring")
+                    f"user {self.bot.author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         args = self.get_args()
@@ -208,7 +212,7 @@ class Module(BaseModule):
         req = args[0].lower()
 
         # allow mods to toggle submode
-        if req == 'submode' and self.bot.author['ismod']:
+        if req == 'submode' and self.bot.author.mod:
             t = not self.cfg_get('submode')
             self.cfg_set('submode', t)
             if t:
@@ -269,7 +273,7 @@ class Module(BaseModule):
         # send message, set cooldown and inform requester
         self.send_osu_message(
             f"{map['sender']['name']} requested: {message}")
-        self.author_cds[self.bot.author['uid']] = time.time()
+        self.author_cds[self.bot.author.uid] = time.time()
         return "Request sent!"
 
     def send_osu_message(self, msg):

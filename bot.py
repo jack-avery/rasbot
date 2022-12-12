@@ -11,6 +11,8 @@ import commands
 import update
 from authentication import Authentication
 from definitions import NO_MESSAGE_SIGNAL,\
+    Author,\
+    Message,\
     CommandIsModOnlyError,\
     CommandStillOnCooldownError,\
     AuthenticationDeniedError
@@ -128,37 +130,35 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         ismod = True if getattr(e.tags, 'mod', '0') == '1' else False
         issub = True if getattr(e.tags, 'subscriber', '0') == '1' else False
         isvip = True if getattr(e.tags, 'vip', '0') == '1' else False
+        ishost = False
 
         # Gauranteeing broadcaster all traits
         if uid == self.channel_id:
             ismod = True
             issub = True
             isvip = True
+            ishost = True
 
-        # For use within modules
-        self.author = {
-            "name": name,
-            "uid": uid,
-            "ismod": ismod,
-            "issub": issub,
-            "isvip": isvip
-        }
+        # Create author object
+        self.author = Author(name, uid, ismod, issub, isvip, ishost)
 
-        # Reading the message
-        self.msg = e.arguments[0]
-        self.msg_split = self.msg.split(' ')
+        # Create message object
+        msg = e.arguments[0]
+        self.message = Message(self.author, msg)
 
         try:
             # Do per-message methods
             self.commands.do_on_pubmsg_methods()
 
             # Don't continue if the message doesn't start with the prefix.
-            if not self.msg.startswith(self.prefix):
+            if not msg.startswith(self.prefix):
                 return
+            split = msg.split(' ')
 
             # Isolating command and command arguments
-            cmd = self.msg_split[0][len(self.prefix):].lower()
-            self.cmdargs = self.msg_split[1:]
+            cmd = split[0][len(self.prefix):].lower()
+            args = split[1:]
+            self.message.attach_command(cmd, args)
 
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
@@ -169,7 +169,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             try:
                 # Run the command and string result message
                 self.logger.info(
-                    f"Running command call '{cmd}' from {name} (mod: {ismod}) (args:{self.cmdargs})")
+                    f"Running command call '{cmd}' from {name} (mod: {ismod}) (args:{self.message.args})")
                 cmdresult = self.commands.commands[cmd].run(self)
 
                 # If there is a string result message, print it to chat
