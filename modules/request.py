@@ -218,7 +218,7 @@ class Module(BaseModule):
             req = requests.get(
                 f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
             # sort mapset descending by difficulty so req[0] gives top diff
-            req.sort(key=lambda r: r['difficultyrating'], reversed=True)
+            req.sort(key=lambda r: r['difficultyrating'], reverse=True)
 
         try:
             map = req[0]
