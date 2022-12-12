@@ -30,7 +30,7 @@ class Module(BaseModule):
         "omit_users": []
     }
 
-    consumes = -1
+    consumes = 5
 
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
