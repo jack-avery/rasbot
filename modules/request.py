@@ -98,7 +98,7 @@ class Module(BaseModule):
         self.beatmapset_res = [beatmapset_re]
 
         self.cooldown = self.cfg_get('cd_per_user')
-        self.author_cds = []
+        self.author_cds = dict()
 
         # resolve usernames
         self.username = self.resolve_username(self.cfg_get('osu_user_id'))
@@ -183,7 +183,10 @@ class Module(BaseModule):
 
         # exit early if user requested within cooldown
         if self.bot.author_uid in self.author_cds:
-            if self.author_cds[self.bot.author_uid] - time.time() < self.cooldown:
+            time_passed = time.time() - self.author_cds[self.bot.author_uid]
+            if time_passed < self.cooldown:
+                self.log_d(
+                    f"uid {self.bot.author_uid} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
