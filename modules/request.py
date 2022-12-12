@@ -204,8 +204,17 @@ class Module(BaseModule):
         if not args:
             return "Provide a map to request."
 
-        # use first arg as request
+        # use first arg as request (or submode toggle)
         req = args[0].lower()
+
+        # allow mods to toggle submode
+        if req == 'submode' and self.bot.author['ismod']:
+            t = not self.cfg_get('submode')
+            self.cfg_set('submode', t)
+            if t:
+                return "Submode enabled"
+            else:
+                return "Submode disabled"
 
         # use second arg as mods
         mods = ''
