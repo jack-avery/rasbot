@@ -60,6 +60,7 @@ MESSAGE_OPTIONS = {
     "songsource": lambda m: m['source'],
 
     # requests specific additions
+    "requester": lambda m: m['sender']['name'],
     "mods": lambda m: m['mods']
 }
 
@@ -80,7 +81,9 @@ class Module(BaseModule):
         # Enclose keys in & as you would a module in a command.
         "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)",
         # Per-user cooldown for requests (in seconds)
-        "cd_per_user": 0
+        "cd_per_user": 0,
+        # Whether or not requests should be for Subscribers, VIPs, and Mods only
+        "submode": False
     }
 
     consumes = 2
@@ -183,12 +186,16 @@ class Module(BaseModule):
         if not self.username or not self.target:
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
+        # prevent normal users from requesting in submode
+        if self.cfg_get('submode') and not (self.bot.author['ismod'] or self.bot.author['issub'] or self.bot.author['isvip']):
+            return NO_MESSAGE_SIGNAL
+
         # exit early if user requested within cooldown
-        if self.bot.author_uid in self.author_cds:
-            time_passed = time.time() - self.author_cds[self.bot.author_uid]
+        if self.bot.author['uid'] in self.author_cds:
+            time_passed = time.time() - self.author_cds[self.bot.author['uid']]
             if time_passed < self.cooldown:
                 self.log_d(
-                    f"uid {self.bot.author_uid} requested while still on cd; ignoring")
+                    f"uid {self.bot.author['uid']} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         args = self.get_args()
@@ -247,12 +254,13 @@ class Module(BaseModule):
 
         # add request mods to map dict and format the message
         map['mods'] = mods
+        map['sender'] = self.bot.author
         message = self.format_message(map)
 
         # send message, set cooldown and inform requester
         self.send_osu_message(
-            f"{self.bot.author_name} requested: {message}")
-        self.author_cds[self.bot.author_uid] = time.time()
+            f"{map['sender']['name']} requested: {message}")
+        self.author_cds[self.bot.author['uid']] = time.time()
         return "Request sent!"
 
     def send_osu_message(self, msg):

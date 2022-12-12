@@ -11,7 +11,7 @@ class Module(BaseModule):
 
     def main(self):
         # only the channel owner can run admin commands
-        if self.bot.author_uid != self.bot.channel_id:
+        if self.bot.author['uid'] != self.bot.channel_id:
             return NO_MESSAGE_SIGNAL
 
         args = self.get_args_lower()

@@ -48,12 +48,12 @@ class Command:
         # Make sure the command is not on cooldown before doing anything
         if not time.time()-self._last_used > self.cooldown:
             raise CommandStillOnCooldownError(
-                f"Command {self.name} called by {bot.author_name} while still on cooldown")
+                f"Command {self.name} called by {bot.author['name']} while still on cooldown")
 
         # Do not allow non-moderators to use mod-only commands
-        if not bot.author_ismod and self.requires_mod:
+        if not bot.author['ismod'] and self.requires_mod:
             raise CommandIsModOnlyError(
-                f"Mod-only command {self.name} called by non-mod {bot.author_name}")
+                f"Mod-only command {self.name} called by non-mod {bot.author['name']}")
 
         # Apply any methods encased in &&
         returned_response = self.response

@@ -122,21 +122,27 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Recomprehend tags into something usable
         e.tags = {i["key"]: i["value"] for i in e.tags}
 
-        # Grab display name, userid and mod status
+        # Grab user info
         name = str.lower(e.tags["display-name"])
         uid = int(e.tags['user-id'])
-        ismod = int(e.tags['mod'])
+        ismod = True if getattr(e.tags, 'mod', '0') == '1' else False
+        issub = True if getattr(e.tags, 'subscriber', '0') == '1' else False
+        isvip = True if getattr(e.tags, 'vip', '0') == '1' else False
 
-        # Giving broadcaster moderator priveleges
+        # Gauranteeing broadcaster all traits
         if uid == self.channel_id:
             ismod = True
-        else:  # Else just set it to a bool
-            ismod = bool(ismod)
+            issub = True
+            isvip = True
 
         # For use within modules
-        self.author_name = name
-        self.author_uid = uid
-        self.author_ismod = ismod
+        self.author = {
+            "name": name,
+            "uid": uid,
+            "ismod": ismod,
+            "issub": issub,
+            "isvip": isvip
+        }
 
         # Reading the message
         self.msg = e.arguments[0]

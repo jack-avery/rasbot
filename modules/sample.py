@@ -42,7 +42,7 @@ class Module(BaseModule):
         self.cfg_set('savedmessage', ' '.join(args))
 
         # You can get the author's name, UID, and mod status like so!
-        return (f"@{self.bot.author_name} ({self.bot.author_uid}, mod: {self.bot.author_ismod}), "
+        return (f"@{self.bot.author['name']} ({self.bot.author['uid']}, mod: {self.bot.author['ismod']}), "
                 + f"{self.count} messages have been sent so far, "
                 + f"and last time you also said '{last_time}'.")
 
