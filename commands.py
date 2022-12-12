@@ -12,7 +12,6 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandGivenInvalidNameError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
-    CommandNotGivenEnoughArgsError,\
     CommandStillOnCooldownError
 
 COMMAND_VALIDATE_RE = re.compile(VALID_COMMAND_REGEX)
