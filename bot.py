@@ -10,7 +10,8 @@ import traceback
 import commands
 import update
 from authentication import Authentication
-from definitions import CommandIsModOnlyError,\
+from definitions import NO_MESSAGE_SIGNAL,\
+    CommandIsModOnlyError,\
     CommandStillOnCooldownError,\
     AuthenticationDeniedError
 
@@ -159,7 +160,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 cmdresult = self.commands.commands[cmd].run(self)
 
                 # If there is a string result message, print it to chat
-                if cmdresult and cmdresult != "None":
+                if cmdresult and not NO_MESSAGE_SIGNAL in cmdresult:
                     self.send_message(f"{cmdresult}")
 
             # If the command is still on cooldown, do nothing.

@@ -8,6 +8,9 @@ VALID_COMMAND_REGEX = r'[a-z0-9_]+'
 MODULE_MENTION_REGEX = r'&([\/a-z0-9_]+)&'
 """Regex to compare command responses to for finding any mentioned modules."""
 
+NO_MESSAGE_SIGNAL = "&NOMSG&"
+"""Signal for a module to return for there to be no message sent no matter what."""
+
 ##
 # Errors
 ##

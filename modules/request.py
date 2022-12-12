@@ -7,8 +7,10 @@
 import socket
 import requests
 import re
+import time
+
 from commands import BaseModule
-from definitions import MODULE_MENTION_REGEX
+from definitions import MODULE_MENTION_REGEX, NO_MESSAGE_SIGNAL
 
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
@@ -76,7 +78,9 @@ class Module(BaseModule):
         "osu_trgt_id": "",
         # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
         # Enclose keys in & as you would a module in a command.
-        "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)"
+        "message_format": "&map& &mods& (&length& @ &bpm&BPM, &stars&*, mapped by &creator&)",
+        # Per-user cooldown for requests (in seconds)
+        "cd_per_user": 0
     }
 
     def __init__(self, bot, name):
@@ -92,6 +96,9 @@ class Module(BaseModule):
         # create regex lists for easy iterating
         self.beatmap_res = [beatmapsetid_re, b_re]
         self.beatmapset_res = [beatmapset_re]
+
+        self.cooldown = self.cfg_get('cd_per_user')
+        self.author_cds = []
 
         # resolve usernames
         self.username = self.resolve_username(self.cfg_get('osu_user_id'))
@@ -174,6 +181,11 @@ class Module(BaseModule):
         if not self.username or not self.target:
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
+        # exit early if user requested within cooldown
+        if self.bot.author_uid in self.author_cds:
+            if self.author_cds[self.bot.author_uid] - time.time() < self.cooldown:
+                return NO_MESSAGE_SIGNAL
+
         # do not continue if no args are provided
         if not self.bot.cmdargs:
             return "Provide a map to request."
@@ -230,10 +242,10 @@ class Module(BaseModule):
         map['mods'] = mods
         message = self.format_message(map)
 
-        # send message and inform requester
+        # send message, set cooldown and inform requester
         self.send_osu_message(
             f"{self.bot.author_name} requested: {message}")
-
+        self.author_cds[self.bot.author_uid] = time.time()
         return "Request sent!"
 
     def send_osu_message(self, msg):
