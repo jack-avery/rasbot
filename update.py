@@ -13,8 +13,11 @@ import config
 # You will need to run the command `update.py --force`, or set this back to False to get updates again.
 ALWAYS_OPT_OUT = False
 
-cfg = config.read_global()
-branch = cfg['release_branch']
+try:
+    cfg = config.read_global()
+    branch = cfg['release_branch']
+except:
+    branch = 'main'
 
 BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 """The base URL to get raw text from and download rasbot from."""
