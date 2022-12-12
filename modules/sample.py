@@ -35,8 +35,11 @@ class Module(BaseModule):
         # Use self.cfg_get(key) to get items from the module config.
         last_time = self.cfg_get('savedmessage')
 
+        # Use self.get_args() to consume the designated amount of arguments and continue.
+        args = self.get_args()
+
         # You can save things using self.cfg_set(key, value):
-        self.cfg_set('savedmessage', ' '.join(self.bot.cmdargs))
+        self.cfg_set('savedmessage', ' '.join(args))
 
         # You can get the author's name, UID, and mod status like so!
         return (f"@{self.bot.author_name} ({self.bot.author_uid}, mod: {self.bot.author_ismod}), "
