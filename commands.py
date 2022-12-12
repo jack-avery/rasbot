@@ -176,9 +176,9 @@ class BaseModule(threading.Thread):
             return self._cfg[key]
         except KeyError:
             self.log_e(
-                f"module {self._name} - config missing searched key '{key}', saving default '{self._cfgdefault[key]}'")
+                f"module {self._name} - config missing searched key '{key}', saving default '{self.default_config[key]}'")
 
-            self.cfg_set(key, self._cfgdefault[key])
+            self.cfg_set(key, self.default_config[key])
             return self._cfg[key]
 
     def cfg_set(self, key: str, value):
