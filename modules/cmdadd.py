@@ -29,10 +29,10 @@ class Module(BaseModule):
         self.DEFAULT_COOLDOWN = self.cfg_get('default_cooldown')
 
     def main(self):
-        if not self.bot.cmdargs:
-            return "No command information given."
+        cmd = self.get_args()
 
-        cmd = self.bot.cmdargs
+        if not cmd:
+            return "No command information given."
 
         # use lower of next item as name
         cmd_name = cmd.pop(0).lower()

@@ -14,10 +14,10 @@ class Module(BaseModule):
         if self.bot.author_uid != self.bot.channel_id:
             return NO_MESSAGE_SIGNAL
 
-        if not self.bot.cmdargs:
-            return NO_MESSAGE_SIGNAL
+        args = self.get_args_lower()
 
-        args = [a.lower() for a in self.bot.cmdargs]
+        if not args:
+            return NO_MESSAGE_SIGNAL
 
         match args[0]:
             case "import":

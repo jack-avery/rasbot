@@ -11,11 +11,13 @@ class Module(BaseModule):
     consumes = 1
 
     def main(self):
-        if not self.bot.cmdargs:
+        args = self.get_args_lower()
+
+        if not args:
             return "No command provided."
 
         # convert argument to lower
-        cmd = self.bot.cmdargs[0].lower()
+        cmd = args[0]
 
         try:
             # try to delete and write config

@@ -10,10 +10,12 @@ class Module(BaseModule):
     consumes = 1
 
     def main(self):
-        if not self.bot.cmdargs:
+        args = self.get_args()
+
+        if not args:
             return self.bot.author_name
 
-        user = self.bot.cmdargs[0]
+        user = args[0]
         if user[0] == "@":
             user = user[1:]
 

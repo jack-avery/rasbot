@@ -240,10 +240,12 @@ class Module(BaseModule):
         return msg
 
     def main(self):
-        if not self.bot.cmdargs:
+        args = self.get_args_lower()
+
+        if not args:
             arg = self.bot.author_name.lower()
         else:
-            arg = self.bot.cmdargs[0].lower()
+            arg = args[0]
 
         # Show top 3
         if arg == "top":
@@ -254,9 +256,7 @@ class Module(BaseModule):
             if not self.bot.author_ismod:
                 return "You must be a moderator to do that."
 
-            args = [arg.lower() for arg in self.bot.cmdargs[1:]]
-
-            return self.mod_user(args)
+            return self.mod_user(args[1:])
 
         user = self.get_user(arg)
         if user:

@@ -14,10 +14,12 @@ class Module(BaseModule):
     consumes = 1
 
     def main(self):
-        if not self.bot.cmdargs:
+        args = self.get_args_lower()
+
+        if not args:
             newprefix = self.cfg_get('default')
         else:
-            newprefix = self.bot.cmdargs[0].lower()
+            newprefix = args[0]
 
         if newprefix.startswith('/'):
             return f'Prefix cannot start with Twitch reserved character /.'
