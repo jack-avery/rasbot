@@ -6,6 +6,9 @@ from definitions import NO_MESSAGE_SIGNAL
 
 
 class Module(BaseModule):
+
+    consumes = -1
+
     def main(self):
         # only the channel owner can run admin commands
         if self.bot.author_uid != self.bot.channel_id:

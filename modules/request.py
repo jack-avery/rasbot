@@ -83,6 +83,8 @@ class Module(BaseModule):
         "cd_per_user": 0
     }
 
+    consumes = 2
+
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
@@ -189,17 +191,19 @@ class Module(BaseModule):
                     f"uid {self.bot.author_uid} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
+        args = self.get_args()
+
         # do not continue if no args are provided
-        if not self.bot.cmdargs:
+        if not args:
             return "Provide a map to request."
 
         # use first arg as request
-        req = self.bot.cmdargs[0].lower()
+        req = args[0].lower()
 
         # use second arg as mods
         mods = ''
-        if len(self.bot.cmdargs) > 1:
-            mods = self.generate_mods_string(self.bot.cmdargs[1].upper())
+        if len(args) > 1:
+            mods = self.generate_mods_string(args[1].upper())
 
         # resolve mapID
         is_id = False

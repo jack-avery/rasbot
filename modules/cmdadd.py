@@ -19,6 +19,8 @@ class Module(BaseModule):
         "default_cooldown": 5,
     }
 
+    consumes = -1
+
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 

@@ -20,6 +20,11 @@ class Module(BaseModule):
         "savedmessage": ""
     }
 
+    # Don't access self.bot.cmdargs directly!
+    # Set "consumes" instead for more predictable interactions with other modules.
+    # You can set it to a negative value to consume ALL (remaining) arguments.
+    consumes = -1
+
     def __init__(self, bot, name):
         # Make sure you call BaseModule init if overriding __init__!
         BaseModule.__init__(self, bot, name)

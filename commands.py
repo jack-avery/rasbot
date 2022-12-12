@@ -12,6 +12,7 @@ from definitions import VALID_COMMAND_REGEX,\
     CommandGivenInvalidNameError,\
     CommandIsModOnlyError,\
     CommandMustHavePositiveCooldownError,\
+    CommandNotGivenEnoughArgsError,\
     CommandStillOnCooldownError
 
 COMMAND_VALIDATE_RE = re.compile(VALID_COMMAND_REGEX)
@@ -133,8 +134,15 @@ class BaseModule(threading.Thread):
 
     Facilitates defaults for a Module so as to prevent errors.
     """
+
     helpmsg = 'No help message available for module.'
+    """Help message to display when used with the `help` module."""
+
     default_config = False
+    """Default configuration to save to-file."""
+
+    consumes = 0
+    """How many message arguments to consume. Any negative value for all remaining."""
 
     def __init__(self, bot: TwitchBot, name):
         """Initialize a module. If a `cfgdefault` is given,
@@ -215,8 +223,49 @@ class BaseModule(threading.Thread):
         self.bot.log_info(f"module {self._name}", msg)
 
     def log_d(self, msg):
-        """Log a debug message alongside the module's name to the window."""
+        """Log a debug message alongside the module's name to the window.
+        """
         self.bot.log_debug(f"module {self._name}", msg)
+
+    def get_args(self) -> list:
+        """Consume `self.consumes` arguments for use as command arguments.
+
+        Returns a list of every argument consumed, or False if there's nothing to consume.
+        """
+        self.log_d(f"consuming {self.consumes} argument(s)")
+
+        ret = []
+        consume = self.consumes
+        remaining = len(self.bot.cmdargs)
+
+        # return false if no arguments remain or not consuming anything
+        if not remaining or self.consumes == 0:
+            return False
+
+        # consume all if negative
+        if self.consumes < 0:
+            consume = remaining
+
+        # don't consume more than in the list
+        elif consume > remaining:
+            consume = remaining
+
+        # consume and return consumed args
+        ret = self.bot.cmdargs[:consume]
+        self.bot.cmdargs = self.bot.cmdargs[consume:]
+        return ret
+
+    def get_args_lower(self) -> list:
+        """Consume `self.consumes` arguments for use as command arguments.
+
+        Returns a list of every argument consumed, in lowercase, or False if there's nothing to consume.
+        """
+        args = self.get_args()
+
+        if args:
+            return [a.lower() for a in args]
+        else:
+            return False
 
 
 def module_add(name: str):

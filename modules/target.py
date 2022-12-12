@@ -7,6 +7,8 @@ from commands import BaseModule
 class Module(BaseModule):
     helpmsg = "Returns a mentioned user. If no user is mentioned, returns the last messages' author."
 
+    consumes = 1
+
     def main(self):
         if not self.bot.cmdargs:
             return self.bot.author_name

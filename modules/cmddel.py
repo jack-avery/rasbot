@@ -8,6 +8,8 @@ from definitions import CommandDoesNotExistError
 class Module(BaseModule):
     helpmsg = 'Deletes an existing command. Usage: cmddel <name>.'
 
+    consumes = 1
+
     def main(self):
         if not self.bot.cmdargs:
             return "No command provided."

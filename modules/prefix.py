@@ -11,6 +11,8 @@ class Module(BaseModule):
         "default": "r!"
     }
 
+    consumes = 1
+
     def main(self):
         if not self.bot.cmdargs:
             newprefix = self.cfg_get('default')
