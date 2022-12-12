@@ -53,7 +53,9 @@ class Message:
     cmd = str
     """The command used, if applicable, in this message."""
     args = list
-    """The list of arguments in the message."""
+    """The list of arguments in the message.
+    Do not modify this directly!! Use `Message.consume()` to get arguments in modules.
+    """
 
     def __init__(self, author: Author, text_raw: str = ''):
         self.author = author
