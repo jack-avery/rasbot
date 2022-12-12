@@ -100,6 +100,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         irc.bot.SingleServerIRCBot.__init__(self, [(
             server, port, f"oauth:{self.auth.get('irc_oauth')}")], self.auth.get('user_id'), self.auth.get('user_id'))
 
+    def unimport_all_modules(self):
+        """Teardown all modules in preparation for closing.
+        """
+        modules = [k for k in self.commands.modules.keys()]
+        for module in modules:
+            self.commands.module_del(module)
+
     def on_welcome(self, c, e):
         # You must request specific capabilities before you can use them
         c.cap('REQ', ':twitch.tv/membership')
@@ -273,8 +280,12 @@ def main(channel=None, auth=None, cfg=None, debug=False):
         cfg = f"config/{channel_id}.txt"
 
     # Start the bot
-    tb = TwitchBot(auth, channel_id, channel, cfg, debug)
-    tb.start()
+    try:
+        tb = TwitchBot(auth, channel_id, channel, cfg, debug)
+        tb.start()
+    except KeyboardInterrupt:
+        tb.unimport_all_modules()
+        sys.exit(0)
 
 
 if __name__ == "__main__":

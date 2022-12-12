@@ -22,4 +22,8 @@ class Module(BaseModule):
         match args[0]:
             case "import":
                 self.bot.commands.module_add(args[1])
-                return f"reimported {args[1]}"
+                return f"imported {args[1]}"
+
+            case "unimport":
+                self.bot.commands.module_del(args[1])
+                return f"unimported {args[1]}"

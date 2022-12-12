@@ -60,8 +60,11 @@ class Module(BaseModule):
         self.active_users = []
 
         # Tick XP every XP_GRANT_FREQUENCY seconds
-        timer = RepeatTimer(self.cfg_get("xp_grant_frequency"), self.tick)
-        timer.start()
+        self.timer = RepeatTimer(self.cfg_get("xp_grant_frequency"), self.tick)
+        self.timer.start()
+
+    def __del__(self):
+        self.timer.cancel()
 
     # Get viewerlist and do XP gain logic
     def tick(self):

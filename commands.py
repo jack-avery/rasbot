@@ -165,6 +165,12 @@ class BaseModule(threading.Thread):
         else:
             self.reload_config()
 
+    def __del__(self):
+        """Destroy a module. Does nothing by default.
+        Used in `xp` to teardown the thread for faster closing through Ctrl+C.
+        """
+        pass
+
     def reload_config(self):
         """Completely reload this module's config from file.
         """
@@ -289,6 +295,16 @@ def module_add(name: str):
         modules[name].start()
     except FileNotFoundError:
         raise ModuleNotFoundError(f"{name} does not exist in modules folder")
+
+
+def module_del(name: str):
+    bot.log_debug("commands", f"unimporting module {name}")
+
+    if name not in modules:
+        return
+
+    modules[name].__del__()
+    del (modules[name])
 
 
 def do_on_pubmsg_methods():
