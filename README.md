@@ -24,7 +24,7 @@ Joined #raspy_on_osu! (57511738)
 ```
 
 > rasbot checks for and performs updates automatically with each start and will let you know if one is ready! <br/>
-> They're recommended, but are easily opted out of. You can disable checking and future notifications in `update.py`.
+> You can disable auto-update checking and notifications **entirely** in `update.py`.
 
 # Managing Commands 📋
 
