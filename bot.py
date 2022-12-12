@@ -166,7 +166,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # If the command is still on cooldown, do nothing.
             # If the command is mod-only and a non-mod calls it, do nothing.
             except (CommandStillOnCooldownError, CommandIsModOnlyError) as err:
-                self.logger.info(f"{err}")
+                self.logger.debug(f"{err}")
 
         except Exception as err:
             self.send_message(f'An error occurred in the processing of your request: {str(err)}. '

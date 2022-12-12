@@ -124,6 +124,7 @@ def command_del(name: str):
     '''
     try:
         del (commands[name])
+        bot.log_debug("commands", f'removing {name}')
     except KeyError:
         raise CommandDoesNotExistError(f'command {name} does not exist')
 
