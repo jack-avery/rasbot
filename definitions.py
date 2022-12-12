@@ -42,6 +42,8 @@ class Author:
         if self.sub:
             return "Sub"
 
+        return "User"
+
 
 class Message:
     author = Author

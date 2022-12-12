@@ -271,8 +271,7 @@ class Module(BaseModule):
         message = self.format_message(map)
 
         # send message, set cooldown and inform requester
-        self.send_osu_message(
-            f"{map['sender']['name']} requested: {message}")
+        self.send_osu_message(message)
         self.author_cds[self.bot.author.uid] = time.time()
         return "Request sent!"
 
