@@ -63,7 +63,7 @@ def check(silent=False, force=False, l=False):
     :param force: Whether or not to force an update.
     """
     if force:
-        update()
+        force_update()
     if l:
         update_after_updater()
 
@@ -118,6 +118,18 @@ def prompt():
 
     if input("Would you like to update? (y/Y for yes): ").lower() == 'y':
         update()
+
+
+def force_update():
+    """Update the updater and the rest of rasbot without opening a new instance of the updater.
+    """
+    do_files('', [RASBOT_BASE_UPDATER])
+    update_after_updater()
+
+    # Close this process, so we don't use a broken bot.py from autoupdate
+    show_motd()
+    input("rasbot is now up to date, and will close to apply changes.")
+    sys.exit(0)
 
 
 def update():
