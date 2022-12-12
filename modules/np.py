@@ -14,7 +14,7 @@ class Module(BaseModule):
     default_config = {
         "path": "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
     }
-    """Path to osu!StreamCompanion NP info file, for use in `methods/np.py`."""
+    """Path to osu!StreamCompanion NP info file."""
 
     def main(self):
         try:
