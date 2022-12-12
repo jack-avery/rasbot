@@ -1,5 +1,4 @@
-This update (2.23.0) does not include any breaking changes:
-- Optimized some parts of commands.py
-- Fixed multiple broken parts of config saving
-- Introduced global config @ config/rasbot.txt
-- Fixed updating on Linux clients
+This update (2.24.0) does not include any breaking changes:
+- osu! requests module now allows you to set a cooldown per-user in the module config
+- For module developers, definitions now includes NO_MESSAGE_SIGNAL to tell the bot not to send anything no matter what
+- Fixed module.cfg_get being broken
