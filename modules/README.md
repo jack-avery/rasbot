@@ -4,11 +4,13 @@
 
 </div>
 
-Modules that use a config store it under `modules/config/[your Twitch ID]`. By default, the only config in here will be for `cmdadd`.
+Modules that use a config store it under `modules/config/[your Twitch ID]`. By default, the only configs in here will be for `cmdadd` and `prefix`.
 
 It's recommended you look at the module (it will have the same name in `modules`, just with the `.py` suffix) in your text editor of choice to see a better description of each option before changing anything.
 
 Some modules require configuration before they can work, e.g. the `request` module which requires you to grant it some credentials for interfacing with the osu! API and IRC.
+
+> Modules only create their default config when first imported, so you'll have to create a command with it first to create the file.
 
 ---
 
