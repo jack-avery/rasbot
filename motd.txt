@@ -1,12 +1,13 @@
-The previous update (2.24.0) does not include any breaking changes.
-
-- osu! requests module now allows you to set a cooldown per-user in the module config
-- For module developers, definitions now includes NO_MESSAGE_SIGNAL to tell the bot not to send anything no matter what
-- Fixed module.cfg_get being broken
-
-This update (2.25.0) does not include any breaking changes.
+The previous update (2.25.0) does not include any breaking changes.
 
 - Fixed shutting down the bot with Ctrl+C not working with the XP module imported.
 - request module now includes subscriber (and VIP/moderator) only mode. Use "!request submode" to toggle.
 For module developers, modules now should declare 'consumes' and use self.get_args().
 This helps multiple modules in one command (if it ever happens) interact more predictably.
+
+This update (2.26.0) does not include any breaking changes.
+
+More options have been given for requests format, removing it from the fixed default.
+For the old look, add "&requester& requested: " to the start of your message_format.
+You can now add &requesterstatus& which will tell you the status of the user:
+Host -> Moderator -> VIP -> Sub -> User
