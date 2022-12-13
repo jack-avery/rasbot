@@ -163,13 +163,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
                 self.logger.debug(
-                    f"Ignoring invalid command call '{cmd}' from {name} (mod: {ismod})")
+                    f"Ignoring invalid command call '{cmd}' from {name} ({self.author.user_status()})")
                 return
 
             try:
                 # Run the command and string result message
                 self.logger.info(
-                    f"Running command call '{cmd}' from {name} (mod: {ismod}) (args:{self.message.args})")
+                    f"Running command call '{cmd}' from {name} ({self.author.user_status()}) (args:{self.message.args})")
                 cmdresult = self.commands.commands[cmd].run(self)
 
                 # If there is a string result message, print it to chat
