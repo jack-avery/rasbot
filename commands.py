@@ -19,8 +19,23 @@ MODULE_MENTION_RE = re.compile(MODULE_MENTION_REGEX)
 
 
 class Command:
+    name = str
+    """The name of the command."""
+
+    cooldown = int
+    """The cooldown for this command in seconds."""
+
+    response = str
+    """The base, unformatted response for this command."""
+
+    requires_mod = bool
+    """Whether this command requires moderator privileges to execute."""
+
+    hidden = bool
+    """Whether this command is hidden from the `help` module."""
+
     def __init__(self, name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
-        '''Creates a new command.
+        """Creates a new command.
 
         :param name: The name of the command.
 
@@ -31,7 +46,7 @@ class Command:
         :param requires_mod: Whether the command requires the user to be a mod.
 
         :param hidden: Whether the command should be hidden from help.
-        '''
+        """
         self.name = name.lower()
         self.cooldown = cooldown
         self.response = response
@@ -74,8 +89,7 @@ class Command:
 
 
 def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
-    '''Creates a new command (or modifies an existing one),
-    and appends it to the commands dict.
+    '''Create a new command (or modifies an existing one).
 
     Automatically attempts to import any unimported modules.
 
@@ -118,10 +132,10 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
 
 
 def command_del(name: str):
-    '''Deletes a command and removes it from the dict.
+    """Delete a command if it exists.
 
     :param name: The name of the command.
-    '''
+    """
     try:
         del (commands[name])
         bot.log_debug("commands", f'removing {name}')
@@ -130,7 +144,7 @@ def command_del(name: str):
 
 
 class BaseModule(threading.Thread):
-    """The base class for a Module, custom or not.
+    """The base class for a Module.
 
     Facilitates defaults for a Module so as to prevent errors.
     """
@@ -166,7 +180,8 @@ class BaseModule(threading.Thread):
             self.reload_config()
 
     def __del__(self):
-        """Destroy a module. Does nothing by default.
+        """Destroy this module. Does nothing by default.
+
         Used in `xp` to teardown the thread for faster closing through Ctrl+C.
         """
         pass
@@ -310,5 +325,10 @@ def pass_bot_ref(ref: TwitchBot):
 
 
 commands = dict()
+"""All commands for this `commands` module."""
+
 modules = dict()
+"""All imported modules."""
+
 bot = TwitchBot
+"""The TwitchBot. For logging activity."""
