@@ -7,7 +7,9 @@ This helps multiple modules in one command (if it ever happens) interact more pr
 
 This update (2.26.0) does not include any breaking changes.
 
-More options have been given for requests format, removing it from the fixed default.
+More options have been given for requests format and the default format has changed.
 For the old look, add "&requester& requested: " to the start of your message_format.
-You can now add &requesterstatus& which will tell you the status of the user:
-Host -> Moderator -> VIP -> Sub -> User
+New options:
+&requester& - Name of the requester
+&requesterstatus - The user status of the requester (Host, Mod, VIP, Sub, etc.)
+&combo& - The maximum combo of the osu! map
