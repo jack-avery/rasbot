@@ -44,6 +44,7 @@ MESSAGE_OPTIONS = {
     # beatmap metadata
     "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
     "bpm": lambda m: round(float(m['bpm']), 2),
+    "combo": lambda m: m['max_combo'],
     "stars": lambda m: round(float(m['difficultyrating']), 2),
     "cs": lambda m: m['diff_size'],
     "od": lambda m: m['diff_overall'],
@@ -241,9 +242,9 @@ class Module(BaseModule):
                     id = beatmapset_re.findall(req)[0]
                     break
 
-        # if couldn't get mapid from either mapID or mapsetID res, give up
-        if not id:
-            return "Could not resolve beatmap link format."
+            # if couldn't get mapid from either mapID or mapsetID res, give up
+            if not id:
+                return "Could not resolve beatmap link format."
 
         # retrieve beatmap information
         if is_id:
