@@ -1,7 +1,7 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseModule
+from src.commands import BaseModule
 import requests
 import datetime
 import time

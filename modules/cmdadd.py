@@ -1,8 +1,8 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from commands import BaseModule
-from definitions import VALID_COMMAND_REGEX,\
+from src.commands import BaseModule
+from src.definitions import VALID_COMMAND_REGEX,\
     CommandGivenInvalidNameError,\
     CommandMustHavePositiveCooldownError
 

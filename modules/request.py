@@ -9,8 +9,8 @@ import requests
 import re
 import time
 
-from commands import BaseModule
-from definitions import MODULE_MENTION_REGEX, NO_MESSAGE_SIGNAL
+from src.commands import BaseModule
+from src.definitions import MODULE_MENTION_REGEX, NO_MESSAGE_SIGNAL
 
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'

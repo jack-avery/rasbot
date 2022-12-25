@@ -2,7 +2,7 @@
 # You can tweak the frequency of granting XP and the ranges to grant in the config file.
 # "Levels" may be implemented eventually, but assume it will be left as-is.
 
-from commands import BaseModule
+from src.commands import BaseModule
 import os
 import random
 import requests

@@ -6,7 +6,7 @@ import threading
 import time
 
 from bot import TwitchBot
-from definitions import VALID_COMMAND_REGEX,\
+from src.definitions import VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
     CommandDoesNotExistError,\
     CommandGivenInvalidNameError,\

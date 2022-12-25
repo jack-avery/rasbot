@@ -6,7 +6,7 @@ import click
 import semantic_version
 import time
 
-import config
+import src.config as config
 
 # Master option to ALWAYS OPT OUT OF UPDATES and ignore any in the future!
 # Set this to True if you want, but things might break eventually.
@@ -25,8 +25,8 @@ BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 RASBOT_BASE_UPDATER = 'update.py'
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE = ['authentication.py', 'bot.py', 'commands.py',
-               'config.py', 'definitions.py', 'setup.py', 'motd.txt']
+RASBOT_BASE = ['src/authentication.py', 'bot.py', 'src/commands.py',
+               'src/config.py', 'src/definitions.py', 'setup.py', 'motd.txt']
 """Remaining built-in base files to update after the updater."""
 
 BUILTIN_MODULES = ['admin.py', 'caller.py', 'cmdadd.py', 'cmddel.py',

@@ -3,8 +3,8 @@
 
 import re
 
-from commands import BaseModule
-from definitions import MODULE_MENTION_REGEX
+from src.commands import BaseModule
+from src.definitions import MODULE_MENTION_REGEX
 
 MODULE_RE = re.compile(MODULE_MENTION_REGEX)
 

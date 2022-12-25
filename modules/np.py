@@ -5,7 +5,7 @@
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
 
-from commands import BaseModule
+from src.commands import BaseModule
 
 
 class Module(BaseModule):

@@ -1,6 +1,3 @@
-# config files or otherwise private
-_*
-
 # ide
 .vscode
 
@@ -17,3 +14,4 @@ _*
 *.spec
 /build
 /dist
+__pycache__

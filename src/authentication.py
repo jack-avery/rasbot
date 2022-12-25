@@ -1,7 +1,7 @@
 import json
 import requests
 
-from definitions import AuthenticationDeniedError
+from src.definitions import AuthenticationDeniedError
 
 
 class Authentication:

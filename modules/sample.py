@@ -7,7 +7,7 @@
 # You can test out this module by adding it in a command as &sample&
 # e.g. "r!cmdadd sample &sample&"
 
-from commands import BaseModule
+from src.commands import BaseModule
 
 
 class Module(BaseModule):

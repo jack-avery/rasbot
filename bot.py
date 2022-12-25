@@ -1,5 +1,5 @@
 import click
-import config
+
 import irc.bot
 import logging
 import requests
@@ -7,10 +7,12 @@ import sys
 import time
 import traceback
 
-import commands
 import update
-from authentication import Authentication
-from definitions import NO_MESSAGE_SIGNAL,\
+
+import src.commands as commands
+import src.config as config
+from src.authentication import Authentication
+from src.definitions import NO_MESSAGE_SIGNAL,\
     Author,\
     Message,\
     CommandIsModOnlyError,\
