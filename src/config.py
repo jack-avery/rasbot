@@ -71,8 +71,8 @@ def read(path: str, default: dict) -> dict:
     """Read a file and return the contained json.
 
     :param cfg: The path to the file.
-
     :param default: Default to write to file if the path does not exist.
+    :return: The resulting config
     """
     # Attempt to read config
     try:
@@ -125,6 +125,9 @@ def write_channel(bot):
 
 def write(path: str, cfg: dict):
     """Write `cfg` to `path` and return `cfg`.
+
+    :param path: The path to write to
+    :param cfg: The `dict` object to convert to json and write
     """
     with open(path, 'w') as file:
         file.write(json.dumps(cfg, indent=4))

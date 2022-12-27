@@ -117,8 +117,11 @@ class Module(BaseModule):
         else:
             self.target = self.resolve_username(self.cfg_get('osu_trgt_id'))
 
-    def resolve_username(self, id):
+    def resolve_username(self, id: (str | int)) -> (str | None):
         """Resolves a users' osu! username from their ID.
+
+        :param id: The ID of the osu! user to resolve the name for.
+        :return: The name of the user, or `None` if the resolution failed.
         """
         self.log_d(f"resolving osu! username for ID {id}")
         req = None
@@ -143,8 +146,12 @@ class Module(BaseModule):
                 )
             return None
 
-    def generate_mods_string(self, mods: str):
-        """Convert `mods` into a more conventional format, and verify that they are real osu! mods."""
+    def generate_mods_string(self, mods: str) -> str:
+        """Convert `mods` into a more conventional format, and verify that they are real osu! mods.
+
+        :param mods: The string given by the user representing the mods selection.
+        :return: The formatted and verified string of valid osu! mods.
+        """
         self.log_d(f"resolving mods from string {mods}")
         # strip + for logic
         if mods.startswith('+'):
@@ -168,10 +175,12 @@ class Module(BaseModule):
         self.log_d(modstring)
         return modstring
 
-    def format_message(self, map):
+    def format_message(self, map) -> str:
         """Format map information for `map` using `message_format` from the config.
 
-        :param map: The map object as returned from the osu! API"""
+        :param map: The map object as returned from the osu! API
+        :return: The message to send as formatted using `message_format`
+        """
         message = self.cfg_get('message_format')
 
         for m in MESSAGE_OPT_RE.findall(message):
@@ -276,7 +285,11 @@ class Module(BaseModule):
         self.author_cds[self.bot.author.uid] = time.time()
         return "Request sent!"
 
-    def send_osu_message(self, msg):
+    def send_osu_message(self, msg: str):
+        """Send `msg` as an osu! message to `target` as `username`
+
+        :param msg: The message to send
+        """
         self.log_d(
             f"sending osu! message to {self.target} as {self.username}: '{msg}'")
 

@@ -19,33 +19,29 @@ MODULE_MENTION_RE = re.compile(MODULE_MENTION_REGEX)
 
 
 class Command:
-    name = str
+    name: str
     """The name of the command."""
 
-    cooldown = int
+    cooldown: int
     """The cooldown for this command in seconds."""
 
-    response = str
+    response: str
     """The base, unformatted response for this command."""
 
-    requires_mod = bool
+    requires_mod: bool
     """Whether this command requires moderator privileges to execute."""
 
-    hidden = bool
+    hidden: bool
     """Whether this command is hidden from the `help` module."""
 
     def __init__(self, name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
-        """Creates a new command.
+        """Create a new `Command`.
 
         :param name: The name of the command.
-
         :param cooldown: The cooldown of the command in seconds.
-
-        :param response: The text response of the command. Encapsulate custom commands in &&.
-
+        :param response: The text response of the command. Encapsulate custom commands in &, e.g. `&module&`.
         :param requires_mod: Whether the command requires the user to be a mod.
-
-        :param hidden: Whether the command should be hidden from help.
+        :param hidden: Whether the command should be hidden from the `help` module..
         """
         self.name = name.lower()
         self.cooldown = cooldown

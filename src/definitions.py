@@ -46,27 +46,43 @@ class Author:
 
 
 class Message:
-    author = Author
+    author: Author
     """The `Author` object of the message."""
-    text_raw = str
+
+    text_raw: str
     """The raw text of the message."""
-    cmd = str
+
+    cmd: str
     """The command used, if applicable, in this message."""
-    args = list
+
+    args: list
     """The list of arguments in the message.
     Do not modify this directly!! Use `Message.consume()` to get arguments in modules.
     """
 
     def __init__(self, author: Author, text_raw: str = ''):
+        """Create a new `Message`.
+
+        :param author: The `Author` of this message.
+        :param text_raw: The raw text of the message.
+        """
         self.author = author
         self.text_raw = text_raw
 
     def attach_command(self, cmd: str = '', args: list = []):
+        """Attach command information to this `Message`.
+
+        :param cmd: The command the `Author` called.
+        :param args: The list of args the `Author` provided.
+        """
         self.cmd = cmd
         self.args = args
 
     def consume(self, amount: int = 0):
         """Consume `amount` arguments, removing them from `self.args` and returning them.
+
+        :param amount: The amount of arguments to consume from `self.args`.
+        :return: The args consumed for use.
         """
         ret = []
         remaining = len(self.args)

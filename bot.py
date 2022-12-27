@@ -23,49 +23,45 @@ from src.definitions import NO_MESSAGE_SIGNAL,\
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    auth = Authentication
+    auth: Authentication
     """The `Authentication` object for this bot."""
 
-    channel_id = int
+    channel_id: int
     """The UID of the Twitch channel."""
 
-    channel_name = str
+    channel_name: str
     """The name of the Twitch channel."""
 
-    channel = str
+    channel: str
     """The Twitch channel."""
 
-    commands = commands
+    commands: commands
     """This Twitch bots' `commands` module."""
 
-    cfgpath = str
+    cfgpath: str
     """Path to the currently used channel config file."""
 
-    prefix = str
+    prefix: str
     """The currently used command prefix."""
 
-    author = Author
+    author: Author
     """The `Author` object representing the sender of the active message."""
 
-    message = Message
+    message: Message
     """The `Message` object representing the active message."""
 
     def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgpath: str = '', debug: bool = False):
-        """Create a new instance of a Twitch bot.
+        """Create a new `TwitchBot`.
 
         :param auth: The Authentication object to use.
-
         :param channel_id: The channel ID.
-
         :param channel: The channel name.
-
-        :param cfginfo: The bot config file to read configuration from.
-
-        :param debug: Whether the bot should be verbose about actions.
+        :param cfgpath: The path of the cfg file to use.
+        :param debug: Whether logging should be `DEBUG` level.
         """
         # Set up logging
-        debug_init_time = time.perf_counter()
         if debug:
+            debug_init_time = time.perf_counter()
             logmode = logging.DEBUG
         else:
             logmode = logging.INFO
@@ -215,18 +211,17 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                               + 'A full stack trace has been output to the command window.')
             traceback.print_exc()
 
-    def send_message(self, message: str):
+    def send_message(self, msg: str):
         """Sends a message to the public chat. For easy use within modules.
 
-        :param message: The message to send.
+        :param msg: The message to send.
         """
-        self.connection.privmsg(self.channel, f'{message}')
+        self.connection.privmsg(self.channel, f'{msg}')
 
     def log_error(self, src: str, msg: str):
         """Log an error. For easy use within modules.
 
         :param src: The file/module this is coming from.
-
         :param msg: The error to log.
         """
         self.logger.error(f'{src} - {msg}')
@@ -235,8 +230,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         """Log an info-level string. For easy use within modules.
 
         :param src: The file/module this is coming from.
-
-        :param message: The message to log.
+        :param msg: The message to log.
         """
         self.logger.info(f'{src} - {msg}')
 
@@ -244,8 +238,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         """Log debug information. For easy use within modules.
 
         :param src: The file/module this is coming from.
-
-        :param message: The debug info to log.
+        :param msg: The debug info to log.
         """
         self.logger.debug(f'{src} - {msg}')
 

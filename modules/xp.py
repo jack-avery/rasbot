@@ -120,6 +120,8 @@ class Module(BaseModule):
 
     def get_user(self, user: str):
         """Return the user, position, and XP.
+
+        :param user: The name of the user
         """
         # Strip @ from mention
         if user.startswith("@"):

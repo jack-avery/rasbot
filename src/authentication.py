@@ -5,23 +5,16 @@ from src.definitions import AuthenticationDeniedError
 
 
 class Authentication:
+    auth: dict
+    """The JSON object representing the given Twitch authentication"""
+
+    file: str
+    """The path to the file containing the given Twitch authentication"""
+
     def __init__(self, file: str):
         """Create a new authentication identity.
-        Automatically pulls and parses from the _AUTH file.
 
-        :param file: The file to pull auth from. See format.
-
-        Format:
-
-        user_id:<twitch_name>
-
-        client_id:<client_id>
-
-        client_secret:<client_secret>
-
-        irc_oauth:<irc_oauth>
-
-        oauth:<twitch_oauth>
+        :param file: The file to pull auth from
         """
         self.file = file
         self.read_authfile()
@@ -52,20 +45,25 @@ class Authentication:
         self.auth = auth
 
     def write_authfile(self):
-        """Writes to the authfile set by self.file.
+        """Writes `self.auth` to `self.file`.
         """
         # Writing the auth file
         with open(self.file, 'w') as authfile:
             authfile.write(json.dumps(self.auth, indent=4))
 
-    def get(self, key):
+    def get(self, key: str) -> str:
         """Return the item with the given `key`.
+
+        :param key: The key to get the value of
+        :return: The value of `self.auth[key]`
         """
         return self.auth[key]
 
-    def get_headers(self):
-        """Returns headers.
+    def get_headers(self) -> dict:
+        """Returns headers for Twitch API calls.
         For use in some queries, e.g. the `uptime` module.
+
+        :return: A dictionary for use with the `headers` param of `requests.get()`
         """
         return {'Client-ID': self.auth["client_id"],
                 'Authorization': f'Bearer {self.auth["oauth"]}',
@@ -80,7 +78,7 @@ class Authentication:
                           + f'&client_secret={self.auth["client_secret"]}'
                           + '&grant_type=client_credentials').json()
 
-        # Return the new OAuth key
+        # Set oauth and write the file
         try:
             self.auth['oauth'] = r['access_token']
             self.write_authfile()
