@@ -19,7 +19,7 @@ def main(file: str):
         print(f"Running this tool will overwrite {file}.")
         print("If you want to save it, please rename it to something else, then restart this tool.\n")
         if input("Are you sure you want to continue? (y/Y for yes): ").lower() != 'y':
-            exit()
+            sys.exit(0)
 
     # Set up
     # Import auth here as it uses requests and will error out otherwise
@@ -71,7 +71,7 @@ def main(file: str):
     except AuthenticationDeniedError as err:
         print(f"Failed to set up: {err}")
         input("Re-run the program, and make sure you enter things correctly!")
-        exit()
+        sys.exit(1)
 
     # Inform the user
     input("\nSetup done! You can close this window.")

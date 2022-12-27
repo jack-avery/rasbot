@@ -302,7 +302,7 @@ def main(channel=None, auth=None, cfg=None, debug=False):
                     print("Please ensure that your credentials are valid.")
                     print("You may need to re-run setup.py.\n")
                     input("This error is unrecoverable. rasbot will now exit.")
-                    exit(1)
+                    sys.exit(1)
 
     if not cfg:
         cfg = f"config/{channel_id}.txt"

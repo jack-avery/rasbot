@@ -95,7 +95,7 @@ def get_current_version():
             return semantic_version.Version(verfile.read())
         except ValueError:
             input("Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
-            sys.exit()
+            sys.exit(1)
 
 
 def prompt():

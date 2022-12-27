@@ -1,5 +1,6 @@
 import json
 import requests
+import sys
 
 from src.definitions import AuthenticationDeniedError
 
@@ -40,7 +41,7 @@ class Authentication:
             print("Your authfile is missing crucial elements.")
             print("You may need to re-run setup.py.")
             input("rasbot cannot continue, exiting.")
-            exit()
+            sys.exit(1)
 
         self.auth = auth
 
