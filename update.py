@@ -3,7 +3,6 @@ import os
 import requests
 import subprocess
 import sys
-import time
 
 import click
 import semantic_version
