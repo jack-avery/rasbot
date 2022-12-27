@@ -338,7 +338,7 @@ commands = dict()
 """All commands for this `commands` module."""
 
 modules = dict()
-"""All imported modules."""
+"""All currently imported modules."""
 
 bot: TwitchBot
 """The TwitchBot. For logging activity."""

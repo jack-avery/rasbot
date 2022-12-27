@@ -27,3 +27,13 @@ class Module(BaseModule):
             case "unimport":
                 self.bot.commands.module_del(args[1])
                 return f"unimported {args[1]}"
+
+            case "alwaysimportadd":
+                if args[1] not in self.bot.always_import_list:
+                    self.bot.always_import_list.append(args[1])
+                    return f"{args[1]} added to always import list (will need restart to take effect)"
+
+            case "alwaysimportrem":
+                if args[1] in self.bot.always_import_list:
+                    self.bot.always_import_list.remove(args[1])
+                    return f"{args[1]} removed from always import list (will need restart to take effect)"

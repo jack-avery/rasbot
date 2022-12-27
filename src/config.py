@@ -107,7 +107,7 @@ def write_channel(bot):
             'prefix': bot.prefix
         },
         'commands': {},
-        'modules': [],
+        'modules': bot.always_import_list,
     }
 
     # Adding commands

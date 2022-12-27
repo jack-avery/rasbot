@@ -25,28 +25,22 @@ from src.definitions import NO_MESSAGE_SIGNAL,\
 class TwitchBot(irc.bot.SingleServerIRCBot):
     auth: Authentication
     """The `Authentication` object for this bot."""
-
     channel_id: int
     """The UID of the Twitch channel."""
-
     channel_name: str
     """The name of the Twitch channel."""
-
     channel: str
     """The Twitch channel."""
-
     commands: commands
     """This Twitch bots' `commands` module."""
-
     cfgpath: str
     """Path to the currently used channel config file."""
-
     prefix: str
     """The currently used command prefix."""
-
+    always_import_list: list
+    """List of modules to always import, regardless of whether they're used in commands."""
     author: Author
     """The `Author` object representing the sender of the active message."""
-
     message: Message
     """The `Message` object representing the active message."""
 
@@ -107,11 +101,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info(f"Imported {len(cfg['commands'])} command(s)")
 
         # Import additional modules
+        self.always_import_list = cfg['modules']
         if cfg["modules"]:
             for module in cfg["modules"]:
                 self.commands.module_add(module)
 
-            self.logger.info(f"Imported {len(cfg['modules'])} module(s)")
+            self.logger.info(
+                f"Imported {len(cfg['modules'])} additional module(s)")
 
         if debug:
             self.logger.debug(
