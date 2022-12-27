@@ -5,15 +5,15 @@ The previous update (2.25.0) does not include any breaking changes.
 For module developers, modules now should declare 'consumes' and use self.get_args().
 This helps multiple modules in one command (if it ever happens) interact more predictably.
 
-This update (2.26.0) does includes one breaking change:
+This update (2.26.0) does not include any breaking changes.
 
---- You will need to create a file in the "src" folder called __init__.py ---
 You can now delete authentication.py, commands.py, config.py, and definitions.py from the root folder,
 as they've all been moved to the "src" folder to reduce clutter.
 
 More options have been given for requests format and the default format has changed.
-For the old look, add "&requester& requested: " to the start of your message_format.
 New options:
 &requester& - Name of the requester
 &requesterstatus - The user status of the requester (Host, Mod, VIP, Sub, etc.)
 &combo& - The maximum combo of the osu! map
+
+For the old look, add "&requester& requested: " to the start of your message_format.

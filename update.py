@@ -1,10 +1,12 @@
 import io
+import os
+import requests
 import subprocess
 import sys
-import requests
+import time
+
 import click
 import semantic_version
-import time
 
 import src.config as config
 
@@ -25,9 +27,12 @@ BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 RASBOT_BASE_UPDATER = 'update.py'
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE = ['src/authentication.py', 'bot.py', 'src/commands.py',
-               'src/config.py', 'src/definitions.py', 'setup.py', 'motd.txt']
+RASBOT_BASE = ['bot.py', 'setup.py', 'motd.txt']
 """Remaining built-in base files to update after the updater."""
+
+RASBOT_SRC = ['__init__.py', 'authentication.py',
+              'commands.py', 'config.py', 'definitions.py']
+"""Files inside `./src` to update."""
 
 BUILTIN_MODULES = ['admin.py', 'caller.py', 'cmdadd.py', 'cmddel.py',
                    'help.py',  'np.py', 'prefix.py', 'request.py',
@@ -151,6 +156,9 @@ def update():
 def update_after_updater():
     # Update base files
     do_files('', RASBOT_BASE)
+
+    # Update source files
+    do_files('src/', RASBOT_SRC)
     print("Finished updating rasbot.\n")
 
     # Update commands
@@ -183,6 +191,11 @@ def do_files(path: str, files: list):
         print(f"Updating {path}{file}...")
         text = requests.get(
             f"{BASE_URL}{path}{file}").text
+
+        if not path == '':
+            # make the folder if it doesn't exist
+            if not os.path.exists(path):
+                os.mkdir(path)
 
         with io.open(f"{path}{file}", 'w', encoding="utf8") as local:
             local.write(text)
