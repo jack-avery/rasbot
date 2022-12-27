@@ -228,7 +228,10 @@ class Module(BaseModule):
     def main(self):
         args = self.get_args()
 
-        self.process_request(args)
+        fail_msg = self.process_request(args)
+
+        if fail_msg:
+            return fail_msg
 
         return "Request sent!"
 
@@ -332,6 +335,8 @@ class Module(BaseModule):
         # send message, set cooldown and inform requester
         self.send_osu_message(message)
         self.author_cds[self.bot.author.uid] = time.time()
+
+        return False
 
     def send_osu_message(self, msg: str):
         """Send `msg` as an osu! message to `target` as `username`
