@@ -50,12 +50,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     message: Message
     """The `Message` object representing the active message."""
 
-    def __init__(self, auth: Authentication, channel_id: int, channel: str, cfgpath: str = '', debug: bool = False):
+    def __init__(self, auth: Authentication, channel_id: int, channel_name: str, cfgpath: str = '', debug: bool = False):
         """Create a new `TwitchBot`.
 
         :param auth: The Authentication object to use.
         :param channel_id: The channel ID.
-        :param channel: The channel name.
+        :param channel_name: The channel name.
         :param cfgpath: The path of the cfg file to use.
         :param debug: Whether logging should be `DEBUG` level.
         """
@@ -79,7 +79,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Initialize authentication
         self.auth = auth
         self.channel_id = channel_id
-        self.channel_name = channel
+        self.channel_name = channel_name
 
         self.logger.info(f"Starting as {self.auth.get('user_id')}...")
 
@@ -93,7 +93,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.logger.info(f"Prefix set as '{self.prefix}'")
 
         # Set channel name
-        self.channel = f"#{channel}"
+        self.channel = f"#{channel_name}"
 
         # Instantiate commands module
         self.commands = commands
