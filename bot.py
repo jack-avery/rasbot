@@ -156,9 +156,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Grab user info
         name = str.lower(e.tags["display-name"])
         uid = int(e.tags['user-id'])
-        ismod = True if getattr(e.tags, 'mod', '0') == '1' else False
-        issub = True if getattr(e.tags, 'subscriber', '0') == '1' else False
-        isvip = True if getattr(e.tags, 'vip', '0') == '1' else False
+        ismod = dict.get(e.tags, 'mod', '0') == '1'
+        issub = dict.get(e.tags, 'subscriber', '0') == '1'
+        isvip = dict.get(e.tags, 'vip', '0') == '1'
         ishost = False
 
         # Gauranteeing broadcaster all traits
