@@ -17,3 +17,4 @@ New options:
 &combo& - The maximum combo of the osu! map
 
 For the old look, add "&requester& requested: " to the start of your message_format.
+The new default is "&requester& (&requesterstatus&) requested: ", if you prefer showing their status.
