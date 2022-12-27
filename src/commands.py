@@ -51,7 +51,7 @@ class Command:
 
         self._last_used = 0
 
-    def run(self, bot):
+    def run(self):
         """Code to be run when this command is called from chat.
 
         Runs all && codes found in the command and returns the result.
@@ -86,18 +86,13 @@ class Command:
 
 def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
     '''Create a new command (or modifies an existing one).
-
     Automatically attempts to import any unimported modules.
 
     :param name: The name of the command.
-
     :param cooldown: The cooldown of the command in seconds.
-
     :param response: The text response of the command. Encapsulate custom commands in &&.
-
     :param requires_mod: Whether this command requires moderator access to use.
-
-    :param hidden: Whether to hide this command from the 'help' module.
+    :param hidden: Whether to hide this command from the `help` module.
     '''
     bot.log_debug("commands",
                   f'adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
@@ -196,6 +191,8 @@ class BaseModule(threading.Thread):
 
     def cfg_get(self, key: str):
         """Read the given config dict key. If it fails to read it will fill it in with the default.
+
+        :param key: The key to grab the value of
         """
         try:
             return self._cfg[key]
@@ -208,17 +205,24 @@ class BaseModule(threading.Thread):
 
     def cfg_set(self, key: str, value):
         """Set the value of a given config dict key, and save the config.
+
+        :param key: The key to set
+        :param value: The value to set `key` to
         """
         self._cfg[key] = value
         self.save_config()
 
     def main(self):
         """Code to be run for the modules' && code.
+
+        :return: The message to replace the message module mention with.
         """
         pass
 
     def help(self):
         """The help message when used with the `help` module.
+
+        :return: The message to show when used as an argument for the `help` module.
         """
         return self.helpmsg
 
@@ -229,25 +233,31 @@ class BaseModule(threading.Thread):
         """
         pass
 
-    def log_e(self, msg):
+    def log_e(self, msg: str):
         """Log an error alongside the module's name to the window.
+
+        :param msg: The error to log.
         """
         self.bot.log_error(f"module {self._name}", msg)
 
-    def log_i(self, msg):
+    def log_i(self, msg: str):
         """Log info alongside the module's name to the window.
+
+        :param msg: The message to log.
         """
         self.bot.log_info(f"module {self._name}", msg)
 
-    def log_d(self, msg):
+    def log_d(self, msg: str):
         """Log a debug message alongside the module's name to the window.
+
+        :param msg: The debug info to log.
         """
         self.bot.log_debug(f"module {self._name}", msg)
 
     def get_args(self) -> list:
         """Consume `self.consumes` arguments for use as command arguments.
 
-        Returns a list of every argument consumed, or False if there's nothing to consume.
+        :return: A list of every argument consumed, or False if there's nothing to consume.
         """
         self.log_d(f"consuming {self.consumes} argument(s)")
 
@@ -256,7 +266,7 @@ class BaseModule(threading.Thread):
     def get_args_lower(self) -> list:
         """Consume `self.consumes` arguments for use as command arguments.
 
-        Returns a list of every argument consumed, in lowercase, or False if there's nothing to consume.
+        :return: A list of every argument consumed (in lowercase), or False if there's nothing to consume.
         """
         args = self.get_args()
 
@@ -267,10 +277,10 @@ class BaseModule(threading.Thread):
 
 
 def module_add(name: str):
-    '''Imports a new module and appends it to the modules dict.
+    """Imports a new module and appends it to the modules dict.
 
     :param name: The name of the module. File must be visible in the modules folder.
-    '''
+    """
     bot.log_debug("commands", f"importing module {name}")
 
     try:
@@ -290,6 +300,10 @@ def module_add(name: str):
 
 
 def module_del(name: str):
+    """Call `module.__del__()` and remove it from `modules`.
+
+    :param name: The name of the module.
+    """
     bot.log_debug("commands", f"unimporting module {name}")
 
     if name not in modules:
@@ -326,5 +340,5 @@ commands = dict()
 modules = dict()
 """All imported modules."""
 
-bot = TwitchBot
+bot: TwitchBot
 """The TwitchBot. For logging activity."""

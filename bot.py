@@ -195,7 +195,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 # Run the command and string result message
                 self.logger.info(
                     f"Running command call '{cmd}' from {name} ({self.author.user_status()}) (args:{self.message.args})")
-                cmdresult = self.commands.commands[cmd].run(self)
+                cmdresult = self.commands.commands[cmd].run()
 
                 # If there is a string result message, print it to chat
                 if cmdresult and not NO_MESSAGE_SIGNAL in cmdresult:
