@@ -107,18 +107,48 @@ class Module(BaseModule):
 
         self.active_users.clear()
 
-    def get_top(self):
+    def get_top(self, rank: int):
         """Return the top 3 XP holders.
         """
-        self.log_d(f"Retrieving top 3 XP holders")
         with self.db as db:
+            if rank:
+                user = self.get_rank(rank=rank)
+                if user:
+                    return f"{user[0]} is #{user[1]} with {user[2]} XP."
+                else:
+                    return f"There is no rank #{rank} user."
+
+            self.log_d(f"Retrieving top 3 XP holders")
             cs = db.cursor()
             cs.execute(f"SELECT user,amt FROM xp ORDER BY amt DESC")
             res = cs.fetchmany(3)
 
             return " | ".join([f"{r[0]}: {r[1]}" for r in res])
 
-    def get_user(self, user: str):
+    def get_rank(self, user: str = None, rank: int = None):
+        self.log_d(f"retrieving rank for {user} or rank #{rank}")
+
+        with self.db as db:
+            cs = db.cursor()
+
+            # Getting their position
+            all = tuple(map(lambda x: x[0], cs.execute(
+                'SELECT user FROM xp ORDER BY amt DESC').fetchall()))
+            try:
+
+                if user:
+                    pos = all.index(user)
+                    return pos + 1
+
+                if rank:
+                    user = all[rank - 1]
+                    return self.get_user(user)
+
+            except ValueError:
+                # If finding their index in the sorted list fails assume they don't exist.
+                return False
+
+    def get_user(self, user: str = None):
         """Return the user, position, and XP.
 
         :param user: The name of the user
@@ -131,14 +161,7 @@ class Module(BaseModule):
         with self.db as db:
             cs = db.cursor()
 
-            # Getting their position
-            all = tuple(map(lambda x: x[0], cs.execute(
-                'SELECT user FROM xp ORDER BY amt DESC').fetchall()))
-            try:
-                pos = all.index(user) + 1
-            except ValueError:
-                # If finding their index in the sorted list fails assume they don't exist.
-                return False
+            pos = self.get_rank(user)
 
             cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
             xp = cs.fetchone()[0]
@@ -250,18 +273,27 @@ class Module(BaseModule):
         if not args:
             arg = self.bot.author.name.lower()
         else:
-            arg = args[0]
+            arg = args.pop(0)
 
-        # Show top 3
+        # Show top 3 or user at rank given
         if arg == "top":
-            return self.get_top()
+
+            rank = None
+            if args:
+                try:
+                    rank = int(args.pop(0))
+                    print(rank)
+                except ValueError:
+                    return "Give a valid integer for rank."
+
+            return self.get_top(rank)
 
         # XP moderation tools
         if arg == "mod":
             if not self.bot.author.mod:
                 return "You must be a moderator to do that."
 
-            return self.mod_user(args[1:])
+            return self.mod_user(args)
 
         user = self.get_user(arg)
         if user:
