@@ -104,7 +104,9 @@ class Module(BaseModule):
         # Per-user cooldown for requests (in seconds)
         "cd_per_user": 0,
         # Whether or not requests should be for Subscribers, VIPs, and Mods only
-        "submode": False
+        "submode": False,
+        # Whether or not ALL messages posted in chat should be parsed for beatmap links.
+        "parse_all_messages": True,
     }
 
     consumes = 2
@@ -139,7 +141,7 @@ class Module(BaseModule):
         # create IRC bot
         if self.username and self.target:
             self.osu_irc_bot = OsuRequestsIRCBot(
-                self.username, self.target, 'irc.ppy.sh', password=self.cfg_get('osu_irc_pwd'), log_d=self.log_i)
+                self.username, self.target, 'irc.ppy.sh', password=self.cfg_get('osu_irc_pwd'), log_i=self.log_i)
 
             self.osu_irc_bot_thread = Thread(target=self.osu_irc_bot.start)
             self.osu_irc_bot_thread.daemon = True
@@ -224,6 +226,27 @@ class Module(BaseModule):
         return message
 
     def main(self):
+        args = self.get_args()
+
+        self.process_request(args)
+
+        return "Request sent!"
+
+    def on_pubmsg(self):
+        if not self.cfg_get('parse_all_messages'):
+            return
+
+        # do not parse again if using a command
+        if self.bot.message.cmd:
+            return
+
+        words = self.bot.message.text_raw.split(' ')
+        for i, word in enumerate(words):
+            if "osu.ppy.sh" in word:
+                args = words[i:]
+                self.process_request(args)
+
+    def process_request(self, args):
         # do not continue if either username or target failed to resolve
         if not self.username or not self.target:
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
@@ -239,8 +262,6 @@ class Module(BaseModule):
                 self.log_d(
                     f"user {self.bot.author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
-
-        args = self.get_args()
 
         # do not continue if no args are provided
         if not args:
@@ -311,7 +332,6 @@ class Module(BaseModule):
         # send message, set cooldown and inform requester
         self.send_osu_message(message)
         self.author_cds[self.bot.author.uid] = time.time()
-        return "Request sent!"
 
     def send_osu_message(self, msg: str):
         """Send `msg` as an osu! message to `target` as `username`

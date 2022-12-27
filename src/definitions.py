@@ -82,6 +82,8 @@ class Message:
         """
         self.author = author
         self.text_raw = text_raw
+        self.cmd = False
+        self.args = False
 
     def attach_command(self, cmd: str = '', args: list = []):
         """Attach command information to this `Message`.
