@@ -98,20 +98,6 @@ def get_current_version():
             sys.exit()
 
 
-def show_motd():
-    """Show the message of the day and wait a second.dd
-    """
-    current = get_current_version()
-
-    with open('motd.txt', 'r') as motdfile:
-        motd = motdfile.read()
-
-    print(f"\nMessage of the day ({current}):\n")
-    print(motd)
-    print("\nPlease take note of anything that the MOTD says may be breaking.")
-    time.sleep(3)
-
-
 def prompt():
     """Prompts the user to update rasbot.
     """
@@ -132,8 +118,7 @@ def force_update():
     update_after_updater()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
-    show_motd()
-    input("rasbot is now up to date, and will close to apply changes.")
+    input("rasbot has reinstalled. You may need to run the updater again to fully fix your installation.")
     sys.exit(0)
 
 
@@ -148,8 +133,8 @@ def update():
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
-    show_motd()
-    input("rasbot is now up to date, and will close to apply changes.")
+    input("See what's changed in the #news channel in the Discord https://discord.gg/qpyT4zx.\n"
+          + "rasbot is now up to date, and will close to apply changes.")
     sys.exit(0)
 
 
@@ -189,16 +174,21 @@ def do_files(path: str, files: list):
     """
     for file in files:
         print(f"Updating {path}{file}...")
-        text = requests.get(
-            f"{BASE_URL}{path}{file}").text
 
+        # if the file doesn't exist don't write anything
+        req = requests.get(f"{BASE_URL}{path}{file}")
+        if req.status_code == 404:
+            print("Failed to fetch: ignoring...")
+            return
+
+        # make the folder if it doesn't exist
         if not path == '':
-            # make the folder if it doesn't exist
             if not os.path.exists(path):
                 os.mkdir(path)
 
+        # write the text to file
         with io.open(f"{path}{file}", 'w', encoding="utf8") as local:
-            local.write(text)
+            local.write(req.text)
 
 
 def check_requirements():
