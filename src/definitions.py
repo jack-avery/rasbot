@@ -5,19 +5,31 @@
 class Author:
     name = str
     """The display name of the author."""
+
     uid = str
     """The ID of the author."""
+
     mod = bool
     """Whether the author is a moderator."""
+
     sub = bool
     """Whether the author is a subscriber."""
+
     vip = bool
     """Whether the author is a VIP."""
+
     host = bool
     """Whether the author is the channel owner."""
 
     def __init__(self, name: str, uid: str, mod: bool = False, sub: bool = False, vip: bool = False, host: bool = False):
         """Create a new `Author`.
+
+        :param name: The name of the user.
+        :param uid: The ID of the user.
+        :param mod: Whether the user is a Moderator of the Twitch chat.
+        :param sub: Whether the user is subscribed to the Twitch channel.
+        :param vip: Whether the user is a VIP of the Twitch channel.
+        :param host: Whether the user is the owner of the Twitch channel.
         """
         self.name = name
         self.uid = uid
@@ -26,9 +38,11 @@ class Author:
         self.vip = vip
         self.host = host
 
-    def user_status(self):
+    def user_status(self) -> str:
         """Returns the highest privilege this user has.
-        host > mod > vip > sub > none
+        `host > mod > vip > sub > none`
+
+        :return: A string representing this users' highest privilege level.
         """
         if self.host:
             return "Host"
