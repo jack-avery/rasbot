@@ -4,13 +4,16 @@
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
 
-import socket
+import irc
 import requests
 import re
+from threading import Thread
 import time
 
 from src.commands import BaseModule
 from src.definitions import MODULE_MENTION_REGEX, NO_MESSAGE_SIGNAL
+
+OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
@@ -67,6 +70,22 @@ MESSAGE_OPTIONS = {
 }
 
 
+class OsuRequestsIRCBot(irc.bot.SingleServerIRCBot):
+    def __init__(self, user, target, server, port=6667, password=None, log_i=None):
+        irc.bot.SingleServerIRCBot.__init__(
+            self, [(server, port, password)], user, user)
+
+        self.target = target
+        self.user = user
+        self.log_i = log_i
+
+    def on_welcome(self, c, e):
+        self.log_i(f"osu! IRC Connected as {self.user}")
+
+    def send_message(self, msg: str):
+        self.connection.privmsg(self.target, msg)
+
+
 class Module(BaseModule):
     helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link> <+mods?> (mods: "request submode" to toggle submode)'
 
@@ -116,6 +135,15 @@ class Module(BaseModule):
             self.target = self.username
         else:
             self.target = self.resolve_username(self.cfg_get('osu_trgt_id'))
+
+        # create IRC bot
+        if self.username and self.target:
+            self.osu_irc_bot = OsuRequestsIRCBot(
+                self.username, self.target, 'irc.ppy.sh', password=self.cfg_get('osu_irc_pwd'), log_d=self.log_i)
+
+            self.osu_irc_bot_thread = Thread(target=self.osu_irc_bot.start)
+            self.osu_irc_bot_thread.daemon = True
+            self.osu_irc_bot_thread.start()
 
     def resolve_username(self, id: (str | int)) -> (str | None):
         """Resolves a users' osu! username from their ID.
@@ -293,15 +321,4 @@ class Module(BaseModule):
         self.log_d(
             f"sending osu! message to {self.target} as {self.username}: '{msg}'")
 
-        # create IRC socket and connect to irc.ppy.sh
-        irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        irc.connect(('irc.ppy.sh', 6667))
-
-        # send message headers and message
-        irc.send(bytes(f"USER {self.username}\n", "UTF-8"))
-        irc.send(bytes(f"PASS {self.cfg_get('osu_irc_pwd')}\n", "UTF-8"))
-        irc.send(bytes(f"NICK {self.username}\n", "UTF-8"))
-        irc.send(bytes(f"PRIVMSG {self.target} {msg}\n", "UTF-8"))
-
-        # close socket so we don't leak anything
-        irc.close()
+        self.osu_irc_bot.send_message(msg)
