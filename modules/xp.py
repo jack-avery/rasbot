@@ -141,6 +141,9 @@ class Module(BaseModule):
                     return pos + 1
 
                 if rank:
+                    if rank > len(all) or rank < 1:
+                        raise ValueError
+
                     user = all[rank - 1]
                     return self.get_user(user)
 
