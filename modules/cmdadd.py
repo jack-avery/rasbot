@@ -47,8 +47,8 @@ class Module(BaseModule):
 
         # check for parameters and consume if found
         params = {
-            'modonly': False,
-            'hidden': False
+            self.MODONLY_ARG: False,
+            self.HIDDEN_ARG: False
         }
         for _ in params:
             for param in params:
@@ -61,8 +61,8 @@ class Module(BaseModule):
             self.bot.commands.command_modify(cmd_name,
                                              cmd_cooldown,
                                              " ".join(cmd),
-                                             params['modonly'],
-                                             params['hidden'])
+                                             params[self.MODONLY_ARG],
+                                             params[self.HIDDEN_ARG])
             self.bot.write_config()
 
             return f'Command {cmd_name} added successfully.'
