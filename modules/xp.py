@@ -167,7 +167,12 @@ class Module(BaseModule):
             pos = self.get_rank(user)
 
             cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
-            xp = cs.fetchone()[0]
+            xp = cs.fetchone()
+
+            if not xp:
+                return False
+
+            xp = 0
 
         return (user, pos, xp)
 
