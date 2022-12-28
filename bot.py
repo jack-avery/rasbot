@@ -170,7 +170,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         try:
             # Don't continue if the message doesn't start with the prefix.
             if not msg.startswith(self.prefix):
+                self.commands.do_on_pubmsg_methods()
                 return
+
             split = msg.split(' ')
 
             # Isolating command and command arguments
