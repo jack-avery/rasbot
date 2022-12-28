@@ -104,7 +104,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.always_import_list = cfg['modules']
         if cfg["modules"]:
             for module in cfg["modules"]:
-                self.commands.module_add(module)
+                if module not in self.commands.modules:
+                    self.commands.module_add(module)
 
             self.logger.info(
                 f"Imported {len(cfg['modules'])} additional module(s)")
