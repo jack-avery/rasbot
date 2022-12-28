@@ -168,9 +168,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.message = Message(self.author, msg)
 
         try:
-            # Do per-message methods
-            self.commands.do_on_pubmsg_methods()
-
             # Don't continue if the message doesn't start with the prefix.
             if not msg.startswith(self.prefix):
                 return
@@ -180,6 +177,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             cmd = split[0][len(self.prefix):].lower()
             args = split[1:]
             self.message.attach_command(cmd, args)
+
+            # Do per-message methods
+            self.commands.do_on_pubmsg_methods()
 
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
