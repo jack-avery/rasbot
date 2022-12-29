@@ -194,7 +194,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 # Run the command and string result message
                 self.logger.info(
                     f"Running command call '{cmd}' from {name} ({self.author.user_status()}) (args:{self.message.args})")
-                cmdresult = self.commands.commands[cmd].run()
+                cmdresult = self.commands.commands[cmd].run(self.message)
 
                 # If there is a string result message, print it to chat
                 if cmdresult and not NO_MESSAGE_SIGNAL in cmdresult:
@@ -244,7 +244,27 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def write_config(self):
         """Write this bots' config file. For easy use within modules.
         """
-        config.write_channel(self)
+        self.log_debug(f"writing config to {self.cfgpath}")
+
+        # Construct skeleton
+        data = {
+            'meta': {
+                'prefix': self.prefix
+            },
+            'commands': {},
+            'modules': self.always_import_list,
+        }
+
+        # Adding commands
+        for name, command in self.commands.commands.items():
+            data['commands'][name] = {
+                'cooldown': command.cooldown,
+                'requires_mod': command.requires_mod,
+                'hidden': command.hidden,
+                'response': command.response,
+            }
+
+        config.write(self.cfgpath, data)
 
 
 @click.command()
@@ -304,7 +324,7 @@ def main(channel=None, auth=None, cfg=None, debug=False):
                     sys.exit(1)
 
     if not cfg:
-        cfg = f"config/{channel_id}.txt"
+        cfg = f"{channel_id}/config.txt"
 
     # Start the bot
     try:

@@ -24,6 +24,6 @@ class Module(BaseModule):
         if newprefix.startswith('/'):
             return f'Prefix cannot start with Twitch reserved character /.'
 
-        self.bot.prefix = newprefix
-        self.bot.write_config()
+        self._bot.prefix = newprefix
+        self._bot.write_config()
         return f'Prefix updated to {newprefix}.'

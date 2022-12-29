@@ -13,7 +13,7 @@ class Module(BaseModule):
         args = self.get_args()
 
         if not args:
-            return self.bot.author.name
+            return self._bot.author.name
 
         user = args[0]
         if user[0] == "@":

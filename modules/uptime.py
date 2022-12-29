@@ -14,11 +14,11 @@ class Module(BaseModule):
         # TODO understand what I was doing when I wrote this and document it better...
 
         r = requests.get(
-            f"https://api.twitch.tv/helix/streams?user_id={self.bot.channel_id}", headers=self.bot.auth.get_headers()).json()
+            f"https://api.twitch.tv/helix/streams?user_id={self._bot.channel_id}", headers=self._bot.auth.get_headers()).json()
         try:
             time_start = r['data'][0]['started_at']
         except IndexError:
-            return f'{self.bot.channel_name} is not currently live.'
+            return f'{self._bot.channel_name} is not currently live.'
 
         time_start = datetime.datetime.strptime(
             f'{time_start[:-1]}', "%Y-%m-%dT%H:%M:%S")

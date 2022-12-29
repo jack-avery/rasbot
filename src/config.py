@@ -1,6 +1,9 @@
 import json
 import os
 
+BASE_CONFIG_PATH = "userdata"
+GLOBAL_CONFIG_FILE = "rasbot.txt"
+
 DEFAULT_CHANNEL = {
     "meta": {
         "prefix": "r!"
@@ -43,20 +46,33 @@ DEFAULT_CHANNEL = {
 
 DEFAULT_GLOBAL = {
     "always_debug": False,
-    "default_authfile": "config/auth.txt",
+    "default_authfile": "auth.txt",
     "release_branch": "main",
-    "channels": [],
 }
+
+
+def verify_folder_exists(path: str):
+    """Create `path` if it does not exist."""
+    folder_list = path.split("/")
+    folders = []
+    for i, name in enumerate(folder_list):
+        # assume file and end of path reached, break
+        if '.' in name:
+            break
+
+        folder = f"{'/'.join(folder_list[:i+1])}"
+        folders.append(folder)
+
+    # Verify config folder exists
+    for folder in folders:
+        if not os.path.exists(folder):
+            os.mkdir(folder)
 
 
 def read_global() -> dict:
     """Reads the global config file.
     """
-    # verify config folder exists
-    if not os.path.exists("config"):
-        os.mkdir("config")
-
-    return read("config/rasbot.txt", DEFAULT_GLOBAL)
+    return read(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
 
 
 def read_channel(path: str) -> dict:
@@ -69,16 +85,19 @@ def read_channel(path: str) -> dict:
 
 def read(path: str, default: dict) -> dict:
     """Read a file and return the contained json.
+    Creates containing folders if they don't exist.
 
     :param cfg: The path to the file.
     :param default: Default to write to file if the path does not exist.
     :return: The resulting config
     """
+    path = f"{BASE_CONFIG_PATH}/{path}"
+    verify_folder_exists(path)
+
     # Attempt to read config
     try:
         with open(path, 'r') as cfgfile:
-            config = json.loads(cfgfile.read())
-            return config
+            return json.loads(cfgfile.read())
 
     # If the json fails to load...
     except json.decoder.JSONDecodeError as err:
@@ -94,42 +113,16 @@ def read(path: str, default: dict) -> dict:
             return write(path, default)
 
 
-def write_channel(bot):
-    """Generates then writes the config file for the given TwitchBot.
-
-    :param bot: The TwitchBot to write the config for.
-    """
-    bot.log_debug("config", f"writing {bot.cfgpath}")
-
-    # Append prefix to lines
-    data = {
-        'meta': {
-            'prefix': bot.prefix
-        },
-        'commands': {},
-        'modules': bot.always_import_list,
-    }
-
-    # Adding commands
-    for name, command in bot.commands.commands.items():
-        data['commands'][name] = {
-            'cooldown': command.cooldown,
-            'requires_mod': command.requires_mod,
-            'hidden': command.hidden,
-            'response': command.response,
-        }
-
-    # Writing config
-    write(bot.cfgpath, data)
-
-
 def write(path: str, cfg: dict):
     """Write `cfg` to `path` and return `cfg`.
 
     :param path: The path to write to
     :param cfg: The `dict` object to convert to json and write
     """
-    with open(path, 'w') as file:
-        file.write(json.dumps(cfg, indent=4))
+    path = f"{BASE_CONFIG_PATH}/{path}"
+    verify_folder_exists(path)
+
+    with open(path, 'w') as cfgfile:
+        cfgfile.write(json.dumps(cfg, indent=4, skipkeys=True))
 
     return cfg

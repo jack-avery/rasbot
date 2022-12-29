@@ -8,4 +8,4 @@ class Module(BaseModule):
     helpmsg = "Returns the display name of the last messages' author."
 
     def main(self):
-        return self.bot.author.name
+        return self._bot.author.name

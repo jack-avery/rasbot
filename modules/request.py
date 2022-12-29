@@ -240,10 +240,10 @@ class Module(BaseModule):
             return
 
         # do not parse again if using a command
-        if self.bot.message.cmd:
+        if self._bot.message.cmd:
             return
 
-        words = self.bot.message.text_raw.split(' ')
+        words = self._bot.message.text_raw.split(' ')
         for i, word in enumerate(words):
             if "osu.ppy.sh" in word:
                 args = words[i:]
@@ -255,15 +255,15 @@ class Module(BaseModule):
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
         # prevent normal users from requesting in submode
-        if self.cfg_get('submode') and not (self.bot.author.mod or self.bot.author.sub or self.bot.author.vip):
+        if self.cfg_get('submode') and not (self._bot.author.mod or self._bot.author.sub or self._bot.author.vip):
             return NO_MESSAGE_SIGNAL
 
         # exit early if user requested within cooldown
-        if self.bot.author.uid in self.author_cds:
-            time_passed = time.time() - self.author_cds[self.bot.author.uid]
+        if self._bot.author.uid in self.author_cds:
+            time_passed = time.time() - self.author_cds[self._bot.author.uid]
             if time_passed < self.cooldown:
                 self.log_d(
-                    f"user {self.bot.author.name} requested while still on cd; ignoring")
+                    f"user {self._bot.author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
@@ -274,7 +274,7 @@ class Module(BaseModule):
         req = args[0].lower()
 
         # allow mods to toggle submode
-        if req == 'submode' and self.bot.author.mod:
+        if req == 'submode' and self._bot.author.mod:
             t = not self.cfg_get('submode')
             self.cfg_set('submode', t)
             if t:
@@ -329,12 +329,12 @@ class Module(BaseModule):
 
         # add request mods to map dict and format the message
         map['mods'] = mods
-        map['sender'] = self.bot.author
+        map['sender'] = self._bot.author
         message = self.format_message(map)
 
         # send message, set cooldown and inform requester
         self.send_osu_message(message)
-        self.author_cds[self.bot.author.uid] = time.time()
+        self.author_cds[self._bot.author.uid] = time.time()
 
         return False
 

@@ -36,7 +36,7 @@ class Module(BaseModule):
         BaseModule.__init__(self, bot, name)
 
         # resolve path
-        self.db_path = f"modules/xp_store/{self.bot.channel_id}.db"
+        self.db_path = f"modules/xp_store/{self._bot.channel_id}.db"
 
         # init the sqlite3 connection
         try:
@@ -74,7 +74,7 @@ class Module(BaseModule):
 
         # TODO replace this if the API ever becomes outdated
         users = requests.get(
-            f"https://tmi.twitch.tv/group/user/{self.bot.channel_name}/chatters", headers=self.bot.auth.get_headers()).json()
+            f"https://tmi.twitch.tv/group/user/{self._bot.channel_name}/chatters", headers=self._bot.auth.get_headers()).json()
 
         # Prevent streamer from earning watchtime XP on their own stream
         users['chatters'].pop('broadcaster')
@@ -279,7 +279,7 @@ class Module(BaseModule):
         args = self.get_args_lower()
 
         if not args:
-            arg = self.bot.author.name.lower()
+            arg = self._bot.author.name.lower()
         else:
             arg = args.pop(0)
 
@@ -298,7 +298,7 @@ class Module(BaseModule):
 
         # XP moderation tools
         if arg == "mod":
-            if not self.bot.author.mod:
+            if not self._bot.author.mod:
                 return "You must be a moderator to do that."
 
             return self.mod_user(args)
@@ -311,5 +311,5 @@ class Module(BaseModule):
 
     def on_pubmsg(self):
         # Add this user to the active users list.
-        if not self.bot.author.name in self.active_users:
-            self.active_users.append(self.bot.author.name.lower())
+        if not self._bot.author.name in self.active_users:
+            self.active_users.append(self._bot.author.name.lower())

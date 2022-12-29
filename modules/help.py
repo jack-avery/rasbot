@@ -21,10 +21,10 @@ class Module(BaseModule):
         if not args:
             # list of all commands (not hidden, not mod-only)
             user_commands_list = ', '.join(
-                [n for n, c in self.bot.commands.commands.items() if not c.hidden and not c.requires_mod])
+                [n for n, c in self._bot.commands.commands.items() if not c.hidden and not c.requires_mod])
             # list of all commands (not hidden, mod-only)
             mod_commands_list = ', '.join(
-                [n for n, c in self.bot.commands.commands.items() if not c.hidden and c.requires_mod])
+                [n for n, c in self._bot.commands.commands.items() if not c.hidden and c.requires_mod])
 
             return f"Available commands are: {user_commands_list} (mod-only: {mod_commands_list})"
 
@@ -33,15 +33,15 @@ class Module(BaseModule):
             name = args[0]
 
             # if the name resolves to a module, give the module's helpmsg
-            if name in self.bot.commands.modules:
-                return str(self.bot.commands.modules[name].help())
+            if name in self._bot.commands.modules:
+                return str(self._bot.commands.modules[name].help())
 
             # if not a module and resolves to a command...
-            elif name in self.bot.commands.commands:
+            elif name in self._bot.commands.commands:
 
                 # see if it mentions any modules
                 command_modules = self.module_re.findall(
-                    self.bot.commands.commands[name].response)
+                    self._bot.commands.commands[name].response)
 
                 # if it does, give the modules it mentions
                 if command_modules:

@@ -1,8 +1,7 @@
-import json
 import requests
-import sys
 
 from src.definitions import AuthenticationDeniedError
+from src.config import read, write
 
 
 class Authentication:
@@ -25,32 +24,12 @@ class Authentication:
 
         Assigns the read values to this `Authentication` objects' `auth` field.
         """
-        # Attempting to read the auth file
-        auth = False
-        try:
-            with open(self.file, 'r') as authfile:
-                auth = json.loads(authfile.read())
-
-        # If not found, do nothing. Assume set-up
-        except FileNotFoundError:
-            self.auth = {}
-            return
-
-            # Verify the auth has everything it needs...
-        if [k for k in auth.keys()] != ['user_id', 'client_id', 'client_secret', 'irc_oauth', 'oauth']:
-            print("Your authfile is missing crucial elements.")
-            print("You may need to re-run setup.py.")
-            input("rasbot cannot continue, exiting.")
-            sys.exit(1)
-
-        self.auth = auth
+        self.auth = read(self.file, {})
 
     def write_authfile(self):
         """Writes `self.auth` to `self.file`.
         """
-        # Writing the auth file
-        with open(self.file, 'w') as authfile:
-            authfile.write(json.dumps(self.auth, indent=4))
+        write(self.file, self.auth)
 
     def get(self, key: str) -> str:
         """Return the item with the given `key`.

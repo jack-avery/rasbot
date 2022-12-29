@@ -3,6 +3,7 @@
 
 # auth & global/private config
 /config
+/userdata
 
 # xp storage dbs
 /modules/xp_store

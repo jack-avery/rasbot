@@ -105,7 +105,7 @@ class Message:
 
         # return false if no arguments remain or not consuming anything
         if not remaining or amount == 0:
-            return False
+            return None
 
         # consume all if negative
         if amount < 0:

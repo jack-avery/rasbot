@@ -6,7 +6,9 @@ import threading
 import time
 
 from bot import TwitchBot
-from src.definitions import VALID_COMMAND_REGEX,\
+from src.config import BASE_CONFIG_PATH, read, write
+from src.definitions import Message,\
+    VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
     CommandDoesNotExistError,\
     CommandGivenInvalidNameError,\
@@ -51,7 +53,7 @@ class Command:
 
         self._last_used = 0
 
-    def run(self):
+    def run(self, message: Message):
         """Code to be run when this command is called from chat.
 
         Runs all && codes found in the command and returns the result.
@@ -59,12 +61,12 @@ class Command:
         # Make sure the command is not on cooldown before doing anything
         if not time.time()-self._last_used > self.cooldown:
             raise CommandStillOnCooldownError(
-                f"Command {self.name} called by {bot.author.name} while still on cooldown")
+                f"Command {self.name} called by {message.author.name} while still on cooldown")
 
         # Do not allow non-moderators to use mod-only commands
-        if not bot.author.mod and self.requires_mod:
+        if not message.author.mod and self.requires_mod:
             raise CommandIsModOnlyError(
-                f"Mod-only command {self.name} called by non-mod {bot.author.name}")
+                f"Mod-only command {self.name} called by non-mod {message.author.name}")
 
         # Apply any methods encased in &&
         returned_response = self.response
@@ -72,7 +74,7 @@ class Command:
             try:
                 returned_response = returned_response.replace(
                     f'&{m}&',
-                    str(modules[m].main())
+                    str(modules[m].main(message))
                 )
             except KeyError:
                 raise KeyError(
@@ -154,20 +156,16 @@ class BaseModule(threading.Thread):
         it will drop the given default into the user's config directory.
         """
         threading.Thread.__init__(self)
-        self.bot = bot
+        self._bot = bot
         self._name = name
 
-        self._cfg_path = f"modules/config/{self.bot.channel_id}/{name}.txt"
+        self._cfg_path = f"{self._bot.channel_id}/modules/{name}.txt"
 
         # If no config found and a default is provided, create it
-        if not os.path.exists(self._cfg_path):
-            if self.default_config:
-                with open(self._cfg_path, 'w') as cfg:
-                    cfg.write(json.dumps(self.default_config, indent=4))
-                    self._cfg = self.default_config
+        if self.default_config:
+            if not os.path.exists(f"{BASE_CONFIG_PATH}/{self._cfg_path}"):
+                self._cfg = write(self._cfg_path, self.default_config)
 
-        # If config found, load it
-        else:
             self.reload_config()
 
     def __del__(self):
@@ -180,14 +178,12 @@ class BaseModule(threading.Thread):
     def reload_config(self):
         """Completely reload this module's config from file.
         """
-        with open(self._cfg_path, 'r') as cfg:
-            self._cfg = json.loads(cfg.read())
+        self._cfg = read(self._cfg_path, self.default_config)
 
     def save_config(self):
         """Save the current form of this module's `self.cfg` attribute to file.
         """
-        with open(self._cfg_path, 'w') as cfg:
-            cfg.write(json.dumps(self._cfg, indent=4))
+        write(self._cfg_path, self._cfg)
 
     def cfg_get(self, key: str):
         """Read the given config dict key. If it fails to read it will fill it in with the default.
@@ -212,7 +208,7 @@ class BaseModule(threading.Thread):
         self._cfg[key] = value
         self.save_config()
 
-    def main(self):
+    def main(self, message: Message):
         """Code to be run for the modules' && code.
 
         :return: The message to replace the message module mention with.
@@ -238,30 +234,29 @@ class BaseModule(threading.Thread):
 
         :param msg: The error to log.
         """
-        self.bot.log_error(f"module {self._name}", msg)
+        self._bot.log_error(f"module {self._name}", msg)
 
     def log_i(self, msg: str):
         """Log info alongside the module's name to the window.
 
         :param msg: The message to log.
         """
-        self.bot.log_info(f"module {self._name}", msg)
+        self._bot.log_info(f"module {self._name}", msg)
 
     def log_d(self, msg: str):
         """Log a debug message alongside the module's name to the window.
 
         :param msg: The debug info to log.
         """
-        self.bot.log_debug(f"module {self._name}", msg)
+        self._bot.log_debug(f"module {self._name}", msg)
 
     def get_args(self) -> list:
         """Consume `self.consumes` arguments for use as command arguments.
 
-        :return: A list of every argument consumed, or False if there's nothing to consume.
+        :return: A list of every argument consumed, as `str`, or `None` if there's nothing to consume.
         """
         self.log_d(f"consuming {self.consumes} argument(s)")
-
-        return self.bot.message.consume(self.consumes)
+        return self.message.consume(self.consumes)
 
     def get_args_lower(self) -> list:
         """Consume `self.consumes` arguments for use as command arguments.
@@ -325,13 +320,6 @@ def pass_bot_ref(ref: TwitchBot):
     """
     global bot
     bot = ref
-
-    # Persistent config loading: create base folder.
-    if not os.path.exists("modules/config"):
-        os.mkdir("modules/config")
-
-    if not os.path.exists(f"modules/config/{bot.channel_id}"):
-        os.mkdir(f"modules/config/{bot.channel_id}")
 
 
 commands = dict()

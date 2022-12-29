@@ -11,7 +11,7 @@ class Module(BaseModule):
 
     def main(self):
         # only the channel owner can run admin commands
-        if not self.bot.author.host:
+        if not self._bot.author.host:
             return NO_MESSAGE_SIGNAL
 
         args = self.get_args_lower()
@@ -21,25 +21,25 @@ class Module(BaseModule):
 
         match args[0]:
             case "import":
-                self.bot.commands.module_add(args[1])
+                self._bot.commands.module_add(args[1])
                 return f"imported {args[1]}"
 
             case "unimport":
-                self.bot.commands.module_del(args[1])
+                self._bot.commands.module_del(args[1])
                 return f"unimported {args[1]}"
 
             case "alwaysimportadd":
-                if args[1] in self.bot.always_import_list:
+                if args[1] in self._bot.always_import_list:
                     return "already present"
 
-                self.bot.always_import_list.append(args[1])
-                self.bot.write_config()
+                self._bot.always_import_list.append(args[1])
+                self._bot.write_config()
                 return f"{args[1]} added to always import list (will need restart to take effect)"
 
             case "alwaysimportdel":
-                if args[1] not in self.bot.always_import_list:
+                if args[1] not in self._bot.always_import_list:
                     return "not present"
 
-                self.bot.always_import_list.remove(args[1])
-                self.bot.write_config()
+                self._bot.always_import_list.remove(args[1])
+                self._bot.write_config()
                 return f"{args[1]} removed from always import list (will need restart to take effect)"

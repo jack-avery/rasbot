@@ -58,12 +58,12 @@ class Module(BaseModule):
 
         try:
             # add command and write config
-            self.bot.commands.command_modify(cmd_name,
-                                             cmd_cooldown,
-                                             " ".join(cmd),
-                                             params[self.MODONLY_ARG],
-                                             params[self.HIDDEN_ARG])
-            self.bot.write_config()
+            self._bot.commands.command_modify(cmd_name,
+                                              cmd_cooldown,
+                                              " ".join(cmd),
+                                              params[self.MODONLY_ARG],
+                                              params[self.HIDDEN_ARG])
+            self._bot.write_config()
 
             return f'Command {cmd_name} added successfully.'
 
