@@ -1,15 +1,8 @@
 # ide
 .vscode
 
-# auth & global/private config
-/config
+# user data
 /userdata
-
-# xp storage dbs
-/modules/xp_store
-
-# modules configuration
-/modules/config
 
 # compiler generated
 *.spec
