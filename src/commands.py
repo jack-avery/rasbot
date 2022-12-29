@@ -222,7 +222,7 @@ class BaseModule(threading.Thread):
         """
         return self.helpmsg
 
-    def on_pubmsg(self):
+    def on_pubmsg(self, message: Message):
         """Code to be run for every message received.
 
         By default, does nothing.
@@ -250,20 +250,20 @@ class BaseModule(threading.Thread):
         """
         self._bot.log_debug(f"module {self._name}", msg)
 
-    def get_args(self) -> list:
-        """Consume `self.consumes` arguments for use as command arguments.
+    def get_args(self, message: Message) -> list:
+        """Consume `self.consumes` arguments from `message` for use as command arguments.
 
         :return: A list of every argument consumed, as `str`, or `None` if there's nothing to consume.
         """
         self.log_d(f"consuming {self.consumes} argument(s)")
-        return self.message.consume(self.consumes)
+        return message.consume(self.consumes)
 
-    def get_args_lower(self) -> list:
-        """Consume `self.consumes` arguments for use as command arguments.
+    def get_args_lower(self, message: Message) -> list:
+        """Consume `self.consumes` arguments from `message` for use as command arguments.
 
         :return: A list of every argument consumed (in lowercase), or False if there's nothing to consume.
         """
-        args = self.get_args()
+        args = self.get_args(message)
 
         if args:
             return [a.lower() for a in args]
@@ -308,11 +308,13 @@ def module_del(name: str):
     del (modules[name])
 
 
-def do_on_pubmsg_methods():
+def do_on_pubmsg_methods(message: Message):
     """Runs the on_pubmsg() of every Module imported.
+
+    :param message: The message this is acting on.
     """
     for module in modules.values():
-        module.on_pubmsg()
+        module.on_pubmsg(message)
 
 
 def pass_bot_ref(ref: TwitchBot):

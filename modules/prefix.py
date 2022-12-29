@@ -2,6 +2,7 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
+from src.definitions import Message
 
 
 class Module(BaseModule):
@@ -13,8 +14,8 @@ class Module(BaseModule):
 
     consumes = 1
 
-    def main(self):
-        args = self.get_args_lower()
+    def main(self, message: Message):
+        args = self.get_args_lower(message)
 
         if not args:
             newprefix = self.cfg_get('default')

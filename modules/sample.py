@@ -8,6 +8,7 @@
 # e.g. "r!cmdadd sample &sample&"
 
 from src.commands import BaseModule
+from src.definitions import Message
 
 
 class Module(BaseModule):
@@ -30,21 +31,21 @@ class Module(BaseModule):
         self.count = 0
 
     # This runs if the module is part of a command which gets called.
-    def main(self):
+    def main(self, message: Message):
         # Use self.cfg_get(key) to get items from the module config.
         last_time = self.cfg_get('savedmessage')
 
-        # Use self.get_args() to consume the designated amount of arguments and continue.
-        args = self.get_args()
+        # Use self.get_args(message) to consume the designated amount of arguments and continue.
+        args = self.get_args(message)
 
         # You can save things using self.cfg_set(key, value):
         self.cfg_set('savedmessage', ' '.join(args))
 
         # You can get the author's name, UID, and mod status like so!
-        return (f"@{self._bot.author.name} ({self._bot.author.uid}, mod: {self._bot.author.mod}), "
+        return (f"@{message.author.name} ({message.author.uid}, mod: {message.author.mod}), "
                 + f"{self.count} messages have been sent so far, "
                 + f"and last time you also said '{last_time}'.")
 
     # This runs on all messages regardless of whether the command is called.
-    def on_pubmsg(self):
+    def on_pubmsg(self, message: Message):
         self.count += 1

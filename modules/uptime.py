@@ -10,7 +10,7 @@ import time
 class Module(BaseModule):
     helpmsg = 'Returns the current stream uptime. Usage: uptime'
 
-    def main(self):
+    def main(self, message):
         # TODO understand what I was doing when I wrote this and document it better...
 
         r = requests.get(

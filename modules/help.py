@@ -4,7 +4,8 @@
 import re
 
 from src.commands import BaseModule
-from src.definitions import MODULE_MENTION_REGEX
+from src.definitions import Message,\
+    MODULE_MENTION_REGEX
 
 MODULE_RE = re.compile(MODULE_MENTION_REGEX)
 
@@ -14,8 +15,8 @@ class Module(BaseModule):
 
     consumes = 1
 
-    def main(self):
-        args = self.get_args_lower()
+    def main(self, message: Message):
+        args = self.get_args_lower(message)
 
         # If no command is provided, just run the base help message.
         if not args:

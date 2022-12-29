@@ -11,7 +11,10 @@ from threading import Thread
 import time
 
 from src.commands import BaseModule
-from src.definitions import MODULE_MENTION_REGEX, NO_MESSAGE_SIGNAL
+from src.definitions import Author,\
+    Message,\
+    MODULE_MENTION_REGEX,\
+    NO_MESSAGE_SIGNAL
 
 OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
@@ -225,45 +228,45 @@ class Module(BaseModule):
 
         return message
 
-    def main(self):
-        args = self.get_args()
+    def main(self, message: Message):
+        args = self.get_args(message)
 
-        fail_msg = self.process_request(args)
+        fail_msg = self.process_request(message.author, args)
 
         if fail_msg:
             return fail_msg
 
         return "Request sent!"
 
-    def on_pubmsg(self):
+    def on_pubmsg(self, message: Message):
         if not self.cfg_get('parse_all_messages'):
             return
 
         # do not parse again if using a command
-        if self._bot.message.cmd:
+        if message.cmd:
             return
 
-        words = self._bot.message.text_raw.split(' ')
+        words = message.text_raw.split(' ')
         for i, word in enumerate(words):
             if "osu.ppy.sh" in word:
                 args = words[i:]
-                self.process_request(args)
+                self.process_request(message.author, args)
 
-    def process_request(self, args):
+    def process_request(self, author: Author, args):
         # do not continue if either username or target failed to resolve
         if not self.username or not self.target:
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
         # prevent normal users from requesting in submode
-        if self.cfg_get('submode') and not (self._bot.author.mod or self._bot.author.sub or self._bot.author.vip):
+        if self.cfg_get('submode') and not (author.mod or author.sub or author.vip):
             return NO_MESSAGE_SIGNAL
 
         # exit early if user requested within cooldown
-        if self._bot.author.uid in self.author_cds:
-            time_passed = time.time() - self.author_cds[self._bot.author.uid]
+        if author.uid in self.author_cds:
+            time_passed = time.time() - self.author_cds[author.uid]
             if time_passed < self.cooldown:
                 self.log_d(
-                    f"user {self._bot.author.name} requested while still on cd; ignoring")
+                    f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
@@ -274,7 +277,7 @@ class Module(BaseModule):
         req = args[0].lower()
 
         # allow mods to toggle submode
-        if req == 'submode' and self._bot.author.mod:
+        if req == 'submode' and author.mod:
             t = not self.cfg_get('submode')
             self.cfg_set('submode', t)
             if t:
@@ -329,12 +332,12 @@ class Module(BaseModule):
 
         # add request mods to map dict and format the message
         map['mods'] = mods
-        map['sender'] = self._bot.author
+        map['sender'] = author
         message = self.format_message(map)
 
         # send message, set cooldown and inform requester
         self.send_osu_message(message)
-        self.author_cds[self._bot.author.uid] = time.time()
+        self.author_cds[author.uid] = time.time()
 
         return False
 

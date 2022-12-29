@@ -162,16 +162,16 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             ishost = True
 
         # Create author object
-        self.author = Author(name, uid, ismod, issub, isvip, ishost)
+        author = Author(name, uid, ismod, issub, isvip, ishost)
 
         # Create message object
         msg = e.arguments[0]
-        self.message = Message(self.author, msg)
+        message = Message(author, msg)
 
         try:
             # Don't continue if the message doesn't start with the prefix.
             if not msg.startswith(self.prefix):
-                self.commands.do_on_pubmsg_methods()
+                self.commands.do_on_pubmsg_methods(message)
                 return
 
             split = msg.split(' ')
@@ -179,22 +179,22 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # Isolating command and command arguments
             cmd = split[0][len(self.prefix):].lower()
             args = split[1:]
-            self.message.attach_command(cmd, args)
+            message.attach_command(cmd, args)
 
             # Do per-message methods
-            self.commands.do_on_pubmsg_methods()
+            self.commands.do_on_pubmsg_methods(message)
 
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
                 self.logger.debug(
-                    f"Ignoring invalid command call '{cmd}' from {name} ({self.author.user_status()})")
+                    f"Ignoring invalid command call '{cmd}' from {name} ({author.user_status()})")
                 return
 
             try:
                 # Run the command and string result message
                 self.logger.info(
-                    f"Running command call '{cmd}' from {name} ({self.author.user_status()}) (args:{self.message.args})")
-                cmdresult = self.commands.commands[cmd].run(self.message)
+                    f"Running command call '{cmd}' from {name} ({author.user_status()}) (args:{message.args})")
+                cmdresult = self.commands.commands[cmd].run(message)
 
                 # If there is a string result message, print it to chat
                 if cmdresult and not NO_MESSAGE_SIGNAL in cmdresult:

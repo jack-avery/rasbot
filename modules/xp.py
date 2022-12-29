@@ -4,6 +4,7 @@
 
 from src.commands import BaseModule
 from src.config import BASE_CONFIG_PATH
+from src.definitions import Message
 
 import os
 import random
@@ -143,10 +144,14 @@ class Module(BaseModule):
                     return pos + 1
 
                 if rank:
-                    if rank > len(all) or rank < 1:
+                    if rank > len(all):
                         raise ValueError
 
-                    user = all[rank - 1]
+                    # to allow negative indices, show last place, etc.
+                    if rank > 0:
+                        rank -= 1
+
+                    user = all[rank]
                     return self.get_user(user)
 
             except ValueError:
@@ -174,7 +179,7 @@ class Module(BaseModule):
             if not xp:
                 return False
 
-            xp = 0
+            xp = xp[0]
 
         return (user, pos, xp)
 
@@ -277,11 +282,11 @@ class Module(BaseModule):
             db.commit()
         return msg
 
-    def main(self):
-        args = self.get_args_lower()
+    def main(self, message: Message):
+        args = self.get_args_lower(message)
 
         if not args:
-            arg = self._bot.author.name.lower()
+            arg = message.author.name.lower()
         else:
             arg = args.pop(0)
 
@@ -299,7 +304,7 @@ class Module(BaseModule):
 
         # XP moderation tools
         if arg == "mod":
-            if not self._bot.author.mod:
+            if not message.author.mod:
                 return "You must be a moderator to do that."
 
             return self.mod_user(args)
@@ -310,7 +315,7 @@ class Module(BaseModule):
         else:
             return f"{arg} has no tracked XP."
 
-    def on_pubmsg(self):
+    def on_pubmsg(self, message: Message):
         # Add this user to the active users list.
-        if not self._bot.author.name in self.active_users:
-            self.active_users.append(self._bot.author.name.lower())
+        if not message.author.name in self.active_users:
+            self.active_users.append(message.author.name.lower())

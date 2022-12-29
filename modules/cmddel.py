@@ -2,7 +2,8 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
-from src.definitions import CommandDoesNotExistError
+from src.definitions import Message,\
+    CommandDoesNotExistError
 
 
 class Module(BaseModule):
@@ -10,18 +11,15 @@ class Module(BaseModule):
 
     consumes = 1
 
-    def main(self):
-        args = self.get_args_lower()
+    def main(self, message: Message):
+        cmd = self.get_args_lower(message)
 
-        if not args:
+        if not cmd:
             return "No command provided."
-
-        # convert argument to lower
-        cmd = args[0]
 
         try:
             # try to delete and write config
-            self._bot.commands.command_del(cmd)
+            self._bot.commands.command_del(cmd[0])
             self._bot.write_config()
 
             return f'Command {cmd} removed successfully.'

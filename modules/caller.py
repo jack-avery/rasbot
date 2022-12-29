@@ -2,10 +2,11 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
+from src.definitions import Message
 
 
 class Module(BaseModule):
     helpmsg = "Returns the display name of the last messages' author."
 
-    def main(self):
-        return self._bot.author.name
+    def main(self, message: Message):
+        return message.author.name

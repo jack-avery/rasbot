@@ -31,7 +31,7 @@ Your module must have a `Module` class that extends `commands.BaseModule`.<br/>
 The code that replaces `&sample&` in the response goes in a method called `main`.<br/>
 You can find the `TwitchBot` instance as `self.bot`.<br/>
 
-If your module intends to use arguments, get them by setting the `consume` static variable and calling `self.get_args()`.<br/>
+If your module intends to use arguments, get them by setting the `consume` static variable and calling `self.get_args(message)`.<br/>
 *This helps bunch up arguments together, allowing multiple modules in the same command to interact predictably.*
 
 Your module can have a help message, stored in the `helpmsg` static variable.<br/>

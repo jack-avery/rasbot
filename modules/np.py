@@ -16,7 +16,7 @@ class Module(BaseModule):
     }
     """Path to osu!StreamCompanion NP info file."""
 
-    def main(self):
+    def main(self, message):
         try:
             with open(self.cfg_get('path'), 'r') as file:
                 return f'{file.readlines()[0]}'

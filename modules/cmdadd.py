@@ -2,7 +2,8 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
-from src.definitions import VALID_COMMAND_REGEX,\
+from src.definitions import Message,\
+    VALID_COMMAND_REGEX,\
     CommandGivenInvalidNameError,\
     CommandMustHavePositiveCooldownError
 
@@ -28,8 +29,8 @@ class Module(BaseModule):
         self.HIDDEN_ARG = self.cfg_get('hidden_arg')
         self.DEFAULT_COOLDOWN = self.cfg_get('default_cooldown')
 
-    def main(self):
-        cmd = self.get_args()
+    def main(self, message: Message):
+        cmd = self.get_args(message)
 
         if not cmd:
             return "No command information given."

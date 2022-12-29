@@ -2,19 +2,20 @@
 # This will likely grow as more cases for admin commands are needed.
 
 from src.commands import BaseModule
-from src.definitions import NO_MESSAGE_SIGNAL
+from src.definitions import Message,\
+    NO_MESSAGE_SIGNAL
 
 
 class Module(BaseModule):
 
     consumes = -1
 
-    def main(self):
+    def main(self, message: Message):
         # only the channel owner can run admin commands
-        if not self._bot.author.host:
+        if not message.author.host:
             return NO_MESSAGE_SIGNAL
 
-        args = self.get_args_lower()
+        args = self.get_args_lower(message)
 
         if not args:
             return NO_MESSAGE_SIGNAL
