@@ -3,6 +3,8 @@
 # "Levels" may be implemented eventually, but assume it will be left as-is.
 
 from src.commands import BaseModule
+from src.config import BASE_CONFIG_PATH
+
 import os
 import random
 import requests
@@ -36,7 +38,7 @@ class Module(BaseModule):
         BaseModule.__init__(self, bot, name)
 
         # resolve path
-        self.db_path = f"modules/xp_store/{self._bot.channel_id}.db"
+        self.db_path = f"{BASE_CONFIG_PATH}/{self._bot.channel_id}/modules/xp.db"
 
         # init the sqlite3 connection
         try:
@@ -290,7 +292,6 @@ class Module(BaseModule):
             if args:
                 try:
                     rank = int(args.pop(0))
-                    print(rank)
                 except ValueError:
                     return "Give a valid integer for rank."
 
