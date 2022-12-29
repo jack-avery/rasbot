@@ -115,7 +115,7 @@ class Module(BaseModule):
         """
         with self.db as db:
             if rank:
-                user = self.get_rank(rank=rank)
+                user = self.get_user(rank=rank)
                 if user:
                     return f"{user[0]} is #{user[1]} with {user[2]} XP."
                 else:
@@ -128,22 +128,30 @@ class Module(BaseModule):
 
             return " | ".join([f"{r[0]}: {r[1]}" for r in res])
 
-    def get_rank(self, user: str = None, rank: int = None):
-        self.log_d(f"retrieving rank for {user} or rank #{rank}")
+    def get_user(self, user: str = None, rank: int = None):
+        """Return the user, position, and XP.
+
+        :param user: The name of the user
+        :param rank: The rank of the user
+        :return: A list containing [`name`, `rank`, `xp`]
+        """
+        self.log_d(f"retrieving user:{user} or rank:{rank}")
 
         with self.db as db:
             cs = db.cursor()
 
             # Getting their position
-            all = tuple(map(lambda x: x[0], cs.execute(
-                'SELECT user FROM xp ORDER BY amt DESC').fetchall()))
+            all = tuple(map(lambda x: x, cs.execute(
+                'SELECT user, amt FROM xp ORDER BY amt DESC').fetchall()))
             try:
-
                 if user:
-                    pos = all.index(user)
-                    return pos + 1
+                    if user.startswith("@"):
+                        user = user[1:]
 
-                if rank:
+                    all_names = [i[0] for i in all]
+                    rank = all_names.index(user)
+
+                else:
                     if rank > len(all):
                         raise ValueError
 
@@ -151,37 +159,12 @@ class Module(BaseModule):
                     if rank > 0:
                         rank -= 1
 
-                    user = all[rank]
-                    return self.get_user(user)
+                user = all[rank]
+                return (user[0], rank + 1, user[1])
 
             except ValueError:
                 # If finding their index in the sorted list fails assume they don't exist.
                 return False
-
-    def get_user(self, user: str = None):
-        """Return the user, position, and XP.
-
-        :param user: The name of the user
-        """
-        # Strip @ from mention
-        if user.startswith("@"):
-            user = user[1:]
-
-        self.log_d(f"retrieving XP for {user}")
-        with self.db as db:
-            cs = db.cursor()
-
-            pos = self.get_rank(user)
-
-            cs.execute(f"SELECT amt FROM xp WHERE user = \"{user}\"")
-            xp = cs.fetchone()
-
-            if not xp:
-                return False
-
-            xp = xp[0]
-
-        return (user, pos, xp)
 
     def mod_user(self, args):
         """Perform an action on a user.
@@ -224,10 +207,10 @@ class Module(BaseModule):
                     return "Please provide a user to transfer the first user's points to, and how many."
 
                 # resolve users and amounts
-                src = self.get_user(user)
+                src = self.get_user(user=user)
                 if not src:
                     return f"User {user} has no tracked XP."
-                tar = self.get_user(target)
+                tar = self.get_user(user=target)
                 if not tar:
                     if target.startswith("@"):
                         target = target[1:]
@@ -309,7 +292,7 @@ class Module(BaseModule):
 
             return self.mod_user(args)
 
-        user = self.get_user(arg)
+        user = self.get_user(user=arg)
         if user:
             return f"{user[0]} is #{user[1]} with {user[2]} XP."
         else:
