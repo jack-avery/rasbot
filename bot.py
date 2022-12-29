@@ -244,7 +244,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def write_config(self):
         """Write this bots' config file. For easy use within modules.
         """
-        self.log_debug(f"writing config to {self.cfgpath}")
+        self.logger.debug(f"writing config to {self.cfgpath}")
 
         # Construct skeleton
         data = {

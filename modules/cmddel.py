@@ -22,7 +22,7 @@ class Module(BaseModule):
             self._bot.commands.command_del(cmd[0])
             self._bot.write_config()
 
-            return f'Command {cmd} removed successfully.'
+            return f'Command {cmd[0]} removed successfully.'
 
         except CommandDoesNotExistError:
-            return f'Command {cmd} does not exist.'
+            return f'Command {cmd[0]} does not exist.'

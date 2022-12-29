@@ -91,7 +91,8 @@ def read(path: str, default: dict) -> dict:
     :param default: Default to write to file if the path does not exist.
     :return: The resulting config
     """
-    path = f"{BASE_CONFIG_PATH}/{path}"
+    if not path.startswith(BASE_CONFIG_PATH):
+        path = f"{BASE_CONFIG_PATH}/{path}"
     verify_folder_exists(path)
 
     # Attempt to read config
@@ -109,7 +110,7 @@ def read(path: str, default: dict) -> dict:
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
-        with open(path, 'w') as cfgfile:
+        if default:
             return write(path, default)
 
 
@@ -119,7 +120,8 @@ def write(path: str, cfg: dict):
     :param path: The path to write to
     :param cfg: The `dict` object to convert to json and write
     """
-    path = f"{BASE_CONFIG_PATH}/{path}"
+    if not path.startswith(BASE_CONFIG_PATH):
+        path = f"{BASE_CONFIG_PATH}/{path}"
     verify_folder_exists(path)
 
     with open(path, 'w') as cfgfile:

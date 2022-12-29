@@ -161,12 +161,7 @@ class BaseModule(threading.Thread):
 
         self._cfg_path = f"{self._bot.channel_id}/modules/{name}.txt"
 
-        # If no config found and a default is provided, create it
-        if self.default_config:
-            if not os.path.exists(f"{BASE_CONFIG_PATH}/{self._cfg_path}"):
-                self._cfg = write(self._cfg_path, self.default_config)
-
-            self.reload_config()
+        self.reload_config()
 
     def __del__(self):
         """Destroy this module. Does nothing by default.
