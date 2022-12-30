@@ -75,7 +75,10 @@ class Module(BaseModule):
             return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
 
         except ModuleNotFoundError as mod:
-            return f'Module {mod} does not exist.'
+            return f'Module {mod} does not exist in the modules folder..'
+
+        except AttributeError as mod:
+            return f'Module {mod} does not have a "Module" class to import.'
 
         except IndexError:
             return 'Command is missing required information.'

@@ -1,5 +1,8 @@
 import json
+import logging
 import os
+
+logger = logging.getLogger("rasbot")
 
 BASE_CONFIG_PATH = "userdata"
 GLOBAL_CONFIG_FILE = "rasbot.txt"
@@ -72,6 +75,7 @@ def verify_folder_exists(path: str):
     # Verify config folder exists
     for folder in folders:
         if not os.path.exists(folder):
+            logger.debug(f"creating non-existent searched folder {folder}")
             os.mkdir(folder)
 
 
@@ -104,19 +108,21 @@ def read(path: str, default: dict) -> dict:
     # Attempt to read config
     try:
         with open(path, 'r') as cfgfile:
+            logger.debug(f"reading {path}")
             return json.loads(cfgfile.read())
 
     # If the json fails to load...
     except json.decoder.JSONDecodeError as err:
-        print(f"\nFailed to read config file at path {path}:")
-        print(f"{err.msg} (line {err.lineno}, column {err.colno})\n")
-        print("The file likely has a formatting error somewhere.")
-        input("Find and fix the error, then re-launch rasbot.")
+        logger.error(f"\nFailed to read config file at path {path}:")
+        logger.error(f"{err.msg} (line {err.lineno}, column {err.colno})\n")
+        logger.error("The file likely has a formatting error somewhere.")
+        logger.error("Find and fix the error, then re-launch rasbot.")
 
     # If no config file is found, write the default,
     # and return a basic config dict.
     except FileNotFoundError:
         if default:
+            logger.debug(f"{path} not found, writing default;")
             return write(path, default)
 
 
@@ -131,6 +137,7 @@ def write(path: str, cfg: dict):
     verify_folder_exists(path)
 
     with open(path, 'w') as cfgfile:
+        logger.debug(f"writing {path}")
         cfgfile.write(json.dumps(cfg, indent=4, skipkeys=True))
 
     return cfg

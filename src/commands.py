@@ -288,8 +288,12 @@ def module_add(name: str):
         # Give it its' own thread and start it up
         modules[name] = module.Module(bot, name)
         modules[name].start()
+
     except FileNotFoundError:
-        raise ModuleNotFoundError(f"{name} does not exist in modules folder")
+        raise ModuleNotFoundError(name)
+
+    except AttributeError:
+        raise AttributeError(name)
 
 
 def module_del(name: str):
