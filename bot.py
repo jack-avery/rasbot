@@ -69,7 +69,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             if not os.path.exists("logs"):
                 os.mkdir("logs")
             file_handler = logging.FileHandler(
-                f"logs/{time.asctime().replace(':','_')}.log")
+                f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log")
             file_handler.setLevel(loglevel)
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
