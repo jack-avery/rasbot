@@ -39,6 +39,12 @@ DEFAULT_CHANNEL = {
             "hidden": False,
             "response": "@&caller& > &prefix&"
         },
+        "admin": {
+            "cooldown": 0,
+            "requires_mod": True,
+            "hidden": True,
+            "response": "&admin&"
+        },
     },
     "modules": []
 }
