@@ -1,5 +1,4 @@
 import click
-
 import irc.bot
 import logging
 import os

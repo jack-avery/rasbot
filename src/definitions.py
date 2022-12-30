@@ -5,19 +5,14 @@
 class Author:
     name = str
     """The display name of the author."""
-
     uid = str
     """The ID of the author."""
-
     mod = bool
     """Whether the author is a moderator."""
-
     sub = bool
     """Whether the author is a subscriber."""
-
     vip = bool
     """Whether the author is a VIP."""
-
     host = bool
     """Whether the author is the channel owner."""
 
@@ -62,16 +57,13 @@ class Author:
 class Message:
     author: Author
     """The `Author` object of the message."""
-
     text_raw: str
     """The raw text of the message."""
-
     cmd: str
     """The command used, if applicable, in this message."""
-
     args: list
-    """The list of arguments in the message.
-    Do not modify this directly!! Use `Message.consume()` to get arguments in modules.
+    """The list of arguments in the message.\n
+    ### Do not modify this directly!! Use `Module.get_args(message)` to get arguments in modules.
     """
 
     def __init__(self, author: Author, text_raw: str = ''):

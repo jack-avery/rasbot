@@ -24,16 +24,12 @@ logger = logging.getLogger("rasbot")
 class Command:
     name: str
     """The name of the command."""
-
     cooldown: int
     """The cooldown for this command in seconds."""
-
     response: str
     """The base, unformatted response for this command."""
-
     requires_mod: bool
     """Whether this command requires moderator privileges to execute."""
-
     hidden: bool
     """Whether this command is hidden from the `help` module."""
 
