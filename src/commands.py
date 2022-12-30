@@ -1,12 +1,11 @@
 import importlib.util
-import json
-import os
+import logging
 import re
 import threading
 import time
 
 from bot import TwitchBot
-from src.config import BASE_CONFIG_PATH, read, write
+from src.config import read, write
 from src.definitions import Message,\
     VALID_COMMAND_REGEX,\
     MODULE_MENTION_REGEX,\
@@ -18,6 +17,8 @@ from src.definitions import Message,\
 
 COMMAND_VALIDATE_RE = re.compile(VALID_COMMAND_REGEX)
 MODULE_MENTION_RE = re.compile(MODULE_MENTION_REGEX)
+
+logger = logging.getLogger("rasbot")
 
 
 class Command:
@@ -85,6 +86,13 @@ class Command:
 
         return returned_response
 
+    def get_used_modules(self) -> list:
+        """Get the list of modules that are mentioned in `self.response`.
+
+        :return: The list of modules used.
+        """
+        return MODULE_MENTION_RE.findall(self.response)
+
 
 def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
     '''Create a new command (or modifies an existing one).
@@ -96,8 +104,8 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
     :param requires_mod: Whether this command requires moderator access to use.
     :param hidden: Whether to hide this command from the `help` module.
     '''
-    bot.log_debug("commands",
-                  f'adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
+    logger.debug(
+        f'adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
 
     # Command cannot have a negative cooldown
     if cooldown < 0:
@@ -110,8 +118,8 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
             f"command provided invalid name {name}")
 
     if not response:
-        bot.log_error("commands",
-                      f"command {name} might have imported incorrectly: empty response?")
+        logger.error(
+            f"command {name} might have imported incorrectly: empty response?")
 
     # Resolve any modules the command mentions and import new ones
     for m in MODULE_MENTION_RE.findall(response):
@@ -131,7 +139,7 @@ def command_del(name: str):
     """
     try:
         del (commands[name])
-        bot.log_debug("commands", f'removing {name}')
+        logger.debug(f'removing {name}')
     except KeyError:
         raise CommandDoesNotExistError(f'command {name} does not exist')
 
@@ -229,28 +237,27 @@ class BaseModule(threading.Thread):
 
         :param msg: The error to log.
         """
-        self._bot.log_error(f"module {self._name}", msg)
+        logger.error(f"({self._name}) - {msg}")
 
     def log_i(self, msg: str):
         """Log info alongside the module's name to the window.
 
         :param msg: The message to log.
         """
-        self._bot.log_info(f"module {self._name}", msg)
+        logger.info(f"({self._name}) - {msg}")
 
     def log_d(self, msg: str):
         """Log a debug message alongside the module's name to the window.
 
         :param msg: The debug info to log.
         """
-        self._bot.log_debug(f"module {self._name}", msg)
+        logger.debug(f"({self._name}) - {msg}")
 
     def get_args(self, message: Message) -> list:
         """Consume `self.consumes` arguments from `message` for use as command arguments.
 
         :return: A list of every argument consumed, as `str`, or `None` if there's nothing to consume.
         """
-        self.log_d(f"consuming {self.consumes} argument(s)")
         return message.consume(self.consumes)
 
     def get_args_lower(self, message: Message) -> list:
@@ -271,7 +278,7 @@ def module_add(name: str):
 
     :param name: The name of the module. File must be visible in the modules folder.
     """
-    bot.log_debug("commands", f"importing module {name}")
+    logger.debug(f"importing module {name}")
 
     try:
         # Create spec and import from directory.
@@ -294,7 +301,7 @@ def module_del(name: str):
 
     :param name: The name of the module.
     """
-    bot.log_debug("commands", f"unimporting module {name}")
+    logger.debug(f"unimporting module {name}")
 
     if name not in modules:
         return
@@ -313,7 +320,7 @@ def do_on_pubmsg_methods(message: Message):
 
 
 def pass_bot_ref(ref: TwitchBot):
-    """Set up this instance of commands
+    """Pass the bot reference so that modules can have a reference to it
     """
     global bot
     bot = ref
@@ -326,4 +333,4 @@ modules = dict()
 """All currently imported modules."""
 
 bot: TwitchBot
-"""The TwitchBot. For logging activity."""
+"""The TwitchBot to pass to modules"""

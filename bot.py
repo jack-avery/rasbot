@@ -2,12 +2,13 @@ import click
 
 import irc.bot
 import logging
+import os
 import requests
 import sys
 import time
 import traceback
 
-import update
+from update import check
 
 import src.commands as commands
 import src.config as config
@@ -53,22 +54,32 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         :param cfgpath: The path of the cfg file to use.
         :param debug: Whether logging should be `DEBUG` level.
         """
+
         # Set up logging
+        self.logger = logging.getLogger("rasbot")
+        formatter = logging.Formatter(
+            "%(asctime)s %(levelname)s %(module)s | %(message)s")
+
+        loglevel = logging.INFO
         if debug:
+            loglevel = logging.DEBUG
+
             debug_init_time = time.perf_counter()
-            logmode = logging.DEBUG
-        else:
-            logmode = logging.INFO
 
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logmode)
+            if not os.path.exists("logs"):
+                os.mkdir("logs")
+            file_handler = logging.FileHandler(
+                f"logs/{time.asctime().replace(':','_')}.log")
+            file_handler.setLevel(loglevel)
+            file_handler.setFormatter(formatter)
+            self.logger.addHandler(file_handler)
 
-        stdout_formatter = logging.Formatter(
-            "%(asctime)s %(levelname)s | %(message)s")
         stdout_handler = logging.StreamHandler(sys.stdout)
-        stdout_handler.setLevel(logmode)
-        stdout_handler.setFormatter(stdout_formatter)
+        stdout_handler.setLevel(loglevel)
+        stdout_handler.setFormatter(formatter)
         self.logger.addHandler(stdout_handler)
+
+        self.logger.setLevel(loglevel)
 
         # Initialize authentication
         self.auth = auth
@@ -287,7 +298,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 )
 def main(channel=None, auth=None, cfg=None, debug=False):
     # Check for updates first!
-    update.check(True)
+    check(silent=True)
 
     cfg_global = config.read_global()
 

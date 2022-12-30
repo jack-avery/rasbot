@@ -4,6 +4,9 @@
 # user data
 /userdata
 
+# debug logs
+/logs
+
 # compiler generated
 *.spec
 /build

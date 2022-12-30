@@ -1,13 +1,8 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-import re
-
 from src.commands import BaseModule
-from src.definitions import Message,\
-    MODULE_MENTION_REGEX
-
-MODULE_RE = re.compile(MODULE_MENTION_REGEX)
+from src.definitions import Message
 
 
 class Module(BaseModule):
@@ -35,14 +30,14 @@ class Module(BaseModule):
 
             # if the name resolves to a module, give the module's helpmsg
             if name in self._bot.commands.modules:
-                return str(self._bot.commands.modules[name].help())
+                return self._bot.commands.modules[name].help()
 
             # if not a module and resolves to a command...
             elif name in self._bot.commands.commands:
 
                 # see if it mentions any modules
-                command_modules = self.module_re.findall(
-                    self._bot.commands.commands[name].response)
+                command_modules = self._bot.commands.commands[name].get_used_modules(
+                )
 
                 # if it does, give the modules it mentions
                 if command_modules:
