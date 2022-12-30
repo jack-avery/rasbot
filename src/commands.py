@@ -67,15 +67,15 @@ class Command:
 
         # Apply any methods encased in &&
         returned_response = self.response
-        for m in MODULE_MENTION_RE.findall(returned_response):
+        for mention, module in MODULE_MENTION_RE.findall(returned_response):
             try:
                 returned_response = returned_response.replace(
-                    f'&{m}&',
-                    str(modules[m].main(message))
+                    mention,
+                    str(modules[module].main(message))
                 )
             except KeyError:
                 raise KeyError(
-                    f'Command {self.name} calls unimported/nonexistent module {m}')
+                    f'Command {self.name} calls unimported/nonexistent module {module}')
 
         # Update the last usage time and return the response
         self._last_used = time.time()
@@ -87,7 +87,7 @@ class Command:
 
         :return: The list of modules used.
         """
-        return MODULE_MENTION_RE.findall(self.response)
+        return [m[1] for m in MODULE_MENTION_RE.findall(self.response)]
 
 
 def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
@@ -118,10 +118,10 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
             f"command {name} might have imported incorrectly: empty response?")
 
     # Resolve any modules the command mentions and import new ones
-    for m in MODULE_MENTION_RE.findall(response):
+    for _, module in MODULE_MENTION_RE.findall(response):
         try:
-            if m not in modules:
-                module_add(m)
+            if module not in modules:
+                module_add(module)
         except ModuleNotFoundError as err:
             raise err
 

@@ -1,14 +1,23 @@
 <div align="center">
 
-# Module Configs
-
+# Using Modules
 </div>
 
-Modules that use a config store it under `modules/config/[your Twitch ID]`. By default, the only configs in here will be for `cmdadd` and `prefix`.
+To use modules, all you need to do is drop the module -- named similar to `something.py` -- into this folder and then mention it in a command.
 
-It's recommended you look at the module (it will have the same name in `modules`, just with the `.py` suffix) in your text editor of choice to see a better description of each option before changing anything.
+You can mention modules in commands by surrounding the name of it in **ampersands**: `&module&`
+> e.g. `r!cmdadd help &help&` would create a command using the `help` module.
 
-Some modules require configuration before they can work, e.g. the `request` module which requires you to grant it some credentials for interfacing with the osu! API and IRC.
+<div align="center">
+
+# Module Configs
+</div>
+
+Some modules use a config to store parameters on how they should work. Modules that use a config store it under `userdata/[your Twitch ID]/modules`. By default, the only configs in here will be for `cmdadd` and `prefix`.
+
+It's recommended you look at the module (it will have the same name in `modules`, just with the `.py` suffix, or given **Type** "Python File" by Windows) in your text editor of choice to see a better description of each option before changing anything.
+
+Some modules require configuration before they can work, e.g. the `request` module which requires you to grant it some credentials for interfacing with the osu! API.
 
 > Modules only create their default config when first imported, so you'll have to create a command with it first to create the file.
 
@@ -17,7 +26,6 @@ Some modules require configuration before they can work, e.g. the `request` modu
 <div align="center">
 
 # Creating your own custom module
-
 </div>
 
 *For advanced users, a sample module showing most things with comments is available as `sample.py`.*
@@ -42,4 +50,4 @@ Otherwise, you're free to add whatever you want to the module, as long as you kn
 
 ### **Be very careful as this can be abused!**<br/>
 
-![firefox_p0K7PPEJBs](https://user-images.githubusercontent.com/47289484/193102564-6245c687-6e25-4f90-a1a8-37d6d2fb91da.png)
+![image](https://user-images.githubusercontent.com/47289484/193102564-6245c687-6e25-4f90-a1a8-37d6d2fb91da.png)

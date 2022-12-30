@@ -216,15 +216,15 @@ class Module(BaseModule):
         """
         message = self.cfg_get('message_format')
 
-        for m in MESSAGE_OPT_RE.findall(message):
+        for flag, option in MESSAGE_OPT_RE.findall(message):
             try:
                 message = message.replace(
-                    f'&{m}&',
-                    str(MESSAGE_OPTIONS[m](map))
+                    flag,
+                    str(MESSAGE_OPTIONS[option](map))
                 )
             except KeyError:
                 self.log_e(
-                    f"config error: message_format uses invalid key '{m}'")
+                    f"config error: message_format uses invalid key '{option}'")
 
         return message
 
