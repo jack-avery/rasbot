@@ -35,6 +35,9 @@ class Module(BaseModule):
         if not cmd:
             return "No command information given."
 
+        if len(cmd) < 2:
+            return "Not enough parameters! You must pass at least a name and a response."
+
         # use lower of next item as name
         cmd_name = cmd.pop(0).lower()
 

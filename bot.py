@@ -118,8 +118,12 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import commands from config
         for name, command in cfg["commands"].items():
-            self.commands.command_modify(
-                name, command['cooldown'], command['response'], command['requires_mod'], command['hidden'])
+            try:
+                self.commands.command_modify(
+                    name, command['cooldown'], command['response'], command['requires_mod'], command['hidden'])
+            except ModuleNotFoundError as mod:
+                logger.error(
+                    f"command '{name}' attempts to use non-existent module '{mod}': ignoring...")
 
         logger.info(f"Imported {len(cfg['commands'])} command(s)")
 
@@ -127,8 +131,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.always_import_list = cfg['modules']
         if cfg["modules"]:
             for module in cfg["modules"]:
-                if module not in self.commands.modules:
+                if module in self.commands.modules:
+                    continue
+
+                try:
                     self.commands.module_add(module)
+                except ModuleNotFoundError as mod:
+                    logger.error(
+                        f"always_import_list ('modules' in config) contains non-existent module '{mod}'")
 
             logger.info(
                 f"Imported {len(cfg['modules'])} additional module(s)")
