@@ -26,5 +26,5 @@ class Module(BaseModule):
             return f'Prefix cannot start with Twitch reserved character /.'
 
         self._bot.prefix = newprefix
-        self._bot.write_config()
+        self._bot.save()
         return f'Prefix updated to {newprefix}.'

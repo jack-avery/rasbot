@@ -34,13 +34,21 @@ class Module(BaseModule):
                     return "already present"
 
                 self._bot.always_import_list.append(args[1])
-                self._bot.write_config()
-                return f"{args[1]} added to always import list (will need restart to take effect)"
+                self._bot.save()
+                return f"{args[1]} added to always import list (restart or use 'admin reload' to take effect)"
 
             case "alwaysimportdel":
                 if args[1] not in self._bot.always_import_list:
                     return "not present"
 
                 self._bot.always_import_list.remove(args[1])
-                self._bot.write_config()
-                return f"{args[1]} removed from always import list (will need restart to take effect)"
+                self._bot.save()
+                return f"{args[1]} removed from always import list (restart or use 'admin reload' to take effect)"
+
+            case "save":
+                self._bot.save()
+                return "saved current config"
+
+            case "reload":
+                self._bot.reload()
+                return "reloaded"

@@ -64,7 +64,7 @@ class Module(BaseModule):
                                               " ".join(cmd),
                                               params[self.MODONLY_ARG],
                                               params[self.HIDDEN_ARG])
-            self._bot.write_config()
+            self._bot.save()
 
             return f'Command {cmd_name} added successfully.'
 

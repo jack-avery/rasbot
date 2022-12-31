@@ -20,7 +20,7 @@ class Module(BaseModule):
         try:
             # try to delete and write config
             self._bot.commands.command_del(cmd[0])
-            self._bot.write_config()
+            self._bot.save()
 
             return f'Command {cmd[0]} removed successfully.'
 

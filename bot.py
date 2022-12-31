@@ -76,25 +76,41 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         logger.setLevel(loglevel)
 
+        # Grab channels
+        self.channel_name = channel_name
+        self.channel = f"#{channel_name}"
+
         # Initialize authentication
         self.auth = auth
-
-        self.channel_name = channel_name
-
         logger.info(f"Starting as {self.auth.get('user_id')}...")
 
         # Import channel info
         self.channel_id = self.resolve_channel_id(channel_name)
         self.cfgpath = f"{self.channel_id}/config.txt"
-        logger.info(f"Reading config from {self.cfgpath}...")
+        self.reload()
 
+        if debug:
+            logger.debug(
+                f"init stats: {len(self.commands.modules)} modules, "
+                + f"{len(self.commands.commands)} commands, "
+                + f"{round(time.perf_counter()-debug_init_time,2)}s to init")
+
+        # Create IRC bot connection
+        server = 'irc.twitch.tv'
+        port = 80
+        logger.info('Connecting to ' + server +
+                    ' on port ' + str(port) + '...')
+        irc.bot.SingleServerIRCBot.__init__(self, [(
+            server, port, f"oauth:{self.auth.get('irc_oauth')}")], self.auth.get('user_id'), self.auth.get('user_id'))
+
+    def reload(self):
+        """Reload the config for the current channel.
+        """
+        logger.info(f"Reading config from {self.cfgpath}...")
         cfg = config.read_channel(self.cfgpath)
 
         self.prefix = cfg['meta']['prefix']
         logger.info(f"Prefix set as '{self.prefix}'")
-
-        # Set channel name
-        self.channel = f"#{channel_name}"
 
         # Instantiate commands module
         self.commands = commands
@@ -117,19 +133,28 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             logger.info(
                 f"Imported {len(cfg['modules'])} additional module(s)")
 
-        if debug:
-            logger.debug(
-                f"init stats: {len(self.commands.modules)} modules, "
-                + f"{len(self.commands.commands)} commands, "
-                + f"{round(time.perf_counter()-debug_init_time,2)}s to init")
+    def save(self):
+        """Write this bots' config file. For easy use within modules.
+        """
+        # Construct skeleton
+        data = {
+            'meta': {
+                'prefix': self.prefix
+            },
+            'commands': {},
+            'modules': self.always_import_list,
+        }
 
-        # Create IRC bot connection
-        server = 'irc.twitch.tv'
-        port = 80
-        logger.info('Connecting to ' + server +
-                    ' on port ' + str(port) + '...')
-        irc.bot.SingleServerIRCBot.__init__(self, [(
-            server, port, f"oauth:{self.auth.get('irc_oauth')}")], self.auth.get('user_id'), self.auth.get('user_id'))
+        # Adding commands
+        for name, command in self.commands.commands.items():
+            data['commands'][name] = {
+                'cooldown': command.cooldown,
+                'requires_mod': command.requires_mod,
+                'hidden': command.hidden,
+                'response': command.response,
+            }
+
+        config.write(self.cfgpath, data)
 
     def resolve_channel_id(self, channel: str) -> int:
         # Resolve ID from channel name
@@ -253,31 +278,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         :param msg: The message to send.
         """
         self.connection.privmsg(self.channel, f'{msg}')
-
-    def write_config(self):
-        """Write this bots' config file. For easy use within modules.
-        """
-        logger.debug(f"writing config to {self.cfgpath}")
-
-        # Construct skeleton
-        data = {
-            'meta': {
-                'prefix': self.prefix
-            },
-            'commands': {},
-            'modules': self.always_import_list,
-        }
-
-        # Adding commands
-        for name, command in self.commands.commands.items():
-            data['commands'][name] = {
-                'cooldown': command.cooldown,
-                'requires_mod': command.requires_mod,
-                'hidden': command.hidden,
-                'response': command.response,
-            }
-
-        config.write(self.cfgpath, data)
 
 
 @click.command()
