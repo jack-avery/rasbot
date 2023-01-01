@@ -8,6 +8,8 @@ To use modules, all you need to do is drop the module -- named similar to `somet
 You can mention modules in commands by surrounding the name of it in **ampersands**: `&module&`
 > e.g. `r!cmdadd help &help&` would create a command using the `help` module.
 
+*You can see a list of additional optional modules [here](https://github.com/jack-avery/rasbot-modules).*
+
 <div align="center">
 
 # Module Configs
