@@ -7,12 +7,13 @@ from src.definitions import Message,\
 
 
 class Module(BaseModule):
+    helpmsg = "Perform an administrative action on the currently running rasbot intance. Usage: admin <command>"
 
     consumes = -1
 
     def main(self, message: Message):
         # only the channel owner can run admin commands
-        if not message.author.host:
+        if not message.author.is_host:
             return NO_MESSAGE_SIGNAL
 
         args = self.get_args_lower(message)

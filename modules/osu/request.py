@@ -258,7 +258,7 @@ class Module(BaseModule):
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
         # prevent normal users from requesting in submode
-        if self.cfg_get('submode') and not (author.mod or author.sub or author.vip):
+        if self.cfg_get('submode') and not (author.is_mod or author.is_sub or author.is_vip):
             return NO_MESSAGE_SIGNAL
 
         # exit early if user requested within cooldown
@@ -277,7 +277,7 @@ class Module(BaseModule):
         req = args[0].lower()
 
         # allow mods to toggle submode
-        if req == 'submode' and author.mod:
+        if req == 'submode' and author.is_mod:
             t = not self.cfg_get('submode')
             self.cfg_set('submode', t)
             if t:

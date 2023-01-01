@@ -45,8 +45,8 @@ BUILTIN_MODULES = [
     'help.py',
     'prefix.py',
     'sample.py',
-    'target.py',
     'uptime.py',
+    'user.py',
     'xp.py',
 
     # osu! modules
@@ -101,6 +101,10 @@ def check(silent=False, force=False, l=False):
 
     if current < latest:
         prompt()
+
+    else:
+        if not silent:
+            input()
 
 
 def get_current_version():

@@ -40,7 +40,7 @@ class Command:
         :param cooldown: The cooldown of the command in seconds.
         :param response: The text response of the command. Encapsulate custom commands in &, e.g. `&module&`.
         :param requires_mod: Whether the command requires the user to be a mod.
-        :param hidden: Whether the command should be hidden from the `help` module..
+        :param hidden: Whether the command should be hidden from the `help` module.
         """
         self.name = name.lower()
         self.cooldown = cooldown
@@ -61,11 +61,11 @@ class Command:
                 f"Command {self.name} called by {message.author.name} while still on cooldown")
 
         # Do not allow non-moderators to use mod-only commands
-        if not message.author.mod and self.requires_mod:
+        if not message.author.is_mod and self.requires_mod:
             raise CommandIsModOnlyError(
                 f"Mod-only command {self.name} called by non-mod {message.author.name}")
 
-        # Apply any methods encased in &&
+        # Apply any modules encased in &&
         returned_response = self.response
         for mention, module in MODULE_MENTION_RE.findall(returned_response):
             try:
@@ -272,7 +272,7 @@ class BaseModule(threading.Thread):
 def module_add(name: str):
     """Imports a new module and appends it to the modules dict.
 
-    :param name: The name of the module. File must be visible in the modules folder.
+    :param name: The path to the module. Path is relative to the `modules` folder.
     """
     logger.debug(f"importing module {name}")
 
@@ -310,8 +310,8 @@ def module_del(name: str):
     del (modules[name])
 
 
-def do_on_pubmsg_methods(message: Message):
-    """Runs the on_pubmsg() of every Module imported.
+def do_on_pubmsg(message: Message):
+    """Runs the on_pubmsg() of every `Module` imported.
 
     :param message: The message this is acting on.
     """

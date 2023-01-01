@@ -16,22 +16,22 @@ class Author:
     host = bool
     """Whether the author is the channel owner."""
 
-    def __init__(self, name: str, uid: str, mod: bool = False, sub: bool = False, vip: bool = False, host: bool = False):
+    def __init__(self, name: str, uid: str, is_mod: bool = False, is_sub: bool = False, is_vip: bool = False, is_host: bool = False):
         """Create a new `Author`.
 
         :param name: The name of the user.
         :param uid: The ID of the user.
-        :param mod: Whether the user is a Moderator of the Twitch chat.
-        :param sub: Whether the user is subscribed to the Twitch channel.
-        :param vip: Whether the user is a VIP of the Twitch channel.
-        :param host: Whether the user is the owner of the Twitch channel.
+        :param is_mod: Whether the user is a Moderator of the Twitch chat.
+        :param is_sub: Whether the user is subscribed to the Twitch channel.
+        :param is_vip: Whether the user is a VIP of the Twitch channel.
+        :param is_host: Whether the user is the owner of the Twitch channel.
         """
         self.name = name
         self.uid = uid
-        self.mod = mod
-        self.sub = sub
-        self.vip = vip
-        self.host = host
+        self.is_mod = is_mod
+        self.is_sub = is_sub
+        self.is_vip = is_vip
+        self.is_host = is_host
 
     def user_status(self) -> str:
         """Returns the highest privilege this user has.
@@ -39,16 +39,16 @@ class Author:
 
         :return: A string representing this users' highest privilege level.
         """
-        if self.host:
+        if self.is_host:
             return "Host"
 
-        if self.mod:
+        if self.is_mod:
             return "Mod"
 
-        if self.vip:
+        if self.is_vip:
             return "VIP"
 
-        if self.sub:
+        if self.is_sub:
             return "Sub"
 
         return "User"
@@ -74,8 +74,8 @@ class Message:
         """
         self.author = author
         self.text_raw = text_raw
-        self.cmd = False
-        self.args = False
+        self.cmd = None
+        self.args = None
 
     def attach_command(self, cmd: str = '', args: list = []):
         """Attach command information to this `Message`.

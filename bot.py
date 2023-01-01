@@ -10,7 +10,7 @@ import traceback
 from update import check
 
 import src.commands as commands
-import src.config as config
+from src.config import write, read_channel, read_global
 from src.authentication import Authentication
 from src.definitions import NO_MESSAGE_SIGNAL,\
     Author,\
@@ -107,7 +107,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         """Reload the config for the current channel.
         """
         logger.info(f"Reading config from {self.cfgpath}...")
-        cfg = config.read_channel(self.cfgpath)
+        cfg = read_channel(self.cfgpath)
 
         self.prefix = cfg['meta']['prefix']
         logger.info(f"Prefix set as '{self.prefix}'")
@@ -164,7 +164,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 'response': command.response,
             }
 
-        config.write(self.cfgpath, data)
+        write(self.cfgpath, data)
 
     def resolve_channel_id(self, channel: str) -> int:
         # Resolve ID from channel name
@@ -243,7 +243,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         try:
             # Don't continue if the message doesn't start with the prefix.
             if not msg.startswith(self.prefix):
-                self.commands.do_on_pubmsg_methods(message)
+                self.commands.do_on_pubmsg(message)
                 return
 
             split = msg.split(' ')
@@ -253,8 +253,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             args = split[1:]
             message.attach_command(cmd, args)
 
-            # Do per-message methods
-            self.commands.do_on_pubmsg_methods(message)
+            self.commands.do_on_pubmsg(message)
 
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
@@ -309,7 +308,7 @@ def main(channel=None, authfile=None, debug=False):
     check(silent=True)
 
     # read global config
-    cfg_global = config.read_global()
+    cfg_global = read_global()
     if cfg_global['always_debug']:
         debug = True
 

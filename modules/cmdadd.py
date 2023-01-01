@@ -9,7 +9,7 @@ from src.definitions import Message,\
 
 
 class Module(BaseModule):
-    helpmsg = 'Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <params?> <response>.'
+    helpmsg = "Adds a new command, or modifies an existing one. Usage: cmdadd <name> <cooldown?> <params?> <response>."
 
     default_config = {
         # The parameters to be given, after cooldown, before response

@@ -16,31 +16,31 @@ DEFAULT_CHANNEL = {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "@&caller& > &help&"
+            "response": "@&user& > &help&"
         },
         "uptime": {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "@&caller& > &uptime&"
+            "response": "@&user& > &uptime&"
         },
         "cmdadd": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@&caller& > &cmdadd&"
+            "response": "@&user& > &cmdadd&"
         },
         "cmddel": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@&caller& > &cmddel&"
+            "response": "@&user& > &cmddel&"
         },
         "prefix": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@&caller& > &prefix&"
+            "response": "@&user& > &prefix&"
         },
         "admin": {
             "cooldown": 0,
@@ -61,7 +61,10 @@ DEFAULT_GLOBAL = {
 
 
 def verify_folder_exists(path: str):
-    """Create `path` if it does not exist."""
+    """Create `path` if it does not exist.
+
+    :param path: The path to verify the entire trace exists for.
+    """
     folder_list = path.split("/")
     folders = []
     for i, name in enumerate(folder_list):
@@ -93,7 +96,7 @@ def read_channel(path: str) -> dict:
     return read(path, DEFAULT_CHANNEL)
 
 
-def read(path: str, default: dict) -> dict:
+def read(path: str, default: dict = None) -> dict:
     """Read a file and return the contained json.
     Creates containing folders if they don't exist.
 

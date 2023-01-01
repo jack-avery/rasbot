@@ -38,7 +38,7 @@ r!cmddel <name>
 
 Valid parameters include:<br/>
 `-modonly`: Set the command to be moderator/broadcaster use only.<br/>
-`-hidden`: Set the command to be hidden from the `help` method.
+`-hidden`: Set the command to be hidden from the `help` command.
 
 # Modules 📦
 rasbot is designed modularly and allows you to add to the base application easily with *"plug-and-play"*-style extensions. You can see some sample modules, **including** built-in functions in the `modules` folder.

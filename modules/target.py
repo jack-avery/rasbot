@@ -17,7 +17,7 @@ class Module(BaseModule):
             return message.author.name
 
         user = args[0]
-        if user[0] == "@":
-            user = user[1:]
+        if user.startswith("@"):
+            return user[1:]
 
         return user

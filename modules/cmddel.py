@@ -7,7 +7,7 @@ from src.definitions import Message,\
 
 
 class Module(BaseModule):
-    helpmsg = 'Deletes an existing command. Usage: cmddel <name>.'
+    helpmsg = "Deletes an existing command. Usage: cmddel <name>."
 
     consumes = 1
 

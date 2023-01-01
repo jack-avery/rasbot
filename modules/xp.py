@@ -21,7 +21,7 @@ class RepeatTimer(threading.Timer):
 
 
 class Module(BaseModule):
-    helpmsg = f"Get how much XP a user has or see the top 3. Usage: xp <username/top>"
+    helpmsg = f"Get how much XP a user has, see the top 3, or get a user at a specific rank. Usage: xp <username?> / xp top <rank?>"
 
     default_config = {
         # Amount of seconds between each grant. Default is 60 (1 minute).
@@ -287,7 +287,7 @@ class Module(BaseModule):
 
         # XP moderation tools
         if arg == "mod":
-            if not message.author.mod:
+            if not message.author.is_mod:
                 return "You must be a moderator to do that."
 
             return self.mod_user(args)

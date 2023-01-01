@@ -6,7 +6,7 @@ from src.definitions import Message
 
 
 class Module(BaseModule):
-    helpmsg = 'Prints all available commands, or, if provided a method, prints the help message for that method. Usage: help <method?>'
+    helpmsg = 'Prints all available commands, or, if provided a module, prints the help message for that module. Usage: help <module?>'
 
     consumes = 1
 

@@ -24,7 +24,7 @@ class Authentication:
 
         Assigns the read values to this `Authentication` objects' `auth` field.
         """
-        self.auth = read(self.file, {})
+        self.auth = read(self.file)
 
     def write_authfile(self):
         """Writes `self.auth` to `self.file`.
