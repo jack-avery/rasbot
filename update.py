@@ -29,14 +29,31 @@ RASBOT_BASE_UPDATER = 'update.py'
 RASBOT_BASE = ['bot.py', 'setup.py']
 """Remaining built-in base files to update after the updater."""
 
-RASBOT_SRC = ['__init__.py', 'authentication.py',
-              'commands.py', 'config.py', 'definitions.py']
+RASBOT_SRC = [
+    'authentication.py',
+    'commands.py',
+    'config.py',
+    'definitions.py'
+]
 """Files inside `./src` to update."""
 
-BUILTIN_MODULES = ['admin.py', 'caller.py', 'cmdadd.py', 'cmddel.py',
-                   'help.py',  'np.py', 'prefix.py', 'request.py',
-                   'sample.py', 'target.py', 'uptime.py', 'xp.py']
-"""Built-in command modules."""
+BUILTIN_MODULES = [
+    'admin.py',
+    'caller.py',
+    'cmdadd.py',
+    'cmddel.py',
+    'help.py',
+    'prefix.py',
+    'sample.py',
+    'target.py',
+    'uptime.py',
+    'xp.py',
+
+    # osu! modules
+    'osu/request.py',
+    'osu/np.py',
+]
+"""Modules to always update alongside rasbot."""
 
 
 @click.command()
@@ -152,7 +169,8 @@ def update_after_updater():
     # Check for new requirements
     do_files('', ['requirements.txt'])
 
-    check_requirements()
+    subprocess.check_call([sys.executable, "-m", "pip",
+                          "install", "-r", "requirements.txt"])
     print("All requirements checked.\n")
 
     # Update README files
@@ -188,11 +206,6 @@ def do_files(path: str, files: list):
         # write the text to file
         with io.open(f"{path}{file}", 'w', encoding="utf8") as local:
             local.write(req.text)
-
-
-def check_requirements():
-    subprocess.check_call([sys.executable, "-m", "pip",
-                          "install", "-r", "requirements.txt"])
 
 
 if __name__ == "__main__":
