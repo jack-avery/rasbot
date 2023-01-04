@@ -82,7 +82,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Initialize authentication
         self.auth = auth
-        logger.info(f"Starting as {self.auth.get('user_id')}...")
+        logger.info(f"Starting as {self.auth.user_id}...")
 
         # Import channel info
         self.channel_id = self.resolve_channel_id(channel_name)
@@ -101,7 +101,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         logger.info('Connecting to ' + server +
                     ' on port ' + str(port) + '...')
         irc.bot.SingleServerIRCBot.__init__(self, [(
-            server, port, f"oauth:{self.auth.get('irc_oauth')}")], self.auth.get('user_id'), self.auth.get('user_id'))
+            server, port, f"oauth:{self.auth.irc_oauth}")], self.auth.user_id, self.auth.user_id)
 
     def reload(self):
         """Reload the config for the current channel.
@@ -315,11 +315,22 @@ def main(channel=None, authfile=None, debug=False):
     # read auth
     if not authfile:
         authfile = cfg_global['default_authfile']
-    auth = Authentication(authfile)
+
+    try:
+        auth = Authentication(authfile)
+    except FileNotFoundError as err:
+        logging.error(f"userdata/{err} not found! Did you run setup?")
+        logging.error("This error is unrecoverable. rasbot will now exit.")
+        sys.exit(1)
+    except KeyError as key:
+        logging.error(
+            f"Error setting '{key}' from authfile. Did you run setup?")
+        logging.error("This error is unrecoverable. rasbot will now exit.")
+        sys.exit(1)
 
     # use self as channel if no channel given
     if not channel:
-        channel = auth.get('user_id')
+        channel = auth.user_id
 
     # start the bot
     try:
