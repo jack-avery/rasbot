@@ -7,6 +7,10 @@
 # debug logs
 /logs
 
+# additional optional modules for rasbot
+# https://github.com/jack-avery/rasbot-modules
+/modules/_additional
+
 # compiler generated
 *.spec
 /build
