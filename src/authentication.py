@@ -3,6 +3,14 @@ import requests
 from src.definitions import AuthenticationDeniedError
 from src.config import read, write
 
+AUTH_SKELETON = {
+    "user_id": None,
+    "client_id": None,
+    "client_secret": None,
+    "irc_oauth": None,
+    "oauth": None,
+}
+
 
 class Authentication:
     file: str

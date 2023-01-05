@@ -111,8 +111,12 @@ def read(path: str, default: dict = None) -> dict:
     # Attempt to read config
     try:
         with open(path, 'r') as cfgfile:
-            logger.debug(f"reading {path}")
-            return json.loads(cfgfile.read())
+            data = json.loads(cfgfile.read())
+
+            if not data:
+                raise FileNotFoundError
+
+            return data
 
     # If the json fails to load...
     except json.decoder.JSONDecodeError as err:
