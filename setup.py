@@ -58,10 +58,10 @@ def main(file: str):
 
     # Adding all the info to the auth
     auth = Authentication(file)
-    auth.auth['user_id'] = user_id
-    auth.auth['client_id'] = client_id
-    auth.auth['client_secret'] = client_secret
-    auth.auth['irc_oauth'] = irc_oauth
+    auth.user_id = user_id
+    auth.client_id = client_id
+    auth.client_secret = client_secret
+    auth.irc_oauth = irc_oauth
 
     # Automatically getting OAuth
     print("\nTrying to automatically set up your OAuth...")
