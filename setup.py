@@ -3,7 +3,6 @@ import sys
 import subprocess
 
 import src.config as config
-from src.definitions import AuthenticationDeniedError
 
 
 def main(file: str):
@@ -23,7 +22,7 @@ def main(file: str):
 
     # Set up
     # Import auth here as it uses requests and will error out otherwise
-    from src.authentication import Authentication
+    from src.authentication import Authentication, AuthenticationDeniedError
 
     # Getting Twitch username
     user_id = input("Your Twitch username: ").lower()

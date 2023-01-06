@@ -1,6 +1,5 @@
 import requests
 
-from src.definitions import AuthenticationDeniedError
 from src.config import read, write
 
 AUTH_SKELETON = {
@@ -84,3 +83,7 @@ class Authentication:
         except KeyError:
             raise AuthenticationDeniedError("got error response status"
                                             + f"{r['status']}, message '{r['message']}'")
+
+
+class AuthenticationDeniedError(Exception):
+    pass

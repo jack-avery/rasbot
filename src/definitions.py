@@ -111,7 +111,3 @@ class Message:
         ret = self.args[:amount]
         self.args = self.args[amount:]
         return ret
-
-
-class AuthenticationDeniedError(Exception):
-    pass
