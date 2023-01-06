@@ -23,7 +23,7 @@ class Module(BaseModule):
             return "No command provided."
         cmd = cmd[0]
 
-        if cmd not in self._bot.commands:
+        if cmd not in self._bot.commands.commands:
             return "Command does not exist."
 
         # to delete and write config
