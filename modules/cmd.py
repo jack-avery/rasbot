@@ -43,7 +43,7 @@ class Module(BaseModule):
         # use lower of next item as acting command name
         cmd_name = cmd.pop(0).lower()
 
-        if action in ['a', "add", "create", "new", "make", "mk"]:
+        if action in ['+', 'a', "add", "create", "new", "make", "mk"]:
             if not cmd:
                 return "Not enough parameters given."
 
@@ -90,7 +90,7 @@ class Module(BaseModule):
             except AttributeError as mod:
                 return f'Module {mod} does not have a "Module" class to import.'
 
-        if action in ['d', "delete", "del", "remove", "rem", "rm"]:
+        if action in ['-', 'd', "delete", "del", "remove", "rem", "rm"]:
             if cmd_name not in self._bot.commands.commands:
                 return f"Command {cmd_name} does not exist!"
 
