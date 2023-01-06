@@ -10,11 +10,9 @@ import re
 from threading import Thread
 import time
 
-from src.commands import BaseModule
+from src.commands import BaseModule, NO_MESSAGE_SIGNAL
 from src.definitions import Author,\
-    Message,\
-    MODULE_MENTION_REGEX,\
-    NO_MESSAGE_SIGNAL
+    Message
 
 OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
@@ -33,7 +31,7 @@ OSU_MODES = ["Standard", "Taiko", "CTB", "Mania"]
 OSU_MODS = ["EZ", "NF", "HT", "HR", "SD", "PF",
             "DT", "NC", "HD", "FL", "RX", "AP", "SO", "V2"]
 
-MESSAGE_OPT_RE = re.compile(MODULE_MENTION_REGEX)
+MESSAGE_OPT_RE = re.compile(r'(&([\/a-z0-9_]+)&)')
 
 MESSAGE_OPTIONS = {
     # web
@@ -168,15 +166,10 @@ class Module(BaseModule):
 
             return name
 
-        except:
-            if isinstance(req, requests.Response):
-                self.log_e(
-                    f"could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code})"
-                )
-            else:
-                self.log_e(
-                    f"something has gone horribly wrong! 'req' is of type {type(req)} - expected requests.Response"
-                )
+        except IndexError:
+            self.log_e(
+                f"could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code})"
+            )
             return None
 
     def generate_mods_string(self, mods: str) -> str:
@@ -217,14 +210,15 @@ class Module(BaseModule):
         message = self.cfg_get('message_format')
 
         for flag, option in MESSAGE_OPT_RE.findall(message):
-            try:
-                message = message.replace(
-                    flag,
-                    str(MESSAGE_OPTIONS[option](map))
-                )
-            except KeyError:
+            if flag not in MESSAGE_OPTIONS:
                 self.log_e(
                     f"config error: message_format uses invalid key '{option}'")
+                continue
+
+            message = message.replace(
+                flag,
+                str(MESSAGE_OPTIONS[option](map))
+            )
 
         return message
 
@@ -327,7 +321,7 @@ class Module(BaseModule):
         try:
             map = req[0]
         except IndexError:
-            self.log_d(f"failed!")
+            self.log_e(f"failed to get info for id/setid {id}")
             return "Could not retrieve beatmap information."
 
         # add request mods to map dict and format the message

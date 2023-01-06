@@ -2,8 +2,7 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
-from src.definitions import Message,\
-    CommandDoesNotExistError
+from src.definitions import Message
 
 
 class Module(BaseModule):
@@ -11,18 +10,24 @@ class Module(BaseModule):
 
     consumes = 1
 
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name)
+
+        self.log_e(
+            "This module will be removed soon! Remove it and add the 'cmd' command instead.")
+
     def main(self, message: Message):
         cmd = self.get_args_lower(message)
 
         if not cmd:
             return "No command provided."
+        cmd = cmd[0]
 
-        try:
-            # try to delete and write config
-            self._bot.commands.command_del(cmd[0])
-            self._bot.save()
+        if cmd not in self._bot.commands:
+            return "Command does not exist."
 
-            return f'Command {cmd[0]} removed successfully.'
+        # to delete and write config
+        self._bot.commands.command_del(cmd)
+        self._bot.save()
 
-        except CommandDoesNotExistError:
-            return f'Command {cmd[0]} does not exist.'
+        return f'Command removed successfully.'

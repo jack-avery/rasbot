@@ -1,11 +1,13 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
+import re
+
 from src.commands import BaseModule
-from src.definitions import Message,\
-    VALID_COMMAND_REGEX,\
-    CommandGivenInvalidNameError,\
-    CommandMustHavePositiveCooldownError
+from src.definitions import Message
+
+VALID_COMMAND_RE = re.compile(r'[a-z0-9_]+')
+"""Regex to compare given command names to for validation."""
 
 
 class Module(BaseModule):
@@ -24,6 +26,9 @@ class Module(BaseModule):
 
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
+
+        self.log_e(
+            "This module will be removed soon! Remove it and add the 'cmd' command instead.")
 
         self.MODONLY_ARG = self.cfg_get('modonly_arg')
         self.HIDDEN_ARG = self.cfg_get('hidden_arg')
@@ -60,22 +65,23 @@ class Module(BaseModule):
                     params[param] = True
                     cmd.pop(0)
 
+        # verify all parameters are valid
+        if not VALID_COMMAND_RE.match(cmd_name):
+            return "Command name can only use alphanumeric characters and underscores (_)."
+
+        if cmd_cooldown < 0:
+            return "Command cooldown must be a positive integer."
+
         try:
             # add command and write config
-            self._bot.commands.command_modify(cmd_name,
-                                              cmd_cooldown,
-                                              " ".join(cmd),
-                                              params[self.MODONLY_ARG],
-                                              params[self.HIDDEN_ARG])
+            self._bot.commands.command_add(cmd_name,
+                                           cmd_cooldown,
+                                           " ".join(cmd),
+                                           params[self.MODONLY_ARG],
+                                           params[self.HIDDEN_ARG])
             self._bot.save()
 
             return f'Command {cmd_name} added successfully.'
-
-        except CommandMustHavePositiveCooldownError:
-            return 'Command must have a positive cooldown.'
-
-        except CommandGivenInvalidNameError:
-            return f'Command name must fit the regular expression {VALID_COMMAND_REGEX}.'
 
         except ModuleNotFoundError as mod:
             return f'Module {mod} does not exist in the modules folder..'

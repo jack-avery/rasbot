@@ -24,17 +24,11 @@ DEFAULT_CHANNEL = {
             "hidden": False,
             "response": "@&user& > &uptime&"
         },
-        "cmdadd": {
+        "cmd": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@&user& > &cmdadd&"
-        },
-        "cmddel": {
-            "cooldown": 0,
-            "requires_mod": True,
-            "hidden": False,
-            "response": "@&user& > &cmddel&"
+            "response": "@&user& > &cmd&"
         },
         "prefix": {
             "cooldown": 0,

@@ -1,9 +1,8 @@
 # This module contains debug commands mostly used for development purposes.
 # This will likely grow as more cases for admin commands are needed.
 
-from src.commands import BaseModule
-from src.definitions import Message,\
-    NO_MESSAGE_SIGNAL
+from src.commands import BaseModule, NO_MESSAGE_SIGNAL
+from src.definitions import Message
 
 
 class Module(BaseModule):

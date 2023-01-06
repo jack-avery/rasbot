@@ -143,43 +143,42 @@ class Module(BaseModule):
             # Getting their position
             all = tuple(map(lambda x: x, cs.execute(
                 'SELECT user, amt FROM xp ORDER BY amt DESC').fetchall()))
-            try:
-                if user:
-                    if user.startswith("@"):
-                        user = user[1:]
+            if user:
+                if user.startswith("@"):
+                    user = user[1:]
 
-                    all_names = [i[0] for i in all]
-                    rank = all_names.index(user)
+                all_names = [i[0] for i in all]
 
-                else:
-                    if rank > len(all):
-                        raise ValueError
+                # Return false if they don't exist.
+                if user not in all_names:
+                    return False
 
-                    # to allow negative indices, show last place, etc.
-                    if rank > 0:
-                        rank -= 1
+                rank = all_names.index(user)
 
-                user = all[rank]
-                return (user[0], rank + 1, user[1])
+            else:
+                if rank > len(all):
+                    raise ValueError
 
-            except ValueError:
-                # If finding their index in the sorted list fails assume they don't exist.
-                return False
+                # to allow negative indices, show last place, etc.
+                if rank > 0:
+                    rank -= 1
+
+            user = all[rank]
+            return (user[0], rank + 1, user[1])
 
     def mod_user(self, args):
         """Perform an action on a user.
         """
+        # TODO: refactor this. it's bad.
+
         actions = ['set', 'transfer', 'ban', 'unban']
         msg = f"Please provide a valid action and a user. Valid actions include: {', '.join(actions)}."
 
-        try:
-            action = args[0]
-            user = args[1]
-
-            if action not in actions:
-                raise IndexError
-        except IndexError:
+        if len(args < 2) or (action not in actions):
             return msg
+
+        action = args[0]
+        user = args[1]
 
         if user.startswith("@"):
             user = user[1:]

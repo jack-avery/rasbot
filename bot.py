@@ -12,11 +12,8 @@ from update import check
 import src.commands as commands
 from src.config import write, read_channel, read_global
 from src.authentication import Authentication
-from src.definitions import NO_MESSAGE_SIGNAL,\
-    Author,\
+from src.definitions import Author,\
     Message,\
-    CommandIsModOnlyError,\
-    CommandStillOnCooldownError,\
     AuthenticationDeniedError
 
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
@@ -119,7 +116,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         # Import commands from config
         for name, command in cfg["commands"].items():
             try:
-                self.commands.command_modify(
+                self.commands.command_add(
                     name, command['cooldown'], command['response'], command['requires_mod'], command['hidden'])
             except ModuleNotFoundError as mod:
                 logger.error(
@@ -261,20 +258,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     f"Ignoring invalid command call '{cmd}' from {name} ({author.user_status()})")
                 return
 
-            try:
-                # Run the command and string result message
-                logger.info(
-                    f"Running command call '{cmd}' from {name} ({author.user_status()}) (args:{message.args})")
-                cmdresult = self.commands.commands[cmd].run(message)
+            # Run the command and string result message
+            logger.info(
+                f"Running command call '{cmd}' from {name} ({author.user_status()}) (args:{message.args})")
+            cmdresult = self.commands.commands[cmd].run(message)
 
-                # If there is a string result message, print it to chat
-                if cmdresult and not NO_MESSAGE_SIGNAL in cmdresult:
-                    self.send_message(f"{cmdresult}")
-
-            # If the command is still on cooldown, do nothing.
-            # If the command is mod-only and a non-mod calls it, do nothing.
-            except (CommandStillOnCooldownError, CommandIsModOnlyError) as err:
-                logger.debug(f"{err}")
+            # If there is a string result message, print it to chat
+            if cmdresult:
+                self.send_message(f"{cmdresult}")
 
         except Exception as err:
             self.send_message(f'An error occurred in the processing of your request: {str(err)}. '
@@ -337,6 +328,8 @@ def main(channel=None, authfile=None, debug=False):
         tb = TwitchBot(auth, channel, debug)
         tb.start()
 
+    # catch ctrl+C and force unimport modules;
+    # speeds up ctrl+C exiting with timed modules
     except KeyboardInterrupt:
         tb.unimport_all_modules()
         sys.exit(0)

@@ -6,19 +6,15 @@ import time
 
 from bot import TwitchBot
 from src.config import read, write
-from src.definitions import Message,\
-    VALID_COMMAND_REGEX,\
-    MODULE_MENTION_REGEX,\
-    CommandDoesNotExistError,\
-    CommandGivenInvalidNameError,\
-    CommandIsModOnlyError,\
-    CommandMustHavePositiveCooldownError,\
-    CommandStillOnCooldownError
-
-COMMAND_VALIDATE_RE = re.compile(VALID_COMMAND_REGEX)
-MODULE_MENTION_RE = re.compile(MODULE_MENTION_REGEX)
+from src.definitions import Message
 
 logger = logging.getLogger("rasbot")
+
+MODULE_MENTION_RE = re.compile(r'(&([\/a-z0-9_]+)&)')
+"""Regex to search command responses with to apply modules."""
+
+NO_MESSAGE_SIGNAL = "&NOMSG&"
+"""Signal for a module to return for there to be no message sent no matter what."""
 
 
 class Command:
@@ -55,31 +51,24 @@ class Command:
 
         Runs all && codes found in the command and returns the result.
         """
-        # Make sure the command is not on cooldown before doing anything
         if not time.time()-self._last_used > self.cooldown:
-            raise CommandStillOnCooldownError(
-                f"Command {self.name} called by {message.author.name} while still on cooldown")
+            return False
 
-        # Do not allow non-moderators to use mod-only commands
         if not message.author.is_mod and self.requires_mod:
-            raise CommandIsModOnlyError(
-                f"Mod-only command {self.name} called by non-mod {message.author.name}")
+            return False
 
-        # Apply any modules encased in &&
+        # Apply the main function for any modules found
         returned_response = self.response
         for mention, module in MODULE_MENTION_RE.findall(returned_response):
-            try:
-                returned_response = returned_response.replace(
-                    mention,
-                    str(modules[module].main(message))
-                )
-            except KeyError:
-                raise KeyError(
-                    f'Command {self.name} calls unimported/nonexistent module {module}')
+            returned_response = returned_response.replace(
+                mention,
+                str(modules[module].main(message))
+            )
 
-        # Update the last usage time and return the response
+        if NO_MESSAGE_SIGNAL in returned_response:
+            return False
+
         self._last_used = time.time()
-
         return returned_response
 
     def get_used_modules(self) -> list:
@@ -90,7 +79,7 @@ class Command:
         return [m[1] for m in MODULE_MENTION_RE.findall(self.response)]
 
 
-def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
+def command_add(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
     '''Create a new command (or modifies an existing one).
     Automatically attempts to import any unimported modules.
 
@@ -103,27 +92,13 @@ def command_modify(name: str, cooldown: int = 5, response: str = '', requires_mo
     logger.debug(
         f'adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
 
-    # Command cannot have a negative cooldown
-    if cooldown < 0:
-        raise CommandMustHavePositiveCooldownError(
-            f"command {name} provided invalid cooldown length {cooldown}")
-
-    # Command must match the regex defined by VALID_COMMAND_REGEX
-    if not COMMAND_VALIDATE_RE.match(name):
-        raise CommandGivenInvalidNameError(
-            f"command provided invalid name {name}")
-
-    if not response:
-        logger.error(
-            f"command {name} might have imported incorrectly: empty response?")
-
     # Resolve any modules the command mentions and import new ones
     for _, module in MODULE_MENTION_RE.findall(response):
-        try:
-            if module not in modules:
+        if module not in modules:
+            try:
                 module_add(module)
-        except ModuleNotFoundError as err:
-            raise err
+            except ModuleNotFoundError as err:
+                raise err
 
     commands[name] = Command(name, cooldown, response, requires_mod, hidden)
 
@@ -133,11 +108,8 @@ def command_del(name: str):
 
     :param name: The name of the command.
     """
-    try:
-        del (commands[name])
-        logger.debug(f'removing {name}')
-    except KeyError:
-        raise CommandDoesNotExistError(f'command {name} does not exist')
+    del (commands[name])
+    logger.debug(f'removing {name}')
 
 
 class BaseModule(threading.Thread):
@@ -145,7 +117,6 @@ class BaseModule(threading.Thread):
 
     Facilitates defaults for a Module so as to prevent errors.
     """
-
     helpmsg = 'No help message available for module.'
     """Help message to display when used with the `help` module."""
 
@@ -189,14 +160,13 @@ class BaseModule(threading.Thread):
 
         :param key: The key to grab the value of
         """
-        try:
-            return self._cfg[key]
-        except KeyError:
+        if key not in self._cfg:
             self.log_e(
                 f"config missing searched key '{key}', saving default '{self.default_config[key]}'")
 
             self.cfg_set(key, self.default_config[key])
-            return self._cfg[key]
+
+        return self._cfg[key]
 
     def cfg_set(self, key: str, value):
         """Set the value of a given config dict key, and save the config.
