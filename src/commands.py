@@ -103,13 +103,37 @@ def command_add(name: str, cooldown: int = 5, response: str = '', requires_mod: 
     commands[name] = Command(name, cooldown, response, requires_mod, hidden)
 
 
+def command_mod(name: str, key: str, value):
+    """Modify `key` for `name`.
+
+    :param name: The name of the command.
+    :param key: The field of the command to modify.
+    :param value: The value to set the field to.
+    """
+    logger.debug(f'modifying {key} of {name} to {value}')
+    if key == "cooldown":
+        commands[name].cooldown = value
+
+    elif key == "response":
+        commands[name].response = value
+
+    elif key == "requires_mod":
+        commands[name].requires_mod = value
+
+    elif key == "hidden":
+        commands[name].hidden = value
+
+    else:
+        raise ValueError(f"{key} is not a valid field to modify")
+
+
 def command_del(name: str):
     """Delete a command if it exists.
 
     :param name: The name of the command.
     """
-    del (commands[name])
     logger.debug(f'removing {name}')
+    del (commands[name])
 
 
 class BaseModule(threading.Thread):
