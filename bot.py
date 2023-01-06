@@ -11,10 +11,9 @@ from update import check
 
 import src.commands as commands
 from src.config import write, read_channel, read_global
-from src.authentication import Authentication
+from src.authentication import Authentication, AuthenticationDeniedError
 from src.definitions import Author,\
-    Message,\
-    AuthenticationDeniedError
+    Message
 
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
 logger = logging.getLogger("rasbot")
