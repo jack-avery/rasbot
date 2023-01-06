@@ -94,8 +94,10 @@ class Module(BaseModule):
             if cmd_name not in self._bot.commands.commands:
                 return f"Command {cmd_name} does not exist!"
 
-            self._bot.commands.command_del(cmd[0])
+            self._bot.commands.command_del(cmd_name)
             self._bot.save()
+
+            return f'Command {cmd_name} removed successfully.'
 
         if action in ['e', "modify", "mod", "edit"]:
             if cmd_name not in self._bot.commands.commands:
