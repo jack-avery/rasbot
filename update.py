@@ -49,8 +49,6 @@ BUILTIN_MODULES = [
     'uptime.py',
     'user.py',
     'xp.py',
-
-    # osu! modules
     'osu/request.py',
     'osu/np.py',
 ]
@@ -202,7 +200,7 @@ def do_files(path: str, files: list):
         req = requests.get(f"{BASE_URL}{path}{file}")
         if req.status_code == 404:
             print("Failed to fetch: ignoring...")
-            return
+            continue
 
         # make the folder if it doesn't exist
         if not path == '':
