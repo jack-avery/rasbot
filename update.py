@@ -40,6 +40,7 @@ RASBOT_SRC = [
 BUILTIN_MODULES = [
     'admin.py',
     'caller.py',
+    'cmd.py',
     'cmdadd.py',
     'cmddel.py',
     'help.py',
@@ -54,6 +55,7 @@ BUILTIN_MODULES = [
     'osu/np.py',
 ]
 """Modules to always update alongside rasbot."""
+# TODO: customization for which to update maybe? idk?
 
 
 @click.command()
