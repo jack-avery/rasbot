@@ -193,9 +193,9 @@ def do_files(path: str, files: list):
 
     :param files: The list of files to update, including extensions.
     """
-    verify_folder_exists(f"{path}{file}")
     for file in files:
         print(f"Updating {path}{file}...")
+        verify_folder_exists(f"{path}{file}")
 
         # if the file doesn't exist don't write anything
         req = requests.get(f"{BASE_URL}{path}{file}")
