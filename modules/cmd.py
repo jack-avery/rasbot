@@ -121,6 +121,18 @@ class Module(BaseModule):
 
                 return f"Cooldown for {cmd_name} set to {value}."
 
+            if key in ["name", "rename"]:
+                new_name = cmd[0].lower()
+
+                if not VALID_COMMAND_RE.match(new_name):
+                    return "Command name can only use alphanumeric characters and underscores (_)."
+
+                self._bot.commands.commands[new_name] = self._bot.commands.commands[cmd_name]
+                self._bot.commands.command_del(cmd_name)
+                self._bot.save()
+
+                return f"Command {cmd_name} renamed to {new_name}."
+
             if key in ["res", "response"]:
                 if not cmd:
                     return "Response cannot be empty."
