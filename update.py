@@ -47,8 +47,6 @@ BUILTIN_MODULES = [
     'uptime.py',
     'user.py',
     'xp.py',
-
-    # osu! modules
     'osu/request.py',
     'osu/np.py',
 ]
@@ -195,12 +193,13 @@ def do_files(path: str, files: list):
     """
     for file in files:
         print(f"Updating {path}{file}...")
+        verify_folder_exists(f"{path}{file}")
 
         # if the file doesn't exist don't write anything
         req = requests.get(f"{BASE_URL}{path}{file}")
         if req.status_code == 404:
             print("Failed to fetch: ignoring...")
-            return
+            continue
 
         # make the folder if it doesn't exist
         if not path == '':
@@ -210,6 +209,27 @@ def do_files(path: str, files: list):
         # write the text to file
         with io.open(f"{path}{file}", 'w', encoding="utf8") as local:
             local.write(req.text)
+
+
+def verify_folder_exists(path: str):
+    """Create `path` if it does not exist.
+
+    :param path: The path to verify the entire trace exists for.
+    """
+    folder_list = path.split("/")
+    folders = []
+    for i, name in enumerate(folder_list):
+        # assume file and end of path reached, break
+        if '.' in name:
+            break
+
+        folder = f"{'/'.join(folder_list[:i+1])}"
+        folders.append(folder)
+
+    # Verify config folder exists
+    for folder in folders:
+        if not os.path.exists(folder):
+            os.mkdir(folder)
 
 
 if __name__ == "__main__":
