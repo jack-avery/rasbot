@@ -1,7 +1,8 @@
 # 'np' code for a Now Playing function. To get this to work:
 # Create an output pattern in osu!StreamCompanion with the info you want (default is for a pattern called np)
-# Replace the path in your module config with the path to the file (below is default, might not need to change it)
-# Create a command using cmdadd with &np& as the response.
+# Replace the path in the config file in `userdata/[id]/modules/osu` with the path to the file
+#   (default value is default path for Windows StreamCompanion, might not need to change it)
+# Create a command using cmd with &np& as the response.
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
 

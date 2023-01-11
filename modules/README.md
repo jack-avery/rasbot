@@ -6,7 +6,7 @@
 To use modules, all you need to do is drop the module -- named similar to `something.py` -- into this folder and then mention it in a command.
 
 You can mention modules in commands by surrounding the name of it in **ampersands**: `&module&`
-> e.g. `r!cmdadd help &help&` would create a command using the `help` module.
+> e.g. `r!cmd add help &help&` would create a command using the `help` module.
 
 *You can see a list of additional optional modules [here](https://github.com/jack-avery/rasbot-modules).*
 
@@ -15,7 +15,7 @@ You can mention modules in commands by surrounding the name of it in **ampersand
 # Module Configs
 </div>
 
-Some modules use a config to store parameters on how they should work. Modules that use a config store it under `userdata/[your Twitch ID]/modules`. By default, the only configs in here will be for `cmdadd` and `prefix`.
+Some modules use a config to store parameters on how they should work. Modules that use a config store it under `userdata/[your Twitch ID]/modules`. By default, the only configs in here will be for `cmd` and `prefix`.
 
 It's recommended you look at the module (it will have the same name in `modules`, just with the `.py` suffix, or given **Type** "Python File" by Windows) in your text editor of choice to see a better description of each option before changing anything.
 
@@ -33,7 +33,7 @@ Some modules require configuration before they can work, e.g. the `request` modu
 *For advanced users, a sample module showing most things with comments is available as `sample.py`.*
 
 Name the file after your module: `sample.py`.<br/>
-You can then reference your module as the response of a command, for example, `r!cmdadd sample &sample&`.
+You can then reference your module as the response of a command, for example, `r!cmd add sample &sample&`.
 
 Your module must have a `Module` class that extends `commands.BaseModule`.<br/>
 > If you're overriding \_\_init__, be sure to call BaseModule.\_\_init__(self, bot, name).

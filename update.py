@@ -41,8 +41,6 @@ BUILTIN_MODULES = [
     'admin.py',
     'caller.py',
     'cmd.py',
-    'cmdadd.py',
-    'cmddel.py',
     'help.py',
     'prefix.py',
     'sample.py',

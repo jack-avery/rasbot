@@ -30,10 +30,10 @@ Joined #raspy_on_osu! (57511738)
 
 ```
 Create/update a command:
-r!cmdadd <name> <cooldown?> <parameters?> <response>
+r!cmd add <name> <cooldown?> <parameters?> <response>
 
 Remove a command:
-r!cmddel <name>
+r!cmd remove <name>
 ```
 
 Valid parameters include:<br/>
@@ -45,7 +45,7 @@ rasbot is designed modularly and allows you to add to the base application easil
 
 To include a module as part of a command, encompass the module name in `&`, e.g.:
 ```
-r!cmdadd np &np&
+r!cmd add np &np&
 ```
 
 *For documentation on configuring modules or creating your own, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*

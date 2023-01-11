@@ -1,6 +1,7 @@
 # 'request' code for osu! requests. To get this to work:
-# Fill out the fields in the config file with the strings found at the websites
-# Create a command using cmdadd with &request& as the response.
+# Fill out the fields in the config file in `userdata/[id]/modules/osu` with the strings found at the websites
+#   ^ Ctrl+F 'default_config' to find the fields
+# Create a command using cmd with &request& as the response.
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
 
