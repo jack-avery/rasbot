@@ -93,7 +93,7 @@ class Module(BaseModule):
     default_config = {
         # Your osu! ID. Go to your profile on the website and this should be in the URL.
         "osu_user_id": "",
-        # Your osu! API key. Get this from https://osu.ppy.sh/p/api.
+        # Your osu! API key. Get this from https://old.ppy.sh/p/api.
         "osu_api_key": "",
         # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
         "osu_irc_pwd": "",
@@ -166,7 +166,7 @@ class Module(BaseModule):
 
             return name
 
-        except IndexError:
+        except (IndexError, KeyError):
             self.log_e(
                 f"could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code})"
             )
@@ -210,7 +210,7 @@ class Module(BaseModule):
         message = self.cfg_get('message_format')
 
         for flag, option in MESSAGE_OPT_RE.findall(message):
-            if flag not in MESSAGE_OPTIONS:
+            if option not in MESSAGE_OPTIONS:
                 self.log_e(
                     f"config error: message_format uses invalid key '{option}'")
                 continue
