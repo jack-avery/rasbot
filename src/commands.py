@@ -10,10 +10,10 @@ from src.definitions import Message
 
 logger = logging.getLogger("rasbot")
 
-MODULE_MENTION_RE = re.compile(r'(&([\/a-z0-9_]+)&)')
+MODULE_MENTION_RE = re.compile(r'(%([\/a-z0-9_]+)%)')
 """Regex to search command responses with to apply modules."""
 
-NO_MESSAGE_SIGNAL = "&NOMSG&"
+NO_MESSAGE_SIGNAL = "%NOMSG%"
 """Signal for a module to return for there to be no message sent no matter what."""
 
 
@@ -34,7 +34,7 @@ class Command:
 
         :param name: The name of the command.
         :param cooldown: The cooldown of the command in seconds.
-        :param response: The text response of the command. Encapsulate custom commands in &, e.g. `&module&`.
+        :param response: The text response of the command. Encapsulate custom commands in %, e.g. `%module%`.
         :param requires_mod: Whether the command requires the user to be a mod.
         :param hidden: Whether the command should be hidden from the `help` module.
         """
@@ -49,7 +49,7 @@ class Command:
     def run(self, message: Message):
         """Code to be run when this command is called from chat.
 
-        Runs all && codes found in the command and returns the result.
+        Runs all %% codes found in the command and returns the result.
         """
         if not time.time()-self._last_used > self.cooldown:
             return False
@@ -85,7 +85,7 @@ def command_add(name: str, cooldown: int = 5, response: str = '', requires_mod: 
 
     :param name: The name of the command.
     :param cooldown: The cooldown of the command in seconds.
-    :param response: The text response of the command. Encapsulate custom commands in &&.
+    :param response: The text response of the command. Encapsulate custom commands in %%.
     :param requires_mod: Whether this command requires moderator access to use.
     :param hidden: Whether to hide this command from the `help` module.
     '''
@@ -202,7 +202,7 @@ class BaseModule(threading.Thread):
         self.save_config()
 
     def main(self, message: Message):
-        """Code to be run for the modules' && code.
+        """Code to be run for the modules' %% code.
 
         :return: The message to replace the message module mention with.
         """

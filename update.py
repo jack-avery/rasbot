@@ -183,6 +183,10 @@ def update_after_updater():
     # Increment version
     do_files('', ['version'])
 
+    # Perform config migrations if they exist
+    print('Attempting to migrate existing configuration to new standard...')
+    attempt_migrate_config()
+
 
 def do_files(path: str, files: list):
     """Update multiple files at once.
@@ -230,6 +234,44 @@ def verify_folder_exists(path: str):
     for folder in folders:
         if not os.path.exists(folder):
             os.mkdir(folder)
+
+
+def attempt_migrate_config():
+    """Attempt to automatically migrate any existing config to a new standard.
+
+    2.31.0 - string replacement moved from & to more often used % -- allows links with multiple & to be used in commands
+    """
+    import re
+
+    OLD_MODULE_MENTION_RE = re.compile(r'(&([\/a-z0-9_]+)&)')
+
+    # read all existing user configs
+    cfgs = {}
+    req_cfgs = {}
+    for uid in os.listdir(config.BASE_CONFIG_PATH):
+        if '.' not in uid:
+            cfgs[uid] = config.read(f"{uid}/config.txt")
+            req_cfgs[uid] = config.read(f"{uid}/modules/osu/request.txt")
+
+    # update module mentions
+    for uid, cfg in cfgs.items():
+        for command in cfg['commands'].values():
+            for mention, module in OLD_MODULE_MENTION_RE.findall(command['response']):
+                command['response'] = command['response'].replace(
+                    mention, f"%{module}%")
+
+        config.write(f"{uid}/config.txt", cfg)
+
+    # update request config
+    for uid, cfg in req_cfgs.items():
+        if not cfg:
+            continue
+
+        for mention, module in OLD_MODULE_MENTION_RE.findall(cfg['message_format']):
+            cfg['message_format'] = cfg['message_format'].replace(
+                mention, f"%{module}%")
+
+        config.write(f"{uid}/modules/osu/request.txt", cfg)
 
 
 if __name__ == "__main__":

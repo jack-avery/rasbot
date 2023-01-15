@@ -1,7 +1,7 @@
 # 'request' code for osu! requests. To get this to work:
 # Fill out the fields in the config file in `userdata/[id]/modules/osu` with the strings found at the websites
 #   ^ Ctrl+F 'default_config' to find the fields
-# Create a command using cmd with &request& as the response.
+# Create a command using cmd with %request% in the response.
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
 
@@ -32,7 +32,7 @@ OSU_MODES = ["Standard", "Taiko", "CTB", "Mania"]
 OSU_MODS = ["EZ", "NF", "HT", "HR", "SD", "PF",
             "DT", "NC", "HD", "FL", "RX", "AP", "SO", "V2"]
 
-MESSAGE_OPT_RE = re.compile(r'(&([\/a-z0-9_]+)&)')
+MESSAGE_OPT_RE = re.compile(r'(%([\/a-z0-9_]+)%)')
 
 MESSAGE_OPTIONS = {
     # web
@@ -101,8 +101,8 @@ class Module(BaseModule):
         # ID of the user that the request should go to.
         "osu_trgt_id": "",
         # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
-        # Enclose keys in & as you would a module in a command.
-        "message_format": "&requester& (&requesterstatus&) requested: &map& &mods& (&length& @ &bpm&BPM, &stars&*, by &creator&)",
+        # Enclose keys in % as you would a module in a command.
+        "message_format": "%requester% (%requesterstatus%) requested: %map% %mods% (%length% @ %bpm%BPM, %stars%*, by %creator%)",
         # Per-user cooldown for requests (in seconds)
         "cd_per_user": 0,
         # Whether or not requests should be for Subscribers, VIPs, and Mods only

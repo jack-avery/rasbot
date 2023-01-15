@@ -16,31 +16,31 @@ DEFAULT_CHANNEL = {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "@&caller& > &help&"
+            "response": "@%caller% > %help%"
         },
         "uptime": {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "@&caller& > &uptime&"
+            "response": "@%caller% > %uptime%"
         },
         "cmd": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@&caller& > &cmd&"
+            "response": "@%caller% > %cmd%"
         },
         "prefix": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@&caller& > &prefix&"
+            "response": "@%caller% > %prefix%"
         },
         "admin": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": True,
-            "response": "@&caller& > &admin&"
+            "response": "@%caller% > %admin%"
         },
     },
     "modules": []

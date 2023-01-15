@@ -2,7 +2,7 @@
 # Create an output pattern in osu!StreamCompanion with the info you want (default is for a pattern called np)
 # Replace the path in the config file in `userdata/[id]/modules/osu` with the path to the file
 #   (default value is default path for Windows StreamCompanion, might not need to change it)
-# Create a command using cmd with &np& as the response.
+# Create a command using cmd with %np% as the response.
 
 # TODO refactor this to use new osu! API v2 once it drops with Lazer
 

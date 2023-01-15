@@ -4,8 +4,8 @@
 # or if they are added to the "modules" array in your config as a string,
 # e.g. "modules": ["sample"]
 #
-# You can test out this module by adding it in a command as &sample&
-# e.g. "r!cmd add sample &sample&"
+# You can test out this module by adding it in a command as %sample%
+# e.g. "r!cmd add sample %sample%"
 
 from src.commands import BaseModule
 from src.definitions import Message

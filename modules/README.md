@@ -5,8 +5,8 @@
 
 To use modules, all you need to do is drop the module -- named similar to `something.py` -- into this folder and then mention it in a command.
 
-You can mention modules in commands by surrounding the name of it in **ampersands**: `&module&`
-> e.g. `r!cmd add help &help&` would create a command using the `help` module.
+You can mention modules in commands by surrounding the name of it in **percentage**: `%module%`
+> e.g. `r!cmd add help %help%` would create a command using the `help` module.
 
 *You can see a list of additional optional modules [here](https://github.com/jack-avery/rasbot-modules).*
 
@@ -33,12 +33,12 @@ Some modules require configuration before they can work, e.g. the `request` modu
 *For advanced users, a sample module showing most things with comments is available as `sample.py`.*
 
 Name the file after your module: `sample.py`.<br/>
-You can then reference your module as the response of a command, for example, `r!cmd add sample &sample&`.
+You can then reference your module as the response of a command, for example, `r!cmd add sample %sample%`.
 
 Your module must have a `Module` class that extends `commands.BaseModule`.<br/>
 > If you're overriding \_\_init__, be sure to call BaseModule.\_\_init__(self, bot, name).
 
-The code that replaces `&sample&` in the response goes in a function called `main`.<br/>
+The code that replaces `%sample%` in the response goes in a function called `main`.<br/>
 You can find the `TwitchBot` instance as `self.bot`.<br/>
 
 If your module intends to use arguments, get them by setting the `consume` static variable and calling `self.get_args(message)`.<br/>
