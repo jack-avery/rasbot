@@ -51,5 +51,3 @@ Otherwise, you're free to add whatever you want to the module, as long as you kn
 > Wiki page containing more useful information about modules coming soon™️!
 
 ### **Be very careful as this can be abused!**<br/>
-
-![image](https://user-images.githubusercontent.com/47289484/193102564-6245c687-6e25-4f90-a1a8-37d6d2fb91da.png)
