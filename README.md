@@ -8,7 +8,7 @@
 
 rasbot is intended to run locally on your account, so it has access to *your* Twitch emotes, and any potential game companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion):
 
-![image](https://cdn.discordapp.com/attachments/488850419301220352/1024615808879579188/unknown.png)
+![image](https://cdn.discordapp.com/attachments/488850419301220352/1063993678575714335/image.png)
 
 # How to Use ✍️
 1. Download and install [Python version 3.11.0+](https://www.python.org/downloads/), ensuring you tick "Add python.exe to PATH" at the bottom of the first screen.
