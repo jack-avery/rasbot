@@ -45,7 +45,7 @@ BUILTIN_MODULES = [
     'prefix.py',
     'sample.py',
     'uptime.py',
-    'user.py',
+    'target.py',
     'xp.py',
     'osu/request.py',
     'osu/np.py',

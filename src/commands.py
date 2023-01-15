@@ -289,6 +289,10 @@ def module_add(name: str):
     except AttributeError:
         raise AttributeError(name)
 
+    except Exception as err:
+        logger.error(f"failed to import module {name} with message: {err}")
+        raise ModuleNotFoundError(name)
+
 
 def module_del(name: str):
     """Call `module.__del__()` and remove it from `modules`.

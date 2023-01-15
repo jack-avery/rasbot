@@ -85,7 +85,7 @@ class Module(BaseModule):
                 return f'Command {cmd_name} added successfully.'
 
             except ModuleNotFoundError as mod:
-                return f'Module {mod} does not exist in the modules folder..'
+                return f'Module {mod} does not exist in the modules folder.'
 
             except AttributeError as mod:
                 return f'Module {mod} does not have a "Module" class to import.'
