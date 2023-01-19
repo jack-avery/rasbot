@@ -187,12 +187,15 @@ class Module(BaseModule):
         actions = ['set', 'transfer', 'ban', 'unban']
         msg = f"Please provide a valid action and a user. Valid actions include: {', '.join(actions)}."
 
-        if len(args) < 2 or (action not in actions):
+        if not args:
             return msg
 
         action = args[0]
-        user = args[1]
 
+        if len(args) < 2 or (action not in actions):
+            return msg
+
+        user = args[1]
         if user.startswith("@"):
             user = user[1:]
 
