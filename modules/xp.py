@@ -30,6 +30,10 @@ class Module(BaseModule):
         "xp_inactive_range": [1, 1],
         # Amount (min, max) to grant to active users. Default is (2, 3).
         "xp_active_range": [2, 3],
+        # Amount of XP required for level 2.
+        "level_requirement": 30,
+        # Additional amount of XP (multiplicative) required for each new level.
+        "level_increment": 1.5,
         "omit_users": []
     }
 
@@ -117,7 +121,7 @@ class Module(BaseModule):
             if rank:
                 user = self.get_user(rank=rank)
                 if user:
-                    return f"{user[0]} is #{user[1]} with {user[2]} XP."
+                    return f"{user[0]} (#{user[1]}) is level {user[2]} with {user[3]} XP."
                 else:
                     return f"There is no rank #{rank} user."
 
@@ -129,11 +133,11 @@ class Module(BaseModule):
             return " | ".join([f"{r[0]}: {r[1]}" for r in res])
 
     def get_user(self, user: str = None, rank: int = None):
-        """Return the user, position, and XP.
+        """Return the user, position, XP, and level.
 
         :param user: The name of the user
         :param rank: The rank of the user
-        :return: A list containing [`name`, `rank`, `xp`]
+        :return: A list containing [`name`, `rank`, `level`, `xp`]
         """
         self.log_d(f"retrieving user:{user} or rank:{rank}")
 
@@ -164,7 +168,16 @@ class Module(BaseModule):
                     rank -= 1
 
             user = all[rank]
-            return (user[0], rank + 1, user[1])
+            username = user[0]
+            xp = user[1]
+
+        next_lv_req = self.cfg_get("level_requirement")
+        level = 1
+        while xp > next_lv_req:
+            level += 1
+            next_lv_req = self.cfg_get("level_increment")
+
+        return (username, rank + 1, level, xp)
 
     def mod_user(self, args):
         """Perform an action on a user.
@@ -293,7 +306,7 @@ class Module(BaseModule):
 
         user = self.get_user(user=arg)
         if user:
-            return f"{user[0]} is #{user[1]} with {user[2]} XP."
+            return f"{user[0]} (#{user[1]}) is level {user[2]} with {user[3]} XP."
         else:
             return f"{arg} has no tracked XP."
 
