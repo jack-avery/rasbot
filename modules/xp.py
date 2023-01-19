@@ -33,7 +33,7 @@ class Module(BaseModule):
         # Amount of XP required for level 2.
         "level_requirement": 30,
         # Additional amount of XP (multiplicative) required for each new level.
-        "level_increment": 1.5,
+        "level_increment": 1.2,
         "omit_users": []
     }
 
@@ -175,7 +175,7 @@ class Module(BaseModule):
         level = 1
         while xp > next_lv_req:
             level += 1
-            next_lv_req = self.cfg_get("level_increment")
+            next_lv_req = next_lv_req * self.cfg_get("level_increment")
 
         return (username, rank + 1, level, xp)
 
