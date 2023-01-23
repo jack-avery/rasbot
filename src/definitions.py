@@ -4,17 +4,11 @@
 
 class Author:
     name = str
-    """The display name of the author."""
     uid = str
-    """The ID of the author."""
-    mod = bool
-    """Whether the author is a moderator."""
-    sub = bool
-    """Whether the author is a subscriber."""
-    vip = bool
-    """Whether the author is a VIP."""
-    host = bool
-    """Whether the author is the channel owner."""
+    is_mod = bool
+    is_sub = bool
+    is_vip = bool
+    is_host = bool
 
     def __init__(self, name: str, uid: str, is_mod: bool = False, is_sub: bool = False, is_vip: bool = False, is_host: bool = False):
         """Create a new `Author`.
@@ -56,9 +50,7 @@ class Author:
 
 class Message:
     author: Author
-    """The `Author` object of the message."""
     text_raw: str
-    """The raw text of the message."""
     cmd: str
     """The command used, if applicable, in this message."""
     args: list
