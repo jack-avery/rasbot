@@ -23,25 +23,15 @@ formatter = logging.Formatter(
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     auth: Authentication
-    """The `Authentication` object for this bot."""
     channel_id: int
-    """The UID of the Twitch channel."""
     channel_name: str
-    """The name of the Twitch channel."""
     channel: str
-    """The Twitch channel."""
     commands: commands
-    """This Twitch bots' `commands` module."""
     cfgpath: str
     """Path to the currently used channel config file."""
     prefix: str
-    """The currently used command prefix."""
     always_import_list: list
     """List of modules to always import, regardless of whether they're used in commands."""
-    author: Author
-    """The `Author` object representing the sender of the active message."""
-    message: Message
-    """The `Message` object representing the active message."""
 
     def __init__(self, auth: Authentication, channel_name: str, debug: bool = False):
         """Create a new `TwitchBot`.
