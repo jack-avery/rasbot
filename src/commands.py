@@ -282,9 +282,6 @@ def module_add(name: str):
     except FileNotFoundError:
         raise ModuleNotFoundError(name)
 
-    except AttributeError:
-        raise AttributeError(name)
-
     except Exception as err:
         logger.error(f"failed to import module {name} with message: {err}")
         raise ModuleNotFoundError(name)

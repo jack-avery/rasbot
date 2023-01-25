@@ -15,7 +15,6 @@ import time
 
 from modules.osu.helpers.api2 import OsuAPIv2Helper
 
-
 OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
