@@ -4,7 +4,8 @@
 #   (default value is default path for Windows StreamCompanion, might not need to change it)
 # Create a command using cmd with %np% as the response.
 
-# TODO refactor this to use new osu! API v2 once it drops with Lazer
+# TODO: refactor this to use new osu! APIv2 "Now Playing" once it drops
+# will remove dependency on using StreamCompanion
 
 from src.commands import BaseModule
 

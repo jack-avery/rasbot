@@ -3,7 +3,9 @@
 #   ^ Ctrl+F 'default_config' to find the fields
 # Create a command using cmd with %request% in the response.
 
-# TODO refactor this to use new osu! API v2 once it drops with Lazer
+from src.commands import BaseModule, NO_MESSAGE_SIGNAL
+from src.definitions import Author,\
+    Message
 
 import irc
 import requests
@@ -11,9 +13,8 @@ import re
 from threading import Thread
 import time
 
-from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Author,\
-    Message
+from modules.osu.helpers.api2 import OsuAPIv2Helper
+
 
 OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
