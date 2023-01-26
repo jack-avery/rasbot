@@ -116,6 +116,9 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
+        # get api v2 helper
+        self.api_helper = OsuAPIv2Helper(self._bot.channel_id)
+
         # compile mapID regex
         beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)
         b_re = re.compile(OSU_B_RE)
