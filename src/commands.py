@@ -3,6 +3,7 @@ import logging
 import re
 import threading
 import time
+import traceback
 
 from bot import TwitchBot
 from src.config import read, write
@@ -282,8 +283,9 @@ def module_add(name: str):
     except FileNotFoundError:
         raise ModuleNotFoundError(name)
 
-    except Exception as err:
-        logger.error(f"failed to import module {name} with message: {err}")
+    except Exception:
+        logger.error(f"failed to import module {name} with error trace:")
+        traceback.print_exc()
         raise ModuleNotFoundError(name)
 
 
