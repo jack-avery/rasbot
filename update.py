@@ -49,6 +49,7 @@ BUILTIN_MODULES = [
     'xp.py',
     'osu/request.py',
     'osu/np.py',
+    'osu/helpers/api2.py',
 ]
 """Modules to always update alongside rasbot."""
 # TODO: customization for which to update maybe? idk?
