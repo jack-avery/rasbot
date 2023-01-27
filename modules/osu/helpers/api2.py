@@ -110,7 +110,7 @@ class OsuAPIv2Helper(Singleton):
         if not self.cfg['token']:
             return False
 
-        endpoint = "https://osu.ppy.sh/api/v2/" + endpoint
+        endpoint = "https://osu.ppy.sh/api/v2" + endpoint
 
         headers = {
             "Authorization": f"{self.cfg['token']['token_type']} {self.cfg['token']['access_token']}",
@@ -151,22 +151,22 @@ class OsuAPIv2Helper(Singleton):
     def get_beatmap(self, beatmap_id: int):
         """Get information for the beatmap with ID `beatmap_id`.
         """
-        return self.get(f"beatmaps/{beatmap_id}")
+        return self.get(f"/beatmaps/{beatmap_id}")
 
     def get_beatmapset(self, beatmapset_id: int):
         """Get maps and information for the beatmap set with ID `beatmapset_id`.
         """
-        return self.get(f"beatmapsets/{beatmapset_id}")
+        return self.get(f"/beatmapsets/{beatmapset_id}")
 
     def get_user_top_plays(self, user_id: int):
         """Get top plays for user with ID `user_id`.
         """
-        return self.get(f"users/{user_id}/scores/best")
+        return self.get(f"/users/{user_id}/scores/best")
 
     def get_user_recent_plays(self, user_id: int):
         """Get recent plays (including fails) for user with ID `user_id`.
         """
-        return self.get(f"users/{user_id}/scores/recent?include_fails=1")
+        return self.get(f"/users/{user_id}/scores/recent?include_fails=1")
 
     def send_message(self, message: str, target_id: int):
         """Send `message` to osu! User ID `target`.
@@ -176,4 +176,4 @@ class OsuAPIv2Helper(Singleton):
             "message": message,
             "is_action": False
         }
-        self.post("chat/new", data)
+        self.post("/chat/new", data)
