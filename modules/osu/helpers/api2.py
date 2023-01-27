@@ -72,6 +72,8 @@ class OsuAPIv2Helper(Singleton):
             "redirect_uri": f"http://localhost:{CALLBACK_PORT}"
         }
         self.__get_token(data)
+        logger.info(
+            "Success! rasbot osu! modules using the v2 API will now work.")
 
     def __refresh_token(self):
         """Refresh the token using the existing OAuth tokens' refresh code.
