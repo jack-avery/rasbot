@@ -4,6 +4,7 @@ import logging
 
 from requests import get, post
 
+from src.definitions import Singleton
 from src.config import BASE_CONFIG_PATH, read, write
 
 logger = logging.getLogger("rasbot")
@@ -21,13 +22,6 @@ DEFAULT_CONFIG = {
 
 CALLBACK_PORT = 27274
 """Callback URL set in the application MUST be `http://localhost:27274`."""
-
-
-class Singleton:
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, 'instance'):
-            cls.instance = super(Singleton, cls).__new__(cls)
-        return cls.instance
 
 
 class OsuAPIv2Helper(Singleton):
@@ -153,6 +147,26 @@ class OsuAPIv2Helper(Singleton):
 
     def post(self, endpoint: str, data: dict):
         return self.__request(post, endpoint, data)
+
+    def get_beatmap(self, beatmap_id: int):
+        """Get information for the beatmap with ID `beatmap_id`.
+        """
+        return self.get(f"beatmaps/{beatmap_id}")
+
+    def get_beatmapset(self, beatmapset_id: int):
+        """Get maps and information for the beatmap set with ID `beatmapset_id`.
+        """
+        return self.get(f"beatmapsets/{beatmapset_id}")
+
+    def get_user_top_plays(self, user_id: int):
+        """Get top plays for user with ID `user_id`.
+        """
+        return self.get(f"users/{user_id}/scores/best")
+
+    def get_user_recent_plays(self, user_id: int):
+        """Get recent plays (including fails) for user with ID `user_id`.
+        """
+        return self.get(f"users/{user_id}/scores/recent?include_fails=1")
 
     def send_message(self, message: str, target_id: int):
         """Send `message` to osu! User ID `target`.

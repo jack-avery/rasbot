@@ -233,15 +233,17 @@ class Module(BaseModule):
         if is_id:
             # beatmap
             self.log_d(f"retrieving osu map info for beatmap id {id}")
-            req = self.api_helper.get(f"beatmaps/{id}")
-            map = req
+            map = self.api_helper.get_beatmap(id)
         else:
             # beatmapset
             self.log_d(f"retrieving top diff info for beatmapset id {id}")
-            req = self.api_helper.get(f"beatmapsets/{id}")
+            maps = self.api_helper.get_beatmapset(id)
             # sort mapset descending by difficulty so req[0] gives top diff
-            req.sort(key=lambda r: r['difficultyrating'], reverse=True)
+            maps.sort(key=lambda m: m['difficultyrating'], reverse=True)
             map = req[0]
+
+        if not map:
+            return "Could not get beatmap information."
 
         # add request mods to map dict and format the message
         map['mods'] = mods
@@ -259,7 +261,12 @@ class Module(BaseModule):
 
         :param msg: The message to send
         """
+        uid = self.cfg_get("osu_trgt_id")
+        if not uid:
+            self.log_e("configure your user id first before using requests!")
+            return
+
         self.log_d(
             f"sending osu! message: '{msg}'")
 
-        self.api_helper.send_message(msg, self.cfg_get("osu_trgt_id"))
+        self.api_helper.send_message(msg, uid)

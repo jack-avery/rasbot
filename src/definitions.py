@@ -103,3 +103,10 @@ class Message:
         ret = self.args[:amount]
         self.args = self.args[amount:]
         return ret
+
+
+class Singleton:
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(Singleton, cls).__new__(cls)
+        return cls.instance
