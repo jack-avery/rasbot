@@ -1,7 +1,8 @@
 import webbrowser
 import socket
-import requests
 import logging
+
+from requests import get, post
 
 from src.config import BASE_CONFIG_PATH, read, write
 
@@ -20,15 +21,6 @@ DEFAULT_CONFIG = {
 
 CALLBACK_PORT = 27274
 """Callback URL set in the application MUST be `http://localhost:27274`."""
-
-OAUTH_APP_AUTH_LINK = "https://osu.ppy.sh/oauth/authorize?client_id=%client_id%&redirect_uri=http://localhost:%callback_port%&response_type=code&scope=chat.write+public"
-OAUTH_TOKEN_REFRESH_EP = "https://osu.ppy.sh/oauth/token"
-OAUTH_TOKEN_REFRESH_HEADERS = {
-    "Accept": "application/json",
-    "Content-Type": "application/json",
-}
-
-OSU_API_BASE = "https://osu.ppy.sh/api/v2/"
 
 
 class Singleton:
@@ -56,8 +48,9 @@ class OsuAPIv2Helper(Singleton):
         if not self.cfg['client_id'] or not self.cfg['client_secret']:
             return
 
-        link = OAUTH_APP_AUTH_LINK.replace("%client_id%", self.cfg['client_id'])\
-                                  .replace("%callback_port%", str(CALLBACK_PORT))
+        link = "https://osu.ppy.sh/oauth/authorize?client_id=%client_id%&redirect_uri=http://localhost:%callback_port%&response_type=code&scope=chat.write+public"
+        link = link.replace("%client_id%", self.cfg['client_id'])\
+                   .replace("%callback_port%", str(CALLBACK_PORT))
         webbrowser.open(link, new=2)
         logger.info(
             "See your web browser to continue setting up your osu! API v2 Authentication.")
@@ -105,49 +98,68 @@ class OsuAPIv2Helper(Singleton):
     def __get_token(self, data):
         """Get a new token or refresh an existing one using `data`.
         """
-        token = requests.post(OAUTH_TOKEN_REFRESH_EP,
-                              headers=OAUTH_TOKEN_REFRESH_HEADERS, json=data)
+        headers = {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }
+        token = post("https://osu.ppy.sh/oauth/token",
+                     headers=headers, json=data)
+
         if not token.status_code == 200:
             logger.error(f"OAuth token grab failed! ({token.json()})")
+            return
 
         self.cfg['token'] = token.json()
         write(self.cfgpath, self.cfg)
 
-    def get(self, endpoint: str):
+    def __request(self, method, endpoint: str, data: dict = None):
         if not self.cfg['token']:
             return False
 
-        endpoint = OSU_API_BASE + endpoint
+        endpoint = "https://osu.ppy.sh/api/v2/" + endpoint
+
         headers = {
             "Authorization": f"{self.cfg['token']['token_type']} {self.cfg['token']['access_token']}",
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
-        response = requests.get(endpoint, headers=headers)
+
+        if data:
+            response = method(endpoint, headers=headers, json=data)
+        else:
+            response = method(endpoint, headers=headers)
+        logger.debug(response.json())
         if response.status_code == 200:
             return response.json()
 
-        # If not successful, refresh token and try again?
+        # refresh token and retry once?
         self.__refresh_token()
-        response = requests.get(endpoint, headers=headers)
-        return response.json()
+        headers["Authorization"] = f"{self.cfg['token']['token_type']} {self.cfg['token']['access_token']}"
+        if data:
+            response = method(endpoint, headers=headers, json=data)
+        else:
+            response = method(endpoint, headers=headers)
+        logger.debug(response.json())
+        if response.status_code == 200:
+            return response.json()
+
+        # give up
+        logger.error(
+            "could not successfully perform request after a token refresh")
+        return False
+
+    def get(self, endpoint: str):
+        return self.__request(get, endpoint)
+
+    def post(self, endpoint: str, data: dict):
+        return self.__request(post, endpoint, data)
 
     def send_message(self, message: str, target_id: int):
         """Send `message` to osu! User ID `target`.
         """
-        if not self.cfg['token']:
-            return False
-
-        endpoint = OSU_API_BASE + "chat/new"
-        headers = {
-            "Authorization": f"{self.cfg['token']['token_type']} {self.cfg['token']['access_token']}",
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
         data = {
             "target_id": target_id,
             "message": message,
             "is_action": False
         }
-        res = requests.post(endpoint,
-                            headers=headers, json=data)
+        self.post("chat/new", data)
