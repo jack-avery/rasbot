@@ -1,7 +1,7 @@
 # 'request' code for osu! requests. To get this to work:
 # Fill out the fields in the config file in `userdata/[id]/modules/osu` with the strings found at the websites
 #   ^ Ctrl+F 'default_config' to find the fields
-# Create a command using cmd with %request% in the response.
+# Create a command using cmd with %osu/request% in the response.
 
 import irc
 import requests

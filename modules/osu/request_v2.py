@@ -1,7 +1,4 @@
-# 'request' code for osu! requests. To get this to work:
-# Fill out the fields in the config file in `userdata/[id]/modules/osu` with the strings found at the websites
-#   ^ Ctrl+F 'default_config' to find the fields
-# Create a command using cmd with %request% in the response.
+# 'request_v2' code for osu! requests using the v2 API instead of IRC.
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
 from src.definitions import Author,\
@@ -11,8 +8,6 @@ import re
 import time
 
 from modules.osu.helpers.api2 import OsuAPIv2Helper
-
-OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
