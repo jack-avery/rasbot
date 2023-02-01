@@ -1,9 +1,7 @@
 # 'request' code for osu! requests. To get this to work:
 # Fill out the fields in the config file in `userdata/[id]/modules/osu` with the strings found at the websites
 #   ^ Ctrl+F 'default_config' to find the fields
-# Create a command using cmd with %request% in the response.
-
-# TODO refactor this to use new osu! API v2 once it drops with Lazer
+# Create a command using cmd with %osu/request% in the response.
 
 import irc
 import requests
@@ -14,8 +12,6 @@ import time
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
 from src.definitions import Author,\
     Message
-
-OSU_API_CHAT_URL = "https://osu.ppy.sh/api/v2/chat/new"
 
 OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
 OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
@@ -151,7 +147,6 @@ class Module(BaseModule):
 
     def resolve_username(self, id: (str | int)) -> (str | None):
         """Resolves a users' osu! username from their ID.
-
         :param id: The ID of the osu! user to resolve the name for.
         :return: The name of the user, or `None` if the resolution failed.
         """
@@ -175,7 +170,6 @@ class Module(BaseModule):
 
     def generate_mods_string(self, mods: str) -> str:
         """Convert `mods` into a more conventional format, and verify that they are real osu! mods.
-
         :param mods: The string given by the user representing the mods selection.
         :return: The formatted and verified string of valid osu! mods.
         """
@@ -204,7 +198,6 @@ class Module(BaseModule):
 
     def format_message(self, map) -> str:
         """Format map information for `map` using `message_format` from the config.
-
         :param map: The map object as returned from the osu! API
         :return: The message to send as formatted using `message_format`
         """
@@ -338,7 +331,6 @@ class Module(BaseModule):
 
     def send_osu_message(self, msg: str):
         """Send `msg` as an osu! message to `target` as `username`
-
         :param msg: The message to send
         """
         self.log_d(

@@ -32,7 +32,7 @@ class Authentication:
         """
         self.file = file
 
-        auth = read(self.file)
+        auth = read(self.file, AUTH_SKELETON)
 
         try:
             self.user_id = auth['user_id']

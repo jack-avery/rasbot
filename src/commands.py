@@ -3,6 +3,7 @@ import logging
 import re
 import threading
 import time
+import traceback
 
 from bot import TwitchBot
 from src.config import read, write
@@ -19,13 +20,9 @@ NO_MESSAGE_SIGNAL = "%NOMSG%"
 
 class Command:
     name: str
-    """The name of the command."""
     cooldown: int
-    """The cooldown for this command in seconds."""
     response: str
-    """The base, unformatted response for this command."""
     requires_mod: bool
-    """Whether this command requires moderator privileges to execute."""
     hidden: bool
     """Whether this command is hidden from the `help` module."""
 
@@ -286,11 +283,9 @@ def module_add(name: str):
     except FileNotFoundError:
         raise ModuleNotFoundError(name)
 
-    except AttributeError:
-        raise AttributeError(name)
-
-    except Exception as err:
-        logger.error(f"failed to import module {name} with message: {err}")
+    except Exception:
+        logger.error(f"failed to import module {name} with error trace:")
+        traceback.print_exc()
         raise ModuleNotFoundError(name)
 
 
