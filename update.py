@@ -48,6 +48,7 @@ BUILTIN_MODULES = [
     'target.py',
     'xp.py',
     'osu/request.py',
+    'osu/request_v2.py',
     'osu/np.py',
     'osu/helpers/api2.py',
 ]
