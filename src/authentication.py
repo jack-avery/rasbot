@@ -32,10 +32,7 @@ class Authentication:
         """
         self.file = file
 
-        auth = read(self.file)
-
-        if not auth:
-            raise FileNotFoundError(self.file)
+        auth = read(self.file, AUTH_SKELETON)
 
         try:
             self.user_id = auth['user_id']
@@ -43,6 +40,7 @@ class Authentication:
             self.client_secret = auth['client_secret']
             self.irc_oauth = auth['irc_oauth']
             self.oauth = auth['oauth']
+
         except KeyError as key:
             raise KeyError(key)
 
