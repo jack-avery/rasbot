@@ -11,7 +11,7 @@ from src.definitions import Message
 
 logger = logging.getLogger("rasbot")
 
-MODULE_MENTION_RE = re.compile(r'(%([\/a-z0-9_]+)%)')
+MODULE_MENTION_RE = re.compile(r"(%([\/a-z0-9_]+)%)")
 """Regex to search command responses with to apply modules."""
 
 NO_MESSAGE_SIGNAL = "%NOMSG%"
@@ -26,7 +26,14 @@ class Command:
     hidden: bool
     """Whether this command is hidden from the `help` module."""
 
-    def __init__(self, name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
+    def __init__(
+        self,
+        name: str,
+        cooldown: int = 5,
+        response: str = "",
+        requires_mod: bool = False,
+        hidden: bool = False,
+    ):
         """Create a new `Command`.
 
         :param name: The name of the command.
@@ -48,7 +55,7 @@ class Command:
 
         Runs all %% codes found in the command and returns the result.
         """
-        if not time.time()-self._last_used > self.cooldown:
+        if not time.time() - self._last_used > self.cooldown:
             return False
 
         if not message.author.is_mod and self.requires_mod:
@@ -58,8 +65,7 @@ class Command:
         returned_response = self.response
         for mention, module in MODULE_MENTION_RE.findall(returned_response):
             returned_response = returned_response.replace(
-                mention,
-                str(modules[module].main(message))
+                mention, str(modules[module].main(message))
             )
 
         if NO_MESSAGE_SIGNAL in returned_response:
@@ -76,8 +82,14 @@ class Command:
         return [m[1] for m in MODULE_MENTION_RE.findall(self.response)]
 
 
-def command_add(name: str, cooldown: int = 5, response: str = '', requires_mod: bool = False, hidden: bool = False):
-    '''Create a new command (or modifies an existing one).
+def command_add(
+    name: str,
+    cooldown: int = 5,
+    response: str = "",
+    requires_mod: bool = False,
+    hidden: bool = False,
+):
+    """Create a new command (or modifies an existing one).
     Automatically attempts to import any unimported modules.
 
     :param name: The name of the command.
@@ -85,9 +97,10 @@ def command_add(name: str, cooldown: int = 5, response: str = '', requires_mod: 
     :param response: The text response of the command. Encapsulate custom commands in %%.
     :param requires_mod: Whether this command requires moderator access to use.
     :param hidden: Whether to hide this command from the `help` module.
-    '''
+    """
     logger.debug(
-        f'adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})')
+        f"adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})"
+    )
 
     # Resolve any modules the command mentions and import new ones
     for _, module in MODULE_MENTION_RE.findall(response):
@@ -107,7 +120,7 @@ def command_mod(name: str, key: str, value):
     :param key: The field of the command to modify.
     :param value: The value to set the field to.
     """
-    logger.debug(f'modifying {key} of {name} to {value}')
+    logger.debug(f"modifying {key} of {name} to {value}")
     if key == "cooldown":
         commands[name].cooldown = value
 
@@ -129,8 +142,8 @@ def command_del(name: str):
 
     :param name: The name of the command.
     """
-    logger.debug(f'removing {name}')
-    del (commands[name])
+    logger.debug(f"removing {name}")
+    del commands[name]
 
 
 class BaseModule(threading.Thread):
@@ -138,7 +151,8 @@ class BaseModule(threading.Thread):
 
     Facilitates defaults for a Module so as to prevent errors.
     """
-    helpmsg = 'No help message available for module.'
+
+    helpmsg = "No help message available for module."
     """Help message to display when used with the `help` module."""
 
     default_config = False
@@ -167,13 +181,11 @@ class BaseModule(threading.Thread):
         pass
 
     def reload_config(self):
-        """Completely reload this module's config from file.
-        """
+        """Completely reload this module's config from file."""
         self._cfg = read(self._cfg_path, self.default_config)
 
     def save_config(self):
-        """Save the current form of this module's `self.cfg` attribute to file.
-        """
+        """Save the current form of this module's `self.cfg` attribute to file."""
         write(self._cfg_path, self._cfg)
 
     def cfg_get(self, key: str):
@@ -183,7 +195,8 @@ class BaseModule(threading.Thread):
         """
         if key not in self._cfg:
             self.log_e(
-                f"config missing searched key '{key}', saving default '{self.default_config[key]}'")
+                f"config missing searched key '{key}', saving default '{self.default_config[key]}'"
+            )
 
             self.cfg_set(key, self.default_config[key])
 
@@ -269,8 +282,7 @@ def module_add(name: str):
 
     try:
         # Create spec and import from directory.
-        spec = importlib.util.spec_from_file_location(
-            f"{name}", f"modules/{name}.py")
+        spec = importlib.util.spec_from_file_location(f"{name}", f"modules/{name}.py")
         module = importlib.util.module_from_spec(spec)
 
         # Execute it to fully import
@@ -300,7 +312,7 @@ def module_del(name: str):
         return
 
     modules[name].__del__()
-    del (modules[name])
+    del modules[name]
 
 
 def do_on_pubmsg(message: Message):
@@ -313,8 +325,7 @@ def do_on_pubmsg(message: Message):
 
 
 def pass_bot_ref(ref: TwitchBot):
-    """Pass the bot reference so that modules can have a reference to it
-    """
+    """Pass the bot reference so that modules can have a reference to it"""
     global bot
     bot = ref
 

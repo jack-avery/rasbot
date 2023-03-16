@@ -17,9 +17,7 @@ class Module(BaseModule):
 
     # You can save parameters for your module using a config.
     # Adding a default will let users know what will be stored:
-    default_config = {
-        "savedmessage": ""
-    }
+    default_config = {"savedmessage": ""}
 
     # Set "consumes" to how many arguments your module intends to consume for more predictable interactions with other modules.
     # You can set it to a negative value to consume ALL (remaining) arguments.
@@ -33,18 +31,20 @@ class Module(BaseModule):
     # This runs if the module is part of a command which gets called.
     def main(self, message: Message):
         # Use self.cfg_get(key) to get items from the module config.
-        last_time = self.cfg_get('savedmessage')
+        last_time = self.cfg_get("savedmessage")
 
         # Use self.get_args(message) to consume the designated amount of arguments and continue.
         args = self.get_args(message)
 
         # You can save things using self.cfg_set(key, value):
-        self.cfg_set('savedmessage', ' '.join(args))
+        self.cfg_set("savedmessage", " ".join(args))
 
         # You can get the author's name, UID, and mod status like so!
-        return (f"@{message.author.name} ({message.author.uid}, mod: {message.author.is_mod}), "
-                + f"{self.count} messages have been sent so far, "
-                + f"and last time you also said '{last_time}'.")
+        return (
+            f"@{message.author.name} ({message.author.uid}, mod: {message.author.is_mod}), "
+            + f"{self.count} messages have been sent so far, "
+            + f"and last time you also said '{last_time}'."
+        )
 
     # This runs on all messages regardless of whether the command is called.
     def on_pubmsg(self, message: Message):

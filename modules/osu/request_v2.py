@@ -1,59 +1,68 @@
 # 'request_v2' code for osu! requests using the v2 API instead of IRC.
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Author,\
-    Message
+from src.definitions import Author, Message
 
 import re
 import time
 
-from modules.osu.helpers.api2 import OsuAPIv2Helper
+from helpers.api2 import OsuAPIv2Helper
 
-OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
-OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
+OSU_BEATMAPSETID_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$"
+OSU_B_RE = r"^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$"
 
-OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)$'
+OSU_BEATMAPSET_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)$"
 
 # TODO update this with lazer mods when the time comes
-OSU_MODS = ["EZ", "NF", "HT", "HR", "SD", "PF",
-            "DT", "NC", "HD", "FL", "RX", "AP", "SO", "V2"]
+OSU_MODS = [
+    "EZ",
+    "NF",
+    "HT",
+    "HR",
+    "SD",
+    "PF",
+    "DT",
+    "NC",
+    "HD",
+    "FL",
+    "RX",
+    "AP",
+    "SO",
+    "V2",
+]
 
-MESSAGE_OPT_RE = re.compile(r'(%([\/a-z0-9_]+)%)')
+MESSAGE_OPT_RE = re.compile(r"(%([\/a-z0-9_]+)%)")
 
 MESSAGE_OPTIONS = {
     # web
     "map": lambda m: f"[{m['url']} {m['beatmapset']['artist']} - {m['beatmapset']['title']} [{m['version']}]]",
-    "mapid": lambda m: m['id'],
-    "mapsetid": lambda m: m['beatmapset_id'],
-    "mapstatus": lambda m: str(m['status']).capitalize(),
-
+    "mapid": lambda m: m["id"],
+    "mapsetid": lambda m: m["beatmapset_id"],
+    "mapstatus": lambda m: str(m["status"]).capitalize(),
     # creator
     "creator": lambda m: f"[https://osu.ppy.sh/users/{m['user_id']} {m['beatmapset']['creator']}]",
-    "creatorid": lambda m: m['user_id'],
-    "creatorname": lambda m: m['creator'],
-
+    "creatorid": lambda m: m["user_id"],
+    "creatorname": lambda m: m["creator"],
     # beatmap metadata
     "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
-    "bpm": lambda m: m['bpm'],
-    "combo": lambda m: m['max_combo'],
-    "stars": lambda m: m['difficulty_rating'],
-    "cs": lambda m: m['cs'],
-    "od": lambda m: m['accuracy'],
-    "ar": lambda m: m['ar'],
-    "hp": lambda m: m['drain'],
-    "gamemode": lambda m: m['mode'],
-
+    "bpm": lambda m: m["bpm"],
+    "combo": lambda m: m["max_combo"],
+    "stars": lambda m: m["difficulty_rating"],
+    "cs": lambda m: m["cs"],
+    "od": lambda m: m["accuracy"],
+    "ar": lambda m: m["ar"],
+    "hp": lambda m: m["drain"],
+    "gamemode": lambda m: m["mode"],
     # song info
     "song": lambda m: f"{m['beatmapset']['artist']} - {m['beatmapset']['title']}",
-    "songartist": lambda m: m['beatmapset']['artist'],
-    "songartistunicode": lambda m: m['beatmapset']['artist_unicode'],
-    "songtitle": lambda m: m['beatmapset']['title'],
-    "songtitleunicode": lambda m: m['beatmapset']['title_unicode'],
-
+    "songartist": lambda m: m["beatmapset"]["artist"],
+    "songartistunicode": lambda m: m["beatmapset"]["artist_unicode"],
+    "songtitle": lambda m: m["beatmapset"]["title"],
+    "songtitleunicode": lambda m: m["beatmapset"]["title_unicode"],
     # requests specific additions
-    "requester": lambda m: m['sender'].name,
-    "requesterstatus": lambda m: m['sender'].user_status(),
-    "mods": lambda m: m['mods']
+    "requester": lambda m: m["sender"].name,
+    "requesterstatus": lambda m: m["sender"].user_status(),
+    "mods": lambda m: m["mods"],
 }
 
 
@@ -93,7 +102,7 @@ class Module(BaseModule):
         self.beatmap_res = [beatmapsetid_re, b_re]
         self.beatmapset_res = [beatmapset_re]
 
-        self.cooldown = self.cfg_get('cd_per_user')
+        self.cooldown = self.cfg_get("cd_per_user")
         self.author_cds = dict()
 
     def generate_mods_string(self, mods: str) -> str:
@@ -104,23 +113,23 @@ class Module(BaseModule):
         """
         self.log_d(f"resolving mods from string {mods}")
         # strip + for logic
-        if mods.startswith('+'):
+        if mods.startswith("+"):
             mods = mods[1:]
 
         # remove any possible ,
-        mods = mods.replace(',', '')
+        mods = mods.replace(",", "")
 
         # split into separate mods
-        mods = [mods[i:i+2] for i in range(0, len(mods), 2)]
+        mods = [mods[i : i + 2] for i in range(0, len(mods), 2)]
 
         # add mods to modstring; prevent duplicates and invalid mods
-        modstring = '+'
+        modstring = "+"
         for mod in mods:
             if mod in OSU_MODS and mod not in modstring:
-                modstring += mod + ','
+                modstring += mod + ","
 
-        if modstring == '+':
-            return ''
+        if modstring == "+":
+            return ""
 
         self.log_d(modstring)
         return modstring
@@ -131,18 +140,14 @@ class Module(BaseModule):
         :param map: The map object as returned from the osu! API
         :return: The message to send as formatted using `message_format`
         """
-        message = self.cfg_get('message_format')
+        message = self.cfg_get("message_format")
 
         for flag, option in MESSAGE_OPT_RE.findall(message):
             if option not in MESSAGE_OPTIONS:
-                self.log_e(
-                    f"config error: message_format uses invalid key '{option}'")
+                self.log_e(f"config error: message_format uses invalid key '{option}'")
                 continue
 
-            message = message.replace(
-                flag,
-                str(MESSAGE_OPTIONS[option](map))
-            )
+            message = message.replace(flag, str(MESSAGE_OPTIONS[option](map)))
 
         return message
 
@@ -157,14 +162,14 @@ class Module(BaseModule):
         return "Request sent!"
 
     def on_pubmsg(self, message: Message):
-        if not self.cfg_get('parse_all_messages'):
+        if not self.cfg_get("parse_all_messages"):
             return
 
         # do not parse again if using a command
         if message.cmd:
             return
 
-        words = message.text_raw.split(' ')
+        words = message.text_raw.split(" ")
         for i, word in enumerate(words):
             if "osu.ppy.sh" in word:
                 args = words[i:]
@@ -172,15 +177,16 @@ class Module(BaseModule):
 
     def process_request(self, author: Author, args):
         # prevent normal users from requesting in submode
-        if self.cfg_get('submode') and not (author.is_mod or author.is_sub or author.is_vip):
+        if self.cfg_get("submode") and not (
+            author.is_mod or author.is_sub or author.is_vip
+        ):
             return NO_MESSAGE_SIGNAL
 
         # exit early if user requested within cooldown
         if author.uid in self.author_cds:
             time_passed = time.time() - self.author_cds[author.uid]
             if time_passed < self.cooldown:
-                self.log_d(
-                    f"user {author.name} requested while still on cd; ignoring")
+                self.log_d(f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
@@ -191,16 +197,16 @@ class Module(BaseModule):
         req = args[0].lower()
 
         # allow mods to toggle submode
-        if req == 'submode' and author.is_mod:
-            t = not self.cfg_get('submode')
-            self.cfg_set('submode', t)
+        if req == "submode" and author.is_mod:
+            t = not self.cfg_get("submode")
+            self.cfg_set("submode", t)
             if t:
                 return "Submode enabled"
             else:
                 return "Submode disabled"
 
         # use second arg as mods
-        mods = ''
+        mods = ""
         if len(args) > 1:
             mods = self.generate_mods_string(args[1].upper())
 
@@ -234,15 +240,15 @@ class Module(BaseModule):
             self.log_d(f"retrieving top diff info for beatmapset id {id}")
             maps = self.api_helper.get_beatmapset(id)
             # sort mapset descending by difficulty so req[0] gives top diff
-            maps.sort(key=lambda m: m['difficultyrating'], reverse=True)
+            maps.sort(key=lambda m: m["difficultyrating"], reverse=True)
             map = req[0]
 
         if not map:
             return "Could not get beatmap information."
 
         # add request mods to map dict and format the message
-        map['mods'] = mods
-        map['sender'] = author
+        map["mods"] = mods
+        map["sender"] = author
         message = self.format_message(map)
 
         # send message, set cooldown and inform requester
@@ -261,7 +267,6 @@ class Module(BaseModule):
             self.log_e("configure your user id first before using requests!")
             return
 
-        self.log_d(
-            f"sending osu! message: '{msg}'")
+        self.log_d(f"sending osu! message: '{msg}'")
 
         self.api_helper.send_message(msg, uid)

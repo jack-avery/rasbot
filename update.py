@@ -16,40 +16,35 @@ ALWAYS_OPT_OUT = False
 
 try:
     cfg = config.read_global()
-    branch = cfg['release_branch']
+    branch = cfg["release_branch"]
 except:
-    branch = 'main'
+    branch = "main"
 
 BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
-RASBOT_BASE_UPDATER = 'update.py'
+RASBOT_BASE_UPDATER = "update.py"
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE = ['bot.py', 'setup.py']
+RASBOT_BASE = ["bot.py", "setup.py"]
 """Remaining built-in base files to update after the updater."""
 
-RASBOT_SRC = [
-    'authentication.py',
-    'commands.py',
-    'config.py',
-    'definitions.py'
-]
+RASBOT_SRC = ["authentication.py", "commands.py", "config.py", "definitions.py"]
 """Files inside `./src` to update."""
 
 BUILTIN_MODULES = [
-    'admin.py',
-    'caller.py',
-    'cmd.py',
-    'help.py',
-    'prefix.py',
-    'sample.py',
-    'uptime.py',
-    'target.py',
-    'xp.py',
-    'osu/request.py',
-    'osu/np.py',
-    'osu/helpers/api2.py',
+    "admin.py",
+    "caller.py",
+    "cmd.py",
+    "help.py",
+    "prefix.py",
+    "sample.py",
+    "uptime.py",
+    "target.py",
+    "xp.py",
+    "osu/request.py",
+    "osu/np.py",
+    "osu/helpers/api2.py",
 ]
 """Modules to always update alongside rasbot."""
 # TODO: customization for which to update maybe? idk?
@@ -57,19 +52,17 @@ BUILTIN_MODULES = [
 
 @click.command()
 @click.option(
-    "--silent/--loud",
-    help="Whether the update check should be silent.",
-    default=False
+    "--silent/--loud", help="Whether the update check should be silent.", default=False
 )
 @click.option(
     "--force/--no-force",
     help="Whether or not to force an update. Use if your installation is broken.",
-    default=False
+    default=False,
 )
 @click.option(
     "-l/-nl",
     help="For update order. Probably shouldn't manually set this.",
-    default=False
+    default=False,
 )
 def main(silent=False, force=False, l=False):
     check(silent, force, l)
@@ -107,44 +100,46 @@ def check(silent=False, force=False, l=False):
 
 
 def get_current_version():
-    """Read the version file and return the contents.
-    """
-    with open('version', 'r') as verfile:
+    """Read the version file and return the contents."""
+    with open("version", "r") as verfile:
         try:
             return semantic_version.Version(verfile.read())
         except ValueError:
-            input("Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation.")
+            input(
+                "Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation."
+            )
             sys.exit(1)
 
 
 def prompt():
-    """Prompts the user to update rasbot.
-    """
+    """Prompts the user to update rasbot."""
     print("--")
     print("HEY! Your version of rasbot is running out of date!")
-    print("Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with.")
+    print(
+        "Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with."
+    )
     print("This does not include anything found in your module config.")
     print("--\n")
 
-    if input("Would you like to update? (y/Y for yes): ").lower() == 'y':
+    if input("Would you like to update? (y/Y for yes): ").lower() == "y":
         update()
 
 
 def force_update():
-    """Update the updater and the rest of rasbot without opening a new instance of the updater.
-    """
-    do_files('', [RASBOT_BASE_UPDATER])
+    """Update the updater and the rest of rasbot without opening a new instance of the updater."""
+    do_files("", [RASBOT_BASE_UPDATER])
     update_after_updater()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
-    input("rasbot has reinstalled. You may need to run the updater again to fully fix your installation.")
+    input(
+        "rasbot has reinstalled. You may need to run the updater again to fully fix your installation."
+    )
     sys.exit(0)
 
 
 def update():
-    """Updates the rasbot updater first, then updates the rest.
-    """
-    do_files('', [RASBOT_BASE_UPDATER])
+    """Updates the rasbot updater first, then updates the rest."""
+    do_files("", [RASBOT_BASE_UPDATER])
     print("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
@@ -152,40 +147,43 @@ def update():
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
-    input("See what's changed in the #news channel in the Discord https://discord.gg/qpyT4zx.\n"
-          + "rasbot is now up to date, and will close to apply changes.")
+    input(
+        "See what's changed in the #news channel in the Discord https://discord.gg/qpyT4zx.\n"
+        + "rasbot is now up to date, and will close to apply changes."
+    )
     sys.exit(0)
 
 
 def update_after_updater():
     # Update base files
-    do_files('', RASBOT_BASE)
+    do_files("", RASBOT_BASE)
 
     # Update source files
-    do_files('src/', RASBOT_SRC)
+    do_files("src/", RASBOT_SRC)
     print("Finished updating rasbot.\n")
 
     # Update commands
-    do_files('modules/', BUILTIN_MODULES)
+    do_files("modules/", BUILTIN_MODULES)
     print("Finished updating built-in modules.\n")
 
     # Check for new requirements
-    do_files('', ['requirements.txt'])
+    do_files("", ["requirements.txt"])
 
-    subprocess.check_call([sys.executable, "-m", "pip",
-                          "install", "-r", "requirements.txt"])
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
+    )
     print("All requirements checked.\n")
 
     # Update README files
-    do_files('', ['README.md'])
-    do_files('modules/', ['README.md'])
+    do_files("", ["README.md"])
+    do_files("modules/", ["README.md"])
     print("Finished updating README files.\n")
 
     # Increment version
-    do_files('', ['version'])
+    do_files("", ["version"])
 
     # Perform config migrations if they exist
-    print('Attempting to migrate existing configuration to new standard...')
+    print("Attempting to migrate existing configuration to new standard...")
     attempt_migrate_config()
 
 
@@ -207,12 +205,12 @@ def do_files(path: str, files: list):
             continue
 
         # make the folder if it doesn't exist
-        if not path == '':
+        if not path == "":
             if not os.path.exists(path):
                 os.mkdir(path)
 
         # write the text to file
-        with io.open(f"{path}{file}", 'w', encoding="utf8") as local:
+        with io.open(f"{path}{file}", "w", encoding="utf8") as local:
             local.write(req.text)
 
 
@@ -225,7 +223,7 @@ def verify_folder_exists(path: str):
     folders = []
     for i, name in enumerate(folder_list):
         # assume file and end of path reached, break
-        if '.' in name:
+        if "." in name:
             break
 
         folder = f"{'/'.join(folder_list[:i+1])}"
@@ -244,22 +242,23 @@ def attempt_migrate_config():
     """
     import re
 
-    OLD_MODULE_MENTION_RE = re.compile(r'(&([\/a-z0-9_]+)&)')
+    OLD_MODULE_MENTION_RE = re.compile(r"(&([\/a-z0-9_]+)&)")
 
     # read all existing user configs
     cfgs = {}
     req_cfgs = {}
     for uid in os.listdir(config.BASE_CONFIG_PATH):
-        if '.' not in uid:
+        if "." not in uid:
             cfgs[uid] = config.read(f"{uid}/config.txt")
             req_cfgs[uid] = config.read(f"{uid}/modules/osu/request.txt")
 
     # update module mentions
     for uid, cfg in cfgs.items():
-        for command in cfg['commands'].values():
-            for mention, module in OLD_MODULE_MENTION_RE.findall(command['response']):
-                command['response'] = command['response'].replace(
-                    mention, f"%{module}%")
+        for command in cfg["commands"].values():
+            for mention, module in OLD_MODULE_MENTION_RE.findall(command["response"]):
+                command["response"] = command["response"].replace(
+                    mention, f"%{module}%"
+                )
 
         config.write(f"{uid}/config.txt", cfg)
 
@@ -268,9 +267,10 @@ def attempt_migrate_config():
         if not cfg:
             continue
 
-        for mention, module in OLD_MODULE_MENTION_RE.findall(cfg['message_format']):
-            cfg['message_format'] = cfg['message_format'].replace(
-                mention, f"%{module}%")
+        for mention, module in OLD_MODULE_MENTION_RE.findall(cfg["message_format"]):
+            cfg["message_format"] = cfg["message_format"].replace(
+                mention, f"%{module}%"
+            )
 
         config.write(f"{uid}/modules/osu/request.txt", cfg)
 

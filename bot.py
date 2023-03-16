@@ -12,13 +12,11 @@ from update import check
 import src.commands as commands
 from src.config import write, read_channel, read_global
 from src.authentication import Authentication, AuthenticationDeniedError
-from src.definitions import Author,\
-    Message
+from src.definitions import Author, Message
 
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
 logger = logging.getLogger("rasbot")
-formatter = logging.Formatter(
-    "%(asctime)s %(levelname)s %(module)s | %(message)s")
+formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
@@ -50,7 +48,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             if not os.path.exists("logs"):
                 os.mkdir("logs")
             file_handler = logging.FileHandler(
-                f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log")
+                f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log"
+            )
             file_handler.setLevel(loglevel)
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
@@ -79,23 +78,26 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             logger.debug(
                 f"init stats: {len(self.commands.modules)} modules, "
                 + f"{len(self.commands.commands)} commands, "
-                + f"{round(time.perf_counter()-debug_init_time,2)}s to init")
+                + f"{round(time.perf_counter()-debug_init_time,2)}s to init"
+            )
 
         # Create IRC bot connection
-        server = 'irc.twitch.tv'
+        server = "irc.twitch.tv"
         port = 80
-        logger.info('Connecting to ' + server +
-                    ' on port ' + str(port) + '...')
-        irc.bot.SingleServerIRCBot.__init__(self, [(
-            server, port, f"oauth:{self.auth.irc_oauth}")], self.auth.user_id, self.auth.user_id)
+        logger.info("Connecting to " + server + " on port " + str(port) + "...")
+        irc.bot.SingleServerIRCBot.__init__(
+            self,
+            [(server, port, f"oauth:{self.auth.irc_oauth}")],
+            self.auth.user_id,
+            self.auth.user_id,
+        )
 
     def reload(self):
-        """Reload the config for the current channel.
-        """
+        """Reload the config for the current channel."""
         logger.info(f"Reading config from {self.cfgpath}...")
         cfg = read_channel(self.cfgpath)
 
-        self.prefix = cfg['meta']['prefix']
+        self.prefix = cfg["meta"]["prefix"]
         logger.info(f"Prefix set as '{self.prefix}'")
 
         # Instantiate commands module
@@ -106,15 +108,21 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         for name, command in cfg["commands"].items():
             try:
                 self.commands.command_add(
-                    name, command['cooldown'], command['response'], command['requires_mod'], command['hidden'])
+                    name,
+                    command["cooldown"],
+                    command["response"],
+                    command["requires_mod"],
+                    command["hidden"],
+                )
             except ModuleNotFoundError as mod:
                 logger.error(
-                    f"command '{name}' attempts to use non-existent module '{mod}': ignoring...")
+                    f"command '{name}' attempts to use non-existent module '{mod}': ignoring..."
+                )
 
         logger.info(f"Imported {len(cfg['commands'])} command(s)")
 
         # Import additional modules
-        self.always_import_list = cfg['modules']
+        self.always_import_list = cfg["modules"]
         if cfg["modules"]:
             for module in cfg["modules"]:
                 if module in self.commands.modules:
@@ -124,30 +132,27 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     self.commands.module_add(module)
                 except ModuleNotFoundError as mod:
                     logger.error(
-                        f"always_import_list ('modules' in config) contains non-existent module '{mod}'")
+                        f"always_import_list ('modules' in config) contains non-existent module '{mod}'"
+                    )
 
-            logger.info(
-                f"Imported {len(cfg['modules'])} additional module(s)")
+            logger.info(f"Imported {len(cfg['modules'])} additional module(s)")
 
     def save(self):
-        """Write this bots' config file. For easy use within modules.
-        """
+        """Write this bots' config file. For easy use within modules."""
         # Construct skeleton
         data = {
-            'meta': {
-                'prefix': self.prefix
-            },
-            'commands': {},
-            'modules': self.always_import_list,
+            "meta": {"prefix": self.prefix},
+            "commands": {},
+            "modules": self.always_import_list,
         }
 
         # Adding commands
         for name, command in self.commands.commands.items():
-            data['commands'][name] = {
-                'cooldown': command.cooldown,
-                'requires_mod': command.requires_mod,
-                'hidden': command.hidden,
-                'response': command.response,
+            data["commands"][name] = {
+                "cooldown": command.cooldown,
+                "requires_mod": command.requires_mod,
+                "hidden": command.hidden,
+                "response": command.response,
             }
 
         write(self.cfgpath, data)
@@ -162,54 +167,52 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 channel_id = int(f"{r['data'][0]['id']}")
             except KeyError:
                 # If it errors with a 401 we try to refresh the oauth key
-                if r['status'] == 401:
+                if r["status"] == 401:
                     logger.info(
-                        "OAuth key is invalid or expired. Attempting a refresh...")
+                        "OAuth key is invalid or expired. Attempting a refresh..."
+                    )
                     try:
                         self.auth.refresh_oauth()
-                        r = requests.get(
-                            url, headers=self.auth.get_headers()).json()
+                        r = requests.get(url, headers=self.auth.get_headers()).json()
 
                     except AuthenticationDeniedError as err:
                         # If THAT fails, we throw our hands in the air and tell them to restart.
                         logger.error(f"Authentication Denied: {err}")
-                        logger.error(
-                            "Please ensure that your credentials are valid.")
+                        logger.error("Please ensure that your credentials are valid.")
                         logger.error("You may need to re-run setup.py.\n")
                         logger.error(
-                            "This error is unrecoverable. rasbot will now exit.")
+                            "This error is unrecoverable. rasbot will now exit."
+                        )
                         sys.exit(1)
 
         return channel_id
 
     def unimport_all_modules(self):
-        """Teardown all modules in preparation for closing.
-        """
+        """Teardown all modules in preparation for closing."""
         modules = [k for k in self.commands.modules.keys()]
         for module in modules:
             self.commands.module_del(module)
 
     def on_welcome(self, c, e):
         # You must request specific capabilities before you can use them
-        c.cap('REQ', ':twitch.tv/membership')
-        c.cap('REQ', ':twitch.tv/tags')
-        c.cap('REQ', ':twitch.tv/commands')
+        c.cap("REQ", ":twitch.tv/membership")
+        c.cap("REQ", ":twitch.tv/tags")
+        c.cap("REQ", ":twitch.tv/commands")
         c.join(f"{self.channel}")
 
-        logger.info(f'Joined {self.channel}! ({self.channel_id})\n')
+        logger.info(f"Joined {self.channel}! ({self.channel_id})\n")
 
     def on_pubmsg(self, c, e):
-        """Code to be run when a message is sent.
-        """
+        """Code to be run when a message is sent."""
         # Recomprehend tags into something usable
         e.tags = {i["key"]: i["value"] for i in e.tags}
 
         # Grab user info
         name = str.lower(e.tags["display-name"])
-        uid = int(e.tags['user-id'])
-        ismod = dict.get(e.tags, 'mod', '0') == '1'
-        issub = dict.get(e.tags, 'subscriber', '0') == '1'
-        isvip = dict.get(e.tags, 'vip', '0') == '1'
+        uid = int(e.tags["user-id"])
+        ismod = dict.get(e.tags, "mod", "0") == "1"
+        issub = dict.get(e.tags, "subscriber", "0") == "1"
+        isvip = dict.get(e.tags, "vip", "0") == "1"
         ishost = False
 
         # Gauranteeing broadcaster all traits
@@ -232,10 +235,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 self.commands.do_on_pubmsg(message)
                 return
 
-            split = msg.split(' ')
+            split = msg.split(" ")
 
             # Isolating command and command arguments
-            cmd = split[0][len(self.prefix):].lower()
+            cmd = split[0][len(self.prefix) :].lower()
             args = split[1:]
             message.attach_command(cmd, args)
 
@@ -244,12 +247,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
                 logger.debug(
-                    f"Ignoring invalid command call '{cmd}' from {name} ({author.user_status()})")
+                    f"Ignoring invalid command call '{cmd}' from {name} ({author.user_status()})"
+                )
                 return
 
             # Run the command and string result message
             logger.info(
-                f"Running command call '{cmd}' from {name} ({author.user_status()}) (args:{message.args})")
+                f"Running command call '{cmd}' from {name} ({author.user_status()}) (args:{message.args})"
+            )
             cmdresult = self.commands.commands[cmd].run(message)
 
             # If there is a string result message, print it to chat
@@ -257,8 +262,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 self.send_message(f"{cmdresult}")
 
         except Exception as err:
-            self.send_message(f'An error occurred in the processing of your request: {str(err)}. '
-                              + 'A full stack trace has been output to the command window.')
+            self.send_message(
+                f"An error occurred in the processing of your request: {str(err)}. "
+                + "A full stack trace has been output to the command window."
+            )
             traceback.print_exc()
 
     def send_message(self, msg: str):
@@ -266,22 +273,19 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         :param msg: The message to send.
         """
-        self.connection.privmsg(self.channel, f'{msg}')
+        self.connection.privmsg(self.channel, f"{msg}")
 
 
 @click.command()
-@click.option(
-    "--channel",
-    help="The Twitch channel to target."
-)
+@click.option("--channel", help="The Twitch channel to target.")
 @click.option(
     "--authfile",
-    help="The path to the auth file. This is relative to the 'userdata' folder."
+    help="The path to the auth file. This is relative to the 'userdata' folder.",
 )
 @click.option(
     "--debug/--normal",
     help="Have this instance be verbose about actions.",
-    default=False
+    default=False,
 )
 def main(channel=None, authfile=None, debug=False):
     # Check for updates first!
@@ -289,12 +293,12 @@ def main(channel=None, authfile=None, debug=False):
 
     # read global config
     cfg_global = read_global()
-    if cfg_global['always_debug']:
+    if cfg_global["always_debug"]:
         debug = True
 
     # read auth
     if not authfile:
-        authfile = cfg_global['default_authfile']
+        authfile = cfg_global["default_authfile"]
 
     try:
         auth = Authentication(authfile)
@@ -303,8 +307,7 @@ def main(channel=None, authfile=None, debug=False):
         logging.error("This error is unrecoverable. rasbot will now exit.")
         sys.exit(1)
     except KeyError as key:
-        logging.error(
-            f"Error setting '{key}' from authfile. Did you run setup?")
+        logging.error(f"Error setting '{key}' from authfile. Did you run setup?")
         logging.error("This error is unrecoverable. rasbot will now exit.")
         sys.exit(1)
 

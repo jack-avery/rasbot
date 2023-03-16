@@ -2,6 +2,7 @@
 # Helper classes.
 ##
 
+
 class Author:
     name = str
     uid = str
@@ -10,7 +11,15 @@ class Author:
     is_vip = bool
     is_host = bool
 
-    def __init__(self, name: str, uid: str, is_mod: bool = False, is_sub: bool = False, is_vip: bool = False, is_host: bool = False):
+    def __init__(
+        self,
+        name: str,
+        uid: str,
+        is_mod: bool = False,
+        is_sub: bool = False,
+        is_vip: bool = False,
+        is_host: bool = False,
+    ):
         """Create a new `Author`.
 
         :param name: The name of the user.
@@ -58,7 +67,7 @@ class Message:
     ### Do not modify this directly!! Use `Module.get_args(message)` to get arguments in modules.
     """
 
-    def __init__(self, author: Author, text_raw: str = ''):
+    def __init__(self, author: Author, text_raw: str = ""):
         """Create a new `Message`.
 
         :param author: The `Author` of this message.
@@ -69,7 +78,7 @@ class Message:
         self.cmd = None
         self.args = None
 
-    def attach_command(self, cmd: str = '', args: list = []):
+    def attach_command(self, cmd: str = "", args: list = []):
         """Attach command information to this `Message`.
 
         :param cmd: The command the `Author` called.
@@ -107,6 +116,6 @@ class Message:
 
 class Singleton:
     def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, 'instance'):
+        if not hasattr(cls, "instance"):
             cls.instance = super(Singleton, cls).__new__(cls)
         return cls.instance

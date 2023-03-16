@@ -6,7 +6,7 @@ from src.definitions import Message
 
 
 class Module(BaseModule):
-    helpmsg = 'Prints all available commands, or, if provided a module, prints the help message for that module. Usage: help <module?>'
+    helpmsg = "Prints all available commands, or, if provided a module, prints the help message for that module. Usage: help <module?>"
 
     consumes = 1
 
@@ -16,11 +16,21 @@ class Module(BaseModule):
         # If no command is provided, just run the base help message.
         if not args:
             # list of all commands (not hidden, not mod-only)
-            user_commands_list = ', '.join(
-                [n for n, c in self._bot.commands.commands.items() if not c.hidden and not c.requires_mod])
+            user_commands_list = ", ".join(
+                [
+                    n
+                    for n, c in self._bot.commands.commands.items()
+                    if not c.hidden and not c.requires_mod
+                ]
+            )
             # list of all commands (not hidden, mod-only)
-            mod_commands_list = ', '.join(
-                [n for n, c in self._bot.commands.commands.items() if not c.hidden and c.requires_mod])
+            mod_commands_list = ", ".join(
+                [
+                    n
+                    for n, c in self._bot.commands.commands.items()
+                    if not c.hidden and c.requires_mod
+                ]
+            )
 
             return f"Available commands are: {user_commands_list} (mod-only: {mod_commands_list})"
 
@@ -36,13 +46,14 @@ class Module(BaseModule):
             elif name in self._bot.commands.commands:
 
                 # see if it mentions any modules
-                command_modules = self._bot.commands.commands[name].get_used_modules(
-                )
+                command_modules = self._bot.commands.commands[name].get_used_modules()
 
                 # if it does, give the modules it mentions
                 if command_modules:
-                    return str(f"Module '{name}' not found, but the matching command uses module(s): "
-                               + f"{', '.join(command_modules)}")
+                    return str(
+                        f"Module '{name}' not found, but the matching command uses module(s): "
+                        + f"{', '.join(command_modules)}"
+                    )
 
                 else:
                     return str(f"Command {name} does not mention any modules.")

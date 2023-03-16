@@ -14,30 +14,33 @@ class Module(BaseModule):
         # TODO understand what I was doing when I wrote this and document it better...
 
         r = requests.get(
-            f"https://api.twitch.tv/helix/streams?user_id={self._bot.channel_id}", headers=self._bot.auth.get_headers()).json()
+            f"https://api.twitch.tv/helix/streams?user_id={self._bot.channel_id}",
+            headers=self._bot.auth.get_headers(),
+        ).json()
         try:
-            time_start = r['data'][0]['started_at']
+            time_start = r["data"][0]["started_at"]
         except IndexError:
-            return f'{self._bot.channel_name} is not currently live.'
+            return f"{self._bot.channel_name} is not currently live."
 
         time_start = datetime.datetime.strptime(
-            f'{time_start[:-1]}', "%Y-%m-%dT%H:%M:%S")
-        time_start = time_start.replace(
-            tzinfo=datetime.timezone.utc).timestamp()
+            f"{time_start[:-1]}", "%Y-%m-%dT%H:%M:%S"
+        )
+        time_start = time_start.replace(tzinfo=datetime.timezone.utc).timestamp()
 
         time_now = str(time.gmtime())
-        time_now = time_now[time_now.find("("):]
+        time_now = time_now[time_now.find("(") :]
 
         r = []
         for _ in range(6):
-            time_now = time_now[time_now.find("=")+1:]
-            r.append(time_now[:time_now.find(",")])
+            time_now = time_now[time_now.find("=") + 1 :]
+            r.append(time_now[: time_now.find(",")])
         time_now = datetime.datetime.strptime(
-            f'{"-".join(r[:3])}T{":".join(r[3:])}', "%Y-%m-%dT%H:%M:%S")
+            f'{"-".join(r[:3])}T{":".join(r[3:])}', "%Y-%m-%dT%H:%M:%S"
+        )
         time_now = time_now.replace(tzinfo=datetime.timezone.utc).timestamp()
 
-        secs = time_now-time_start
-        mins = round((secs-secs % 60)/60)
-        hrs = round((mins-mins % 60)/60)
+        secs = time_now - time_start
+        mins = round((secs - secs % 60) / 60)
+        hrs = round((mins - mins % 60) / 60)
 
-        return f'Uptime: {hrs}h{mins%60}m{round(secs%60)}s.'
+        return f"Uptime: {hrs}h{mins%60}m{round(secs%60)}s."

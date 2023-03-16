@@ -13,14 +13,12 @@ from src.commands import BaseModule
 class Module(BaseModule):
     helpmsg = 'Prints "Now Playing" information from a configured file. Usage: np'
 
-    default_config = {
-        "path": "C:/Program Files (x86)/StreamCompanion/Files/np.txt"
-    }
+    default_config = {"path": "C:/Program Files (x86)/StreamCompanion/Files/np.txt"}
     """Path to osu!StreamCompanion NP info file."""
 
     def main(self, message):
         try:
-            with open(self.cfg_get('path'), 'r') as file:
-                return f'{file.readlines()[0]}'
+            with open(self.cfg_get("path"), "r") as file:
+                return f"{file.readlines()[0]}"
         except (FileNotFoundError, IndexError):
-            return 'No NP data found.'
+            return "No NP data found."

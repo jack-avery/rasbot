@@ -8,42 +8,40 @@ BASE_CONFIG_PATH = "userdata"
 GLOBAL_CONFIG_FILE = "rasbot.txt"
 
 DEFAULT_CHANNEL = {
-    "meta": {
-        "prefix": "r!"
-    },
+    "meta": {"prefix": "r!"},
     "commands": {
         "help": {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "@%caller% > %help%"
+            "response": "@%caller% > %help%",
         },
         "uptime": {
             "cooldown": 10,
             "requires_mod": False,
             "hidden": False,
-            "response": "@%caller% > %uptime%"
+            "response": "@%caller% > %uptime%",
         },
         "cmd": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@%caller% > %cmd%"
+            "response": "@%caller% > %cmd%",
         },
         "prefix": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": False,
-            "response": "@%caller% > %prefix%"
+            "response": "@%caller% > %prefix%",
         },
         "admin": {
             "cooldown": 0,
             "requires_mod": True,
             "hidden": True,
-            "response": "@%caller% > %admin%"
+            "response": "@%caller% > %admin%",
         },
     },
-    "modules": []
+    "modules": [],
 }
 """Default channel config."""
 
@@ -63,7 +61,7 @@ def verify_folder_exists(path: str):
     folders = []
     for i, name in enumerate(folder_list):
         # assume file and end of path reached, break
-        if '.' in name:
+        if "." in name:
             break
 
         folder = f"{'/'.join(folder_list[:i+1])}"
@@ -77,8 +75,7 @@ def verify_folder_exists(path: str):
 
 
 def read_global() -> dict:
-    """Reads the global config file.
-    """
+    """Reads the global config file."""
     return read(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
 
 
@@ -104,7 +101,7 @@ def read(path: str, default: dict = None) -> dict:
 
     # Attempt to read config
     try:
-        with open(path, 'r') as cfgfile:
+        with open(path, "r") as cfgfile:
             data = json.loads(cfgfile.read())
 
             if not data:
@@ -137,7 +134,7 @@ def write(path: str, cfg: dict):
         path = f"{BASE_CONFIG_PATH}/{path}"
     verify_folder_exists(path)
 
-    with open(path, 'w') as cfgfile:
+    with open(path, "w") as cfgfile:
         logger.debug(f"writing {path}")
         cfgfile.write(json.dumps(cfg, indent=4, skipkeys=True))
 

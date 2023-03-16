@@ -35,11 +35,11 @@ class Authentication:
         auth = read(self.file, AUTH_SKELETON)
 
         try:
-            self.user_id = auth['user_id']
-            self.client_id = auth['client_id']
-            self.client_secret = auth['client_secret']
-            self.irc_oauth = auth['irc_oauth']
-            self.oauth = auth['oauth']
+            self.user_id = auth["user_id"]
+            self.client_id = auth["client_id"]
+            self.client_secret = auth["client_secret"]
+            self.irc_oauth = auth["irc_oauth"]
+            self.oauth = auth["oauth"]
 
         except KeyError as key:
             raise KeyError(key)
@@ -50,22 +50,25 @@ class Authentication:
 
         :return: A dictionary for use with the `headers` param of `requests.get()`
         """
-        return {'Client-ID': self.client_id,
-                'Authorization': f'Bearer {self.oauth}',
-                'Accept': 'application/vnd.twitchtv.v5+json'}
+        return {
+            "Client-ID": self.client_id,
+            "Authorization": f"Bearer {self.oauth}",
+            "Accept": "application/vnd.twitchtv.v5+json",
+        }
 
     def refresh_oauth(self):
-        """Attempts to automatically refresh the OAuth for the given user, then save to file.
-        """
+        """Attempts to automatically refresh the OAuth for the given user, then save to file."""
         # Request new oauth token from Twitch
-        r = requests.post(f"https://id.twitch.tv/oauth2/token"
-                          + f'?client_id={self.client_id}'
-                          + f'&client_secret={self.client_secret}'
-                          + '&grant_type=client_credentials').json()
+        r = requests.post(
+            f"https://id.twitch.tv/oauth2/token"
+            + f"?client_id={self.client_id}"
+            + f"&client_secret={self.client_secret}"
+            + "&grant_type=client_credentials"
+        ).json()
 
         # Set oauth and write the file
         try:
-            self.oauth = r['access_token']
+            self.oauth = r["access_token"]
 
             data = {
                 "user_id": self.user_id,
@@ -79,8 +82,9 @@ class Authentication:
 
         # If it can't find the key...
         except KeyError:
-            raise AuthenticationDeniedError("got error response status"
-                                            + f"{r['status']}, message '{r['message']}'")
+            raise AuthenticationDeniedError(
+                "got error response status" + f"{r['status']}, message '{r['message']}'"
+            )
 
 
 class AuthenticationDeniedError(Exception):

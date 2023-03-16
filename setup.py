@@ -8,16 +8,19 @@ import src.config as config
 def main(file: str):
     # Check for new requirements
     print("Running local requirements.txt...")
-    subprocess.check_call([sys.executable, "-m", "pip",
-                           "install", "-r", "requirements.txt"])
+    subprocess.check_call(
+        [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
+    )
     print("All requirements installed.\n")
 
     # We don't want people to accidentally overwrite their current auth
     if os.path.isfile(file):
         print(f"You already have an authfile at {file}!")
         print(f"Running this tool will overwrite {file}.")
-        print("If you want to save it, please rename it to something else, then restart this tool.\n")
-        if input("Are you sure you want to continue? (y/Y for yes): ").lower() != 'y':
+        print(
+            "If you want to save it, please rename it to something else, then restart this tool.\n"
+        )
+        if input("Are you sure you want to continue? (y/Y for yes): ").lower() != "y":
             sys.exit(0)
 
     # Set up
@@ -29,9 +32,13 @@ def main(file: str):
 
     # Asking to set up Twitch 2FA
     print(f"\nHello, {user_id}!")
-    print("You'll need to make sure you have Twitch.tv mobile two-factor authentication enabled:")
+    print(
+        "You'll need to make sure you have Twitch.tv mobile two-factor authentication enabled:"
+    )
     print("1. Go to your Twitch account settings, Security and Privacy.")
-    print("2. Scroll to Security and click 'Set Up Two-Factor Authentication' and follow the steps.")
+    print(
+        "2. Scroll to Security and click 'Set Up Two-Factor Authentication' and follow the steps."
+    )
     input("Press [Enter] once you've set that up.")
 
     # Getting Client ID and Secret
@@ -79,6 +86,6 @@ def main(file: str):
 if __name__ == "__main__":
     cfg_global = config.read_global()
 
-    file = cfg_global['default_authfile']
+    file = cfg_global["default_authfile"]
 
     main(file)

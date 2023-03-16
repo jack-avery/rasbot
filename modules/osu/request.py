@@ -10,68 +10,85 @@ from threading import Thread
 import time
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Author,\
-    Message
+from src.definitions import Author, Message
 
-OSU_BEATMAPSETID_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$'
-OSU_B_RE = r'^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$'
+OSU_BEATMAPSETID_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$"
+OSU_B_RE = r"^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$"
 
-OSU_BEATMAPSET_RE = r'^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)$'
+OSU_BEATMAPSET_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)$"
 
 # See https://github.com/ppy/osu-api/wiki#response for more info
-OSU_STATUSES = ["Pending", "Ranked", "Approved",
-                "Qualified", "Loved", "Graveyard", "WIP"]
+OSU_STATUSES = [
+    "Pending",
+    "Ranked",
+    "Approved",
+    "Qualified",
+    "Loved",
+    "Graveyard",
+    "WIP",
+]
 
 OSU_MODES = ["Standard", "Taiko", "CTB", "Mania"]
 
 # TODO update this with lazer mods when the time comes
-OSU_MODS = ["EZ", "NF", "HT", "HR", "SD", "PF",
-            "DT", "NC", "HD", "FL", "RX", "AP", "SO", "V2"]
+OSU_MODS = [
+    "EZ",
+    "NF",
+    "HT",
+    "HR",
+    "SD",
+    "PF",
+    "DT",
+    "NC",
+    "HD",
+    "FL",
+    "RX",
+    "AP",
+    "SO",
+    "V2",
+]
 
-MESSAGE_OPT_RE = re.compile(r'(%([\/a-z0-9_]+)%)')
+MESSAGE_OPT_RE = re.compile(r"(%([\/a-z0-9_]+)%)")
 
 MESSAGE_OPTIONS = {
     # web
     "map": lambda m: f"[https://osu.ppy.sh/b/{m['beatmap_id']} {m['artist']} - {m['title']} [{m['version']}]]",
-    "mapid": lambda m: m['beatmap_id'],
-    "mapsetid": lambda m: m['beatmapset_id'],
+    "mapid": lambda m: m["beatmap_id"],
+    "mapsetid": lambda m: m["beatmapset_id"],
     "mapstatus": lambda m: f"{OSU_STATUSES[int(m['approved'])]}",
-
     # creator
     "creator": lambda m: f"[https://osu.ppy.sh/users/{m['creator_id']} {m['creator']}]",
-    "creatorid": lambda m: m['creator_id'],
-    "creatorname": lambda m: m['creator'],
-
+    "creatorid": lambda m: m["creator_id"],
+    "creatorname": lambda m: m["creator"],
     # beatmap metadata
     "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
-    "bpm": lambda m: round(float(m['bpm']), 2),
-    "combo": lambda m: m['max_combo'],
-    "stars": lambda m: round(float(m['difficultyrating']), 2),
-    "cs": lambda m: m['diff_size'],
-    "od": lambda m: m['diff_overall'],
-    "ar": lambda m: m['diff_approach'],
-    "hp": lambda m: m['diff_drain'],
+    "bpm": lambda m: round(float(m["bpm"]), 2),
+    "combo": lambda m: m["max_combo"],
+    "stars": lambda m: round(float(m["difficultyrating"]), 2),
+    "cs": lambda m: m["diff_size"],
+    "od": lambda m: m["diff_overall"],
+    "ar": lambda m: m["diff_approach"],
+    "hp": lambda m: m["diff_drain"],
     "gamemode": lambda m: f"{OSU_MODES[int(m['mode'])]}",
-
     # song info
     "song": lambda m: f"{m['artist']} - {m['title']}",
-    "songartist": lambda m: m['artist'],
-    "songartistunicode": lambda m: m['artist_unicode'],
-    "songtitle": lambda m: m['title'],
-    "songtitleunicode": lambda m: m['title_unicode'],
-    "songsource": lambda m: m['source'],
-
+    "songartist": lambda m: m["artist"],
+    "songartistunicode": lambda m: m["artist_unicode"],
+    "songtitle": lambda m: m["title"],
+    "songtitleunicode": lambda m: m["title_unicode"],
+    "songsource": lambda m: m["source"],
     # requests specific additions
-    "requester": lambda m: m['sender'].name,
-    "requesterstatus": lambda m: m['sender'].user_status(),
-    "mods": lambda m: m['mods']
+    "requester": lambda m: m["sender"].name,
+    "requesterstatus": lambda m: m["sender"].user_status(),
+    "mods": lambda m: m["mods"],
 }
 
 
 class OsuRequestsIRCBot(irc.bot.SingleServerIRCBot):
     def __init__(self, user, target, server, port=6667, password=None, log_i=None):
         irc.bot.SingleServerIRCBot.__init__(
-            self, [(server, port, password)], user, user)
+            self, [(server, port, password)], user, user
+        )
 
         self.target = target
         self.user = user
@@ -123,23 +140,28 @@ class Module(BaseModule):
         self.beatmap_res = [beatmapsetid_re, b_re]
         self.beatmapset_res = [beatmapset_re]
 
-        self.cooldown = self.cfg_get('cd_per_user')
+        self.cooldown = self.cfg_get("cd_per_user")
         self.author_cds = dict()
 
         # resolve usernames
-        self.username = self.resolve_username(self.cfg_get('osu_user_id'))
+        self.username = self.resolve_username(self.cfg_get("osu_user_id"))
 
         # if the target is the same as the user, just copy it over instead of a second call
-        if self.cfg_get('osu_user_id') == self.cfg_get('osu_trgt_id'):
+        if self.cfg_get("osu_user_id") == self.cfg_get("osu_trgt_id"):
             self.log_d("username same as target, skipping extra api call")
             self.target = self.username
         else:
-            self.target = self.resolve_username(self.cfg_get('osu_trgt_id'))
+            self.target = self.resolve_username(self.cfg_get("osu_trgt_id"))
 
         # create IRC bot
         if self.username and self.target:
             self.osu_irc_bot = OsuRequestsIRCBot(
-                self.username, self.target, 'irc.ppy.sh', password=self.cfg_get('osu_irc_pwd'), log_i=self.log_i)
+                self.username,
+                self.target,
+                "irc.ppy.sh",
+                password=self.cfg_get("osu_irc_pwd"),
+                log_i=self.log_i,
+            )
 
             self.osu_irc_bot_thread = Thread(target=self.osu_irc_bot.start)
             self.osu_irc_bot_thread.daemon = True
@@ -154,10 +176,11 @@ class Module(BaseModule):
         req = None
         try:
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}")
+                f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}"
+            )
 
             # replace ' ' with '_'
-            name = req.json()[0]['username'].replace(" ", "_")
+            name = req.json()[0]["username"].replace(" ", "_")
             self.log_d(f"resolved to {name}")
 
             return name
@@ -175,23 +198,23 @@ class Module(BaseModule):
         """
         self.log_d(f"resolving mods from string {mods}")
         # strip + for logic
-        if mods.startswith('+'):
+        if mods.startswith("+"):
             mods = mods[1:]
 
         # remove any possible ,
-        mods = mods.replace(',', '')
+        mods = mods.replace(",", "")
 
         # split into separate mods
-        mods = [mods[i:i+2] for i in range(0, len(mods), 2)]
+        mods = [mods[i : i + 2] for i in range(0, len(mods), 2)]
 
         # add mods to modstring; prevent duplicates and invalid mods
-        modstring = '+'
+        modstring = "+"
         for mod in mods:
             if mod in OSU_MODS and mod not in modstring:
-                modstring += mod + ','
+                modstring += mod + ","
 
-        if modstring == '+':
-            return ''
+        if modstring == "+":
+            return ""
 
         self.log_d(modstring)
         return modstring
@@ -201,18 +224,14 @@ class Module(BaseModule):
         :param map: The map object as returned from the osu! API
         :return: The message to send as formatted using `message_format`
         """
-        message = self.cfg_get('message_format')
+        message = self.cfg_get("message_format")
 
         for flag, option in MESSAGE_OPT_RE.findall(message):
             if option not in MESSAGE_OPTIONS:
-                self.log_e(
-                    f"config error: message_format uses invalid key '{option}'")
+                self.log_e(f"config error: message_format uses invalid key '{option}'")
                 continue
 
-            message = message.replace(
-                flag,
-                str(MESSAGE_OPTIONS[option](map))
-            )
+            message = message.replace(flag, str(MESSAGE_OPTIONS[option](map)))
 
         return message
 
@@ -227,14 +246,14 @@ class Module(BaseModule):
         return "Request sent!"
 
     def on_pubmsg(self, message: Message):
-        if not self.cfg_get('parse_all_messages'):
+        if not self.cfg_get("parse_all_messages"):
             return
 
         # do not parse again if using a command
         if message.cmd:
             return
 
-        words = message.text_raw.split(' ')
+        words = message.text_raw.split(" ")
         for i, word in enumerate(words):
             if "osu.ppy.sh" in word:
                 args = words[i:]
@@ -246,15 +265,16 @@ class Module(BaseModule):
             return "A username (either self or target) could not be resolved. Please check/fix configuration."
 
         # prevent normal users from requesting in submode
-        if self.cfg_get('submode') and not (author.is_mod or author.is_sub or author.is_vip):
+        if self.cfg_get("submode") and not (
+            author.is_mod or author.is_sub or author.is_vip
+        ):
             return NO_MESSAGE_SIGNAL
 
         # exit early if user requested within cooldown
         if author.uid in self.author_cds:
             time_passed = time.time() - self.author_cds[author.uid]
             if time_passed < self.cooldown:
-                self.log_d(
-                    f"user {author.name} requested while still on cd; ignoring")
+                self.log_d(f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
@@ -265,16 +285,16 @@ class Module(BaseModule):
         req = args[0].lower()
 
         # allow mods to toggle submode
-        if req == 'submode' and author.is_mod:
-            t = not self.cfg_get('submode')
-            self.cfg_set('submode', t)
+        if req == "submode" and author.is_mod:
+            t = not self.cfg_get("submode")
+            self.cfg_set("submode", t)
             if t:
                 return "Submode enabled"
             else:
                 return "Submode disabled"
 
         # use second arg as mods
-        mods = ''
+        mods = ""
         if len(args) > 1:
             mods = self.generate_mods_string(args[1].upper())
 
@@ -303,14 +323,16 @@ class Module(BaseModule):
             # beatmap
             self.log_d(f"retrieving osu map info for beatmap id {id}")
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}").json()
+                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}"
+            ).json()
         else:
             # beatmapset
             self.log_d(f"retrieving top diff info for beatmapset id {id}")
             req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}").json()
+                f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}"
+            ).json()
             # sort mapset descending by difficulty so req[0] gives top diff
-            req.sort(key=lambda r: r['difficultyrating'], reverse=True)
+            req.sort(key=lambda r: r["difficultyrating"], reverse=True)
 
         try:
             map = req[0]
@@ -319,8 +341,8 @@ class Module(BaseModule):
             return "Could not retrieve beatmap information."
 
         # add request mods to map dict and format the message
-        map['mods'] = mods
-        map['sender'] = author
+        map["mods"] = mods
+        map["sender"] = author
         message = self.format_message(map)
 
         # send message, set cooldown and inform requester
@@ -333,7 +355,6 @@ class Module(BaseModule):
         """Send `msg` as an osu! message to `target` as `username`
         :param msg: The message to send
         """
-        self.log_d(
-            f"sending osu! message to {self.target} as {self.username}: '{msg}'")
+        self.log_d(f"sending osu! message to {self.target} as {self.username}: '{msg}'")
 
         self.osu_irc_bot.send_message(msg)

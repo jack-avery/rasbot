@@ -6,7 +6,7 @@ import re
 from src.commands import BaseModule
 from src.definitions import Message
 
-VALID_COMMAND_RE = re.compile(r'[a-z0-9_]+')
+VALID_COMMAND_RE = re.compile(r"[a-z0-9_]+")
 """Regex to compare given command names to for validation."""
 
 
@@ -27,9 +27,9 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
-        self.MODONLY_ARG = self.cfg_get('modonly_arg')
-        self.HIDDEN_ARG = self.cfg_get('hidden_arg')
-        self.DEFAULT_COOLDOWN = self.cfg_get('default_cooldown')
+        self.MODONLY_ARG = self.cfg_get("modonly_arg")
+        self.HIDDEN_ARG = self.cfg_get("hidden_arg")
+        self.DEFAULT_COOLDOWN = self.cfg_get("default_cooldown")
 
     def main(self, message: Message):
         cmd = self.get_args(message)
@@ -43,7 +43,7 @@ class Module(BaseModule):
         # use lower of next item as acting command name
         cmd_name = cmd.pop(0).lower()
 
-        if action in ['+', 'a', "add", "create", "new", "make", "mk"]:
+        if action in ["+", "a", "add", "create", "new", "make", "mk"]:
             if not cmd:
                 return "Not enough parameters given."
 
@@ -62,7 +62,7 @@ class Module(BaseModule):
             }
             for _ in params:
                 for param in params:
-                    if (cmd[0].lower() == param):
+                    if cmd[0].lower() == param:
                         params[param] = True
                         cmd.pop(0)
 
@@ -75,31 +75,33 @@ class Module(BaseModule):
 
             # add command and write config
             try:
-                self._bot.commands.command_add(cmd_name,
-                                               cmd_cooldown,
-                                               " ".join(cmd),
-                                               params[self.MODONLY_ARG],
-                                               params[self.HIDDEN_ARG])
+                self._bot.commands.command_add(
+                    cmd_name,
+                    cmd_cooldown,
+                    " ".join(cmd),
+                    params[self.MODONLY_ARG],
+                    params[self.HIDDEN_ARG],
+                )
                 self._bot.save()
 
-                return f'Command {cmd_name} added successfully.'
+                return f"Command {cmd_name} added successfully."
 
             except ModuleNotFoundError as mod:
-                return f'Module {mod} does not exist in the modules folder.'
+                return f"Module {mod} does not exist in the modules folder."
 
             except AttributeError as mod:
                 return f'Module {mod} does not have a "Module" class to import.'
 
-        if action in ['-', 'd', "delete", "del", "remove", "rem", "rm"]:
+        if action in ["-", "d", "delete", "del", "remove", "rem", "rm"]:
             if cmd_name not in self._bot.commands.commands:
                 return f"Command {cmd_name} does not exist!"
 
             self._bot.commands.command_del(cmd_name)
             self._bot.save()
 
-            return f'Command {cmd_name} removed successfully.'
+            return f"Command {cmd_name} removed successfully."
 
-        if action in ['e', "modify", "mod", "edit"]:
+        if action in ["e", "modify", "mod", "edit"]:
             if cmd_name not in self._bot.commands.commands:
                 return f"Command {cmd_name} does not exist!"
 
@@ -127,7 +129,9 @@ class Module(BaseModule):
                 if not VALID_COMMAND_RE.match(new_name):
                     return "Command name can only use alphanumeric characters and underscores (_)."
 
-                self._bot.commands.commands[new_name] = self._bot.commands.commands[cmd_name]
+                self._bot.commands.commands[new_name] = self._bot.commands.commands[
+                    cmd_name
+                ]
                 self._bot.commands.command_del(cmd_name)
                 self._bot.save()
 
@@ -160,6 +164,8 @@ class Module(BaseModule):
 
                 return f"Hiding from help for {cmd_name} toggled to {value}."
 
-            return "Valid fields to modify are: cooldown, response, requires_mod, hidden"
+            return (
+                "Valid fields to modify are: cooldown, response, requires_mod, hidden"
+            )
 
         return "Valid actions are: add, remove, edit."
