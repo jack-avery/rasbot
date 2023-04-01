@@ -240,39 +240,8 @@ def attempt_migrate_config():
 
     2.31.0 - string replacement moved from & to more often used % -- allows links with multiple & to be used in commands
     """
-    import re
-
-    OLD_MODULE_MENTION_RE = re.compile(r"(&([\/a-z0-9_]+)&)")
-
-    # read all existing user configs
-    cfgs = {}
-    req_cfgs = {}
-    for uid in os.listdir(config.BASE_CONFIG_PATH):
-        if "." not in uid:
-            cfgs[uid] = config.read(f"{uid}/config.txt")
-            req_cfgs[uid] = config.read(f"{uid}/modules/osu/request.txt")
-
-    # update module mentions
-    for uid, cfg in cfgs.items():
-        for command in cfg["commands"].values():
-            for mention, module in OLD_MODULE_MENTION_RE.findall(command["response"]):
-                command["response"] = command["response"].replace(
-                    mention, f"%{module}%"
-                )
-
-        config.write(f"{uid}/config.txt", cfg)
-
-    # update request config
-    for uid, cfg in req_cfgs.items():
-        if not cfg:
-            continue
-
-        for mention, module in OLD_MODULE_MENTION_RE.findall(cfg["message_format"]):
-            cfg["message_format"] = cfg["message_format"].replace(
-                mention, f"%{module}%"
-            )
-
-        config.write(f"{uid}/modules/osu/request.txt", cfg)
+    # TODO: add version checks and perform config migrations in order automatically depending on previous version to current.
+    # also don't have them on same branch as rasbot main -- different repo w/ alg to get migrations required?
 
 
 if __name__ == "__main__":
