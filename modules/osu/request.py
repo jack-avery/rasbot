@@ -4,13 +4,14 @@
 # Create a command using cmd with %osu/request% in the response.
 
 import irc
-import requests
 import re
 from threading import Thread
 import time
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
 from src.definitions import Author, Message
+
+from modules.osu.helpers.api2 import OsuAPIv2Helper
 
 OSU_BEATMAPSETID_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$"
 OSU_B_RE = r"^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$"
@@ -52,31 +53,30 @@ MESSAGE_OPT_RE = re.compile(r"(%([\/a-z0-9_]+)%)")
 
 MESSAGE_OPTIONS = {
     # web
-    "map": lambda m: f"[https://osu.ppy.sh/b/{m['beatmap_id']} {m['artist']} - {m['title']} [{m['version']}]]",
-    "mapid": lambda m: m["beatmap_id"],
+    "map": lambda m: f"[https://osu.ppy.sh/b/{m['id']} {m['beatmapset']['artist']} - {m['beatmapset']['title']} [{m['version']}]]",
+    "mapid": lambda m: m["id"],
     "mapsetid": lambda m: m["beatmapset_id"],
-    "mapstatus": lambda m: f"{OSU_STATUSES[int(m['approved'])]}",
+    "mapstatus": lambda m: str(m["status"]).capitalize(),
     # creator
-    "creator": lambda m: f"[https://osu.ppy.sh/users/{m['creator_id']} {m['creator']}]",
-    "creatorid": lambda m: m["creator_id"],
+    "creator": lambda m: f"[https://osu.ppy.sh/users/{m['user_id']} {m['beatmapset']['creator']}]",
+    "creatorid": lambda m: m["user_id"],
     "creatorname": lambda m: m["creator"],
     # beatmap metadata
     "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
-    "bpm": lambda m: round(float(m["bpm"]), 2),
+    "bpm": lambda m: m["bpm"],
     "combo": lambda m: m["max_combo"],
-    "stars": lambda m: round(float(m["difficultyrating"]), 2),
-    "cs": lambda m: m["diff_size"],
-    "od": lambda m: m["diff_overall"],
-    "ar": lambda m: m["diff_approach"],
-    "hp": lambda m: m["diff_drain"],
-    "gamemode": lambda m: f"{OSU_MODES[int(m['mode'])]}",
+    "stars": lambda m: m["difficulty_rating"],
+    "cs": lambda m: m["cs"],
+    "od": lambda m: m["accuracy"],
+    "ar": lambda m: m["ar"],
+    "hp": lambda m: m["drain"],
+    "gamemode": lambda m: m["mode"],
     # song info
-    "song": lambda m: f"{m['artist']} - {m['title']}",
-    "songartist": lambda m: m["artist"],
-    "songartistunicode": lambda m: m["artist_unicode"],
-    "songtitle": lambda m: m["title"],
-    "songtitleunicode": lambda m: m["title_unicode"],
-    "songsource": lambda m: m["source"],
+    "song": lambda m: f"{m['beatmapset']['artist']} - {m['beatmapset']['title']}",
+    "songartist": lambda m: m["beatmapset"]["artist"],
+    "songartistunicode": lambda m: m["beatmapset"]["artist_unicode"],
+    "songtitle": lambda m: m["beatmapset"]["title"],
+    "songtitleunicode": lambda m: m["beatmapset"]["title_unicode"],
     # requests specific additions
     "requester": lambda m: m["sender"].name,
     "requesterstatus": lambda m: m["sender"].user_status(),
@@ -85,12 +85,10 @@ MESSAGE_OPTIONS = {
 
 
 class OsuRequestsIRCBot(irc.bot.SingleServerIRCBot):
-    def __init__(self, user, target, server, port=6667, password=None, log_i=None):
+    def __init__(self, user, server, port=6667, password=None, log_i=None):
         irc.bot.SingleServerIRCBot.__init__(
             self, [(server, port, password)], user, user
         )
-
-        self.target = target
         self.user = user
         self.log_i = log_i
 
@@ -98,7 +96,7 @@ class OsuRequestsIRCBot(irc.bot.SingleServerIRCBot):
         self.log_i(f"osu! IRC Connected as {self.user}")
 
     def send_message(self, msg: str):
-        self.connection.privmsg(self.target, msg)
+        self.connection.privmsg(self.user, msg)
 
 
 class Module(BaseModule):
@@ -106,13 +104,9 @@ class Module(BaseModule):
 
     default_config = {
         # Your osu! ID. Go to your profile on the website and this should be in the URL.
-        "osu_user_id": "",
-        # Your osu! API key. Get this from https://old.ppy.sh/p/api.
-        "osu_api_key": "",
+        "osu_trgt_id": "",
         # Your osu! IRC password. Get this from https://old.ppy.sh/p/irc.
         "osu_irc_pwd": "",
-        # ID of the user that the request should go to.
-        "osu_trgt_id": "",
         # The format of the message to send alongside. See MESSAGE_OPTIONS for keys.
         # Enclose keys in % as you would a module in a command.
         "message_format": "%requester% (%requesterstatus%) requested: %map% %mods% (%length% @ %bpm%BPM, %stars%*, by %creator%)",
@@ -129,6 +123,9 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
+        # get api v2 helper
+        self.api_helper = OsuAPIv2Helper(self._bot.channel_id)
+
         # compile mapID regex
         beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)
         b_re = re.compile(OSU_B_RE)
@@ -143,21 +140,13 @@ class Module(BaseModule):
         self.cooldown = self.cfg_get("cd_per_user")
         self.author_cds = dict()
 
-        # resolve usernames
-        self.username = self.resolve_username(self.cfg_get("osu_user_id"))
-
-        # if the target is the same as the user, just copy it over instead of a second call
-        if self.cfg_get("osu_user_id") == self.cfg_get("osu_trgt_id"):
-            self.log_d("username same as target, skipping extra api call")
-            self.target = self.username
-        else:
-            self.target = self.resolve_username(self.cfg_get("osu_trgt_id"))
+        # resolve username
+        self.username = self.resolve_username(self.cfg_get("osu_trgt_id"))
 
         # create IRC bot
-        if self.username and self.target:
+        if self.username:
             self.osu_irc_bot = OsuRequestsIRCBot(
                 self.username,
-                self.target,
                 "irc.ppy.sh",
                 password=self.cfg_get("osu_irc_pwd"),
                 log_i=self.log_i,
@@ -173,23 +162,15 @@ class Module(BaseModule):
         :return: The name of the user, or `None` if the resolution failed.
         """
         self.log_d(f"resolving osu! username for ID {id}")
-        req = None
-        try:
-            req = requests.get(
-                f"https://osu.ppy.sh/api/get_user?u={id}&k={self.cfg_get('osu_api_key')}"
-            )
 
-            # replace ' ' with '_'
-            name = req.json()[0]["username"].replace(" ", "_")
-            self.log_d(f"resolved to {name}")
-
-            return name
-
-        except (IndexError, KeyError):
-            self.log_e(
-                f"could not resolve osu! username for id:{id}. API key may be invalid. (response code {req.status_code})"
-            )
+        name = self.api_helper.get_username(id)
+        if not name:
             return None
+
+        # replace ' ' with '_'
+        name = name["username"].replace(" ", "_")
+        self.log_d(f"resolved to {name}")
+        return name
 
     def generate_mods_string(self, mods: str) -> str:
         """Convert `mods` into a more conventional format, and verify that they are real osu! mods.
@@ -261,8 +242,10 @@ class Module(BaseModule):
 
     def process_request(self, author: Author, args):
         # do not continue if either username or target failed to resolve
-        if not self.username or not self.target:
-            return "A username (either self or target) could not be resolved. Please check/fix configuration."
+        if not self.username:
+            return (
+                "Your username could not be resolved. Please check/fix configuration."
+            )
 
         # prevent normal users from requesting in submode
         if self.cfg_get("submode") and not (
@@ -322,22 +305,16 @@ class Module(BaseModule):
         if is_id:
             # beatmap
             self.log_d(f"retrieving osu map info for beatmap id {id}")
-            req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?b={id}&k={self.cfg_get('osu_api_key')}"
-            ).json()
+            map = self.api_helper.get_beatmap(id)
         else:
             # beatmapset
             self.log_d(f"retrieving top diff info for beatmapset id {id}")
-            req = requests.get(
-                f"https://osu.ppy.sh/api/get_beatmaps?s={id}&k={self.cfg_get('osu_api_key')}"
-            ).json()
+            maps = self.api_helper.get_beatmapset(id)
             # sort mapset descending by difficulty so req[0] gives top diff
-            req.sort(key=lambda r: r["difficultyrating"], reverse=True)
-
-        try:
+            maps.sort(key=lambda m: m["difficultyrating"], reverse=True)
             map = req[0]
-        except IndexError:
-            self.log_e(f"failed to get info for id/setid {id}")
+
+        if not map:
             return "Could not retrieve beatmap information."
 
         # add request mods to map dict and format the message
@@ -355,6 +332,6 @@ class Module(BaseModule):
         """Send `msg` as an osu! message to `target` as `username`
         :param msg: The message to send
         """
-        self.log_d(f"sending osu! message to {self.target} as {self.username}: '{msg}'")
+        self.log_d(f"sending osu! message to {self.username}: '{msg}'")
 
         self.osu_irc_bot.send_message(msg)

@@ -140,29 +140,37 @@ class OsuAPIv2Helper(Singleton):
         logger.error("could not successfully perform request after a token refresh")
         return False
 
-    def get(self, endpoint: str):
+    def _get(self, endpoint: str = None, data: dict = None):
+        if data:
+            return self.__request(get, endpoint, data)
         return self.__request(get, endpoint)
 
-    def post(self, endpoint: str, data: dict):
+    def _post(self, endpoint: str = None, data: dict = None):
         return self.__request(post, endpoint, data)
+
+    def get_username(self, user_id: int):
+        """Get the username for user with ID `user_id`."""
+        return self._get(f"/users/{user_id}")
 
     def get_beatmap(self, beatmap_id: int):
         """Get information for the beatmap with ID `beatmap_id`."""
-        return self.get(f"/beatmaps/{beatmap_id}")
+        return self._get(f"/beatmaps/{beatmap_id}")
 
     def get_beatmapset(self, beatmapset_id: int):
         """Get maps and information for the beatmap set with ID `beatmapset_id`."""
-        return self.get(f"/beatmapsets/{beatmapset_id}")
+        return self._get(f"/beatmapsets/{beatmapset_id}")
 
     def get_user_top_plays(self, user_id: int):
         """Get top plays for user with ID `user_id`."""
-        return self.get(f"/users/{user_id}/scores/best")
+        return self._get(f"/users/{user_id}/scores/best")
 
-    def get_user_recent_plays(self, user_id: int):
-        """Get recent plays (including fails) for user with ID `user_id`."""
-        return self.get(f"/users/{user_id}/scores/recent?include_fails=1")
+    def get_user_recent_plays(self, user_id: int, include_fails: bool = True):
+        """Get recent plays for user with ID `user_id`. Includes fails by default."""
+        return self._get(
+            f"/users/{user_id}/scores/recent?include_fails={'1' if include_fails else '0'}"
+        )
 
-    def send_message(self, message: str, target_id: int):
+    def send_message(self, target_id: int, message: str):
         """Send `message` to osu! User ID `target`."""
         data = {"target_id": target_id, "message": message, "is_action": False}
-        self.post("/chat/new", data)
+        self._post("/chat/new", data)
