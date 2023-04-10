@@ -34,13 +34,21 @@ class Module(BaseModule):
         "level_requirement": 30,
         # Additional amount of XP (multiplicative) required for each new level.
         "level_increment": 1.2,
-        "omit_users": []
+        "omit_users": [],
     }
 
     consumes = 5
 
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
+
+        self.log_e(
+            "The XP module is under maintenance, and will return eventually:tm:."
+        )
+        self.log_e(
+            "Your stored user XP is safe. This message will disappear once it works again."
+        )
+        return
 
         # resolve path
         self.db_path = f"{BASE_CONFIG_PATH}/{self._bot.channel_id}/modules/xp.db"
@@ -55,13 +63,15 @@ class Module(BaseModule):
             self.db = sqlite3.connect(self.db_path)
 
         # Create the table if it doesn't exist
-        self.db.execute("""
+        self.db.execute(
+            """
         CREATE TABLE IF NOT EXISTS xp (
             user,
             amt,
             UNIQUE(user)
         )
-        """)
+        """
+        )
 
         # Create active users array for activity bonus
         self.active_users = []
@@ -71,6 +81,7 @@ class Module(BaseModule):
         self.timer.start()
 
     def __del__(self):
+        return
         self.timer.cancel()
 
     # Get viewerlist and do XP gain logic
@@ -81,33 +92,33 @@ class Module(BaseModule):
 
         # TODO replace this if the API ever becomes outdated
         users = requests.get(
-            f"https://tmi.twitch.tv/group/user/{self._bot.channel_name}/chatters", headers=self._bot.auth.get_headers()).json()
+            f"https://tmi.twitch.tv/group/user/{self._bot.channel_name}/chatters",
+            headers=self._bot.auth.get_headers(),
+        ).json()
 
         # Prevent streamer from earning watchtime XP on their own stream
-        users['chatters'].pop('broadcaster')
+        users["chatters"].pop("broadcaster")
 
         # Give XP to each user
-        for utype in users['chatters']:
-            for user in users['chatters'][utype]:
+        for utype in users["chatters"]:
+            for user in users["chatters"][utype]:
                 user = user.lower()
                 if user in self.cfg_get("omit_users"):
                     continue
 
                 # Resolve how much XP to grant to this user
-                active_range = self.cfg_get('xp_active_range')
-                inactive_range = self.cfg_get('xp_inactive_range')
-                if (user in self.active_users):
-                    amt = random.randint(
-                        active_range[0], active_range[1])
+                active_range = self.cfg_get("xp_active_range")
+                inactive_range = self.cfg_get("xp_inactive_range")
+                if user in self.active_users:
+                    amt = random.randint(active_range[0], active_range[1])
                 else:
-                    amt = random.randint(
-                        inactive_range[0], inactive_range[1])
+                    amt = random.randint(inactive_range[0], inactive_range[1])
 
                 # Grant it to the user
+                thread_db.execute("INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
                 thread_db.execute(
-                    "INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
-                thread_db.execute(
-                    f"UPDATE xp SET amt = amt + {amt} WHERE user = \"{user}\"")
+                    f'UPDATE xp SET amt = amt + {amt} WHERE user = "{user}"'
+                )
 
         # Commit XP modifications and clear active users for the next window.
         thread_db.commit()
@@ -115,13 +126,14 @@ class Module(BaseModule):
         self.active_users.clear()
 
     def get_top(self, rank: int):
-        """Return the top 3 XP holders.
-        """
+        """Return the top 3 XP holders."""
         with self.db as db:
             if rank:
                 user = self.get_user(rank=rank)
                 if user:
-                    return f"{user[0]} (#{user[1]}) is level {user[2]} with {user[3]} XP."
+                    return (
+                        f"{user[0]} (#{user[1]}) is level {user[2]} with {user[3]} XP."
+                    )
                 else:
                     return f"There is no rank #{rank} user."
 
@@ -145,8 +157,12 @@ class Module(BaseModule):
             cs = db.cursor()
 
             # Getting their position
-            all = tuple(map(lambda x: x, cs.execute(
-                'SELECT user, amt FROM xp ORDER BY amt DESC').fetchall()))
+            all = tuple(
+                map(
+                    lambda x: x,
+                    cs.execute("SELECT user, amt FROM xp ORDER BY amt DESC").fetchall(),
+                )
+            )
             if user:
                 if user.startswith("@"):
                     user = user[1:]
@@ -180,11 +196,10 @@ class Module(BaseModule):
         return (username, rank + 1, level, xp)
 
     def mod_user(self, args):
-        """Perform an action on a user.
-        """
+        """Perform an action on a user."""
         # TODO: refactor this. it's bad.
 
-        actions = ['set', 'transfer', 'ban', 'unban']
+        actions = ["set", "transfer", "ban", "unban"]
         msg = f"Please provide a valid action and a user. Valid actions include: {', '.join(actions)}."
 
         if not args:
@@ -209,8 +224,7 @@ class Module(BaseModule):
                     return "Please provide a number to set the user's XP to."
 
                 # perform update
-                db.execute(
-                    f"UPDATE xp SET amt = {amt} WHERE user = \"{user}\"")
+                db.execute(f'UPDATE xp SET amt = {amt} WHERE user = "{user}"')
                 msg = f"Set {user}'s XP to {amt}."
 
             elif action == "transfer":
@@ -232,8 +246,7 @@ class Module(BaseModule):
 
                     tar = (target, 0, 0)
 
-                    db.execute(
-                        "INSERT OR IGNORE INTO xp VALUES(?,?)", (target, 0))
+                    db.execute("INSERT OR IGNORE INTO xp VALUES(?,?)", (target, 0))
 
                 # ensure we don't grant more than the user can afford
                 d = src[2] - amount
@@ -246,10 +259,8 @@ class Module(BaseModule):
                     t_amt = tar[2] + amount
 
                 # perform updates
-                db.execute(
-                    f"UPDATE xp SET amt = {s_amt} WHERE user = \"{src[0]}\"")
-                db.execute(
-                    f"UPDATE xp SET amt = {t_amt} WHERE user = \"{tar[0]}\"")
+                db.execute(f'UPDATE xp SET amt = {s_amt} WHERE user = "{src[0]}"')
+                db.execute(f'UPDATE xp SET amt = {t_amt} WHERE user = "{tar[0]}"')
                 msg = f"Transferred {amount} points from {user} to {tar[0]}."
 
             elif action == "ban":
@@ -258,9 +269,8 @@ class Module(BaseModule):
                     return f"User {user} is already banned from XP."
 
                 # create the user if they don't already exist
-                db.execute(
-                    "INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
-                db.execute(f"UPDATE xp SET amt = 0 WHERE user = \"{user}\"")
+                db.execute("INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
+                db.execute(f'UPDATE xp SET amt = 0 WHERE user = "{user}"')
 
                 omit_users.append(user)
                 self.cfg_set("omit_users", omit_users)
@@ -281,6 +291,7 @@ class Module(BaseModule):
         return msg
 
     def main(self, message: Message):
+        return
         args = self.get_args_lower(message)
 
         if not args:
@@ -290,7 +301,6 @@ class Module(BaseModule):
 
         # Show top 3 or user at rank given
         if arg == "top":
-
             rank = None
             if args:
                 try:
@@ -314,6 +324,7 @@ class Module(BaseModule):
             return f"{arg} has no tracked XP."
 
     def on_pubmsg(self, message: Message):
+        return
         # Add this user to the active users list.
         if not message.author.name in self.active_users:
             self.active_users.append(message.author.name.lower())
