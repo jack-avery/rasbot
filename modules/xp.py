@@ -42,6 +42,14 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
+        self.log_e(
+            "The XP module is under maintenance, and will return eventually:tm:."
+        )
+        self.log_e(
+            "Your stored user XP is safe. This message will disappear once it works again."
+        )
+        return
+
         # resolve path
         self.db_path = f"{BASE_CONFIG_PATH}/{self._bot.channel_id}/modules/xp.db"
 
@@ -73,6 +81,7 @@ class Module(BaseModule):
         self.timer.start()
 
     def __del__(self):
+        return
         self.timer.cancel()
 
     # Get viewerlist and do XP gain logic
@@ -282,6 +291,7 @@ class Module(BaseModule):
         return msg
 
     def main(self, message: Message):
+        return
         args = self.get_args_lower(message)
 
         if not args:
@@ -291,7 +301,6 @@ class Module(BaseModule):
 
         # Show top 3 or user at rank given
         if arg == "top":
-
             rank = None
             if args:
                 try:
@@ -315,6 +324,7 @@ class Module(BaseModule):
             return f"{arg} has no tracked XP."
 
     def on_pubmsg(self, message: Message):
+        return
         # Add this user to the active users list.
         if not message.author.name in self.active_users:
             self.active_users.append(message.author.name.lower())
