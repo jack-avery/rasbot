@@ -1,4 +1,5 @@
 import src.authentication
+import webbrowser
 
 
 class OsuAPIv2Helper(src.authentication.OAuth2Handler):
@@ -30,6 +31,33 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
 
     api = "https://osu.ppy.sh/api/v2"
     """Base URL of the API."""
+
+    def setup(self):
+        print("osu! API v2 setup")
+
+        print("Go to your osu! profile on the website.")
+        osu_user_id = input(
+            "Your osu! User ID (https://osu.ppy.sh/users/[this number]): "
+        )
+
+        webbrowser.open(
+            "https://osu.ppy.sh/home/account/edit#new-oauth-application", new=2
+        )
+        print(
+            "\nA new browser page to your osu! profile has opened. Click on 'New OAuth Application' at the bottom."
+        )
+        print(
+            "Enter a name and set the Application Callback URL to http://localhost:27274."
+        )
+
+        client_id = input("Client ID: ")
+        client_secret = input("Client Secret: ")
+
+        self.cfg["osu_user_id"] = osu_user_id
+        self.cfg["client_id"] = client_id
+        self.cfg["client_secret"] = client_secret
+
+        return True
 
     def get_username(self, user_id: int):
         """Get the username for user with ID `user_id`."""

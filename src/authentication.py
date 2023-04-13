@@ -48,10 +48,10 @@ class OAuth2Handler(Singleton):
     def __get_auth(self):
         """Opens the Application Authorization page to get the auth code, and gets the initial token."""
         if not self.cfg["client_id"] or not self.cfg["client_secret"]:
-            logger.error(
-                f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
-            )
-            return
+            setup_complete = self.setup()
+
+            if not setup_complete:
+                return
 
         link = f"{self.oauth_grant_uri}?client_id={self.cfg['client_id']}&redirect_uri=http://localhost{f':{self.callback_port}' if self.callback_port else ''}&response_type=code&scope={' '.join(self.scopes)}"
         webbrowser.open(link, new=2)
@@ -154,6 +154,13 @@ class OAuth2Handler(Singleton):
 
     def _post(self, endpoint: str = None, data: dict = None):
         return self.__request(post, endpoint, data)
+
+    def setup(self):
+        """Perform a guided setup for this OAuth2. By default just logs an error and does nothing."""
+        logger.error(
+            f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
+        )
+        return False
 
 
 class OAuth2ListenHandler(http.server.SimpleHTTPRequestHandler):
