@@ -71,6 +71,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Import channel info
         self.channel_id = self.resolve_channel_id(channel_name)
+        self.user_id = self.resolve_channel_id(self.auth.user_id)
         self.cfgpath = f"{self.channel_id}/config.txt"
         self.reload()
 

@@ -130,15 +130,20 @@ class OAuth2Handler(Singleton):
 
         headers = {
             "Authorization": f"{str.capitalize(self.cfg['token']['token_type'])} {self.cfg['token']['access_token']}",
+            "Client-Id": self.cfg["client_id"],
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+
+        logger.debug(url, headers)
 
         if data:
             response = method(url, headers=headers, json=data)
         else:
             response = method(url, headers=headers)
+
         logger.debug(response.json())
+
         if response.status_code == 200:
             return response.json()
 

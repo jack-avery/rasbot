@@ -41,14 +41,6 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
-        self.log_e(
-            "The XP module is under maintenance, and will return eventually:tm:."
-        )
-        self.log_e(
-            "Your stored user XP is safe. This message will disappear once it works again."
-        )
-        return
-
         # resolve path
         self.db_path = f"{BASE_CONFIG_PATH}/{self._bot.channel_id}/modules/xp.db"
 
@@ -80,7 +72,6 @@ class Module(BaseModule):
         self.timer.start()
 
     def __del__(self):
-        return
         self.timer.cancel()
 
     # Get viewerlist and do XP gain logic
@@ -89,31 +80,28 @@ class Module(BaseModule):
         # Create a new connection for this thread
         thread_db = sqlite3.connect(self.db_path)
 
-        # i can't believe they outdated the api
-
-        # Prevent streamer from earning watchtime XP on their own stream
-        users["chatters"].pop("broadcaster")
+        # TODO: support more than 1k users through pagination
+        users = self._bot.auth.oauth2._get(
+            f"/chat/chatters?broadcaster_id={self._bot.channel_id}&moderator_id={self._bot.user_id}&first=1000"
+        )
 
         # Give XP to each user
-        for utype in users["chatters"]:
-            for user in users["chatters"][utype]:
-                user = user.lower()
-                if user in self.cfg_get("omit_users"):
-                    continue
+        for user in users["data"]:
+            user = user["user_login"].lower()
+            if user in self.cfg_get("omit_users"):
+                continue
 
-                # Resolve how much XP to grant to this user
-                active_range = self.cfg_get("xp_active_range")
-                inactive_range = self.cfg_get("xp_inactive_range")
-                if user in self.active_users:
-                    amt = random.randint(active_range[0], active_range[1])
-                else:
-                    amt = random.randint(inactive_range[0], inactive_range[1])
+            # Resolve how much XP to grant to this user
+            active_range = self.cfg_get("xp_active_range")
+            inactive_range = self.cfg_get("xp_inactive_range")
+            if user in self.active_users:
+                amt = random.randint(active_range[0], active_range[1])
+            else:
+                amt = random.randint(inactive_range[0], inactive_range[1])
 
-                # Grant it to the user
-                thread_db.execute("INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
-                thread_db.execute(
-                    f'UPDATE xp SET amt = amt + {amt} WHERE user = "{user}"'
-                )
+            # Grant it to the user
+            thread_db.execute("INSERT OR IGNORE INTO xp VALUES(?,?)", (user, 0))
+            thread_db.execute(f'UPDATE xp SET amt = amt + {amt} WHERE user = "{user}"')
 
         # Commit XP modifications and clear active users for the next window.
         thread_db.commit()
@@ -286,7 +274,6 @@ class Module(BaseModule):
         return msg
 
     def main(self, message: Message):
-        return
         args = self.get_args_lower(message)
 
         if not args:
