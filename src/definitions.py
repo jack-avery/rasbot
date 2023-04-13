@@ -115,7 +115,10 @@ class Message:
 
 
 class Singleton:
+    spaces = {}
+
     def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, "instance"):
-            cls.instance = super(Singleton, cls).__new__(cls)
-        return cls.instance
+        name = args[0]
+        if not hasattr(cls.spaces, name):
+            cls.spaces[name] = super(Singleton, cls).__new__(cls)
+        return cls.spaces[name]

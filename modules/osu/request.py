@@ -124,7 +124,9 @@ class Module(BaseModule):
         BaseModule.__init__(self, bot, name)
 
         # get api v2 helper
-        self.api_helper = OsuAPIv2Helper(self._bot.channel_id)
+        self.api_helper = OsuAPIv2Helper(
+            f"{self._bot.channel_id}/modules/osu/helpers/api2.txt"
+        )
 
         # compile mapID regex
         beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)
@@ -156,7 +158,7 @@ class Module(BaseModule):
             self.osu_irc_bot_thread.daemon = True
             self.osu_irc_bot_thread.start()
 
-    def resolve_username(self, id: (str | int)) -> (str | None):
+    def resolve_username(self, id: (str | int)) -> str | None:
         """Resolves a users' osu! username from their ID.
         :param id: The ID of the osu! user to resolve the name for.
         :return: The name of the user, or `None` if the resolution failed.

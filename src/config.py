@@ -123,6 +123,9 @@ def read(path: str, default: dict = None) -> dict:
             logger.debug(f"{path} not found, writing default;")
             return write(path, default)
 
+        # No default; return empty dict to prevent errors
+        return dict()
+
 
 def write(path: str, cfg: dict):
     """Write `cfg` to `path` and return `cfg`.
