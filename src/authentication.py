@@ -21,22 +21,16 @@ AUTH_SKELETON = {
 class OAuth2Handler(Singleton):
     name = "twitch"
     """Discriminator for this OAuth2Handler."""
-
     default_config = None
     """Default configuration for this OAuth2Handler."""
-
     callback_port = None
     """Callback port to http://localhost for auth code grabbing."""
-
     scopes = ["moderator:read:chatters"]
     """A list of scopes that are used by the handler. Default is for Twitch."""
-
     oauth_grant_uri = "https://id.twitch.tv/oauth2/authorize"
     """Base URL of the website to get the user authorization grant from."""
-
     oauth_token_uri = "https://id.twitch.tv/oauth2/token"
     """API endpoint to get/refresh the OAuth token at."""
-
     api = "https://api.twitch.tv/helix"
     """Base URL of the API."""
 

@@ -8,7 +8,6 @@ from src.definitions import Message
 
 import os
 import random
-import requests
 import sqlite3
 import threading
 
@@ -90,11 +89,7 @@ class Module(BaseModule):
         # Create a new connection for this thread
         thread_db = sqlite3.connect(self.db_path)
 
-        # TODO replace this if the API ever becomes outdated
-        users = requests.get(
-            f"https://tmi.twitch.tv/group/user/{self._bot.channel_name}/chatters",
-            headers=self._bot.auth.get_headers(),
-        ).json()
+        # i can't believe they outdated the api
 
         # Prevent streamer from earning watchtime XP on their own stream
         users["chatters"].pop("broadcaster")
