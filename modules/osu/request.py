@@ -62,7 +62,7 @@ MESSAGE_OPTIONS = {
     "creatorid": lambda m: m["user_id"],
     "creatorname": lambda m: m["creator"],
     # beatmap metadata
-    "length": lambda m: f"{int(int(m['total_length']) / 60)}:{int(m['total_length']) % 60}",
+    "length": lambda m: f"{int(int(m['total_length']) / 60)}:{0 if int(m['total_length']) % 60 < 10 else ''}{int(m['total_length']) % 60}",
     "bpm": lambda m: m["bpm"],
     "combo": lambda m: m["max_combo"],
     "stars": lambda m: m["difficulty_rating"],
