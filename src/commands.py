@@ -9,7 +9,7 @@ from bot import TwitchBot
 from src.config import read, write
 from src.definitions import Message
 
-logger = logging.getLogger("rasbot")
+log = logging.getLogger("rasbot")
 
 MODULE_MENTION_RE = re.compile(r"(%([\/a-z0-9_]+)%)")
 """Regex to search command responses with to apply modules."""
@@ -98,7 +98,7 @@ def command_add(
     :param requires_mod: Whether this command requires moderator access to use.
     :param hidden: Whether to hide this command from the `help` module.
     """
-    logger.debug(
+    log.debug(
         f"adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})"
     )
 
@@ -120,7 +120,7 @@ def command_mod(name: str, key: str, value):
     :param key: The field of the command to modify.
     :param value: The value to set the field to.
     """
-    logger.debug(f"modifying {key} of {name} to {value}")
+    log.debug(f"modifying {key} of {name} to {value}")
     if key == "cooldown":
         commands[name].cooldown = value
 
@@ -142,7 +142,7 @@ def command_del(name: str):
 
     :param name: The name of the command.
     """
-    logger.debug(f"removing {name}")
+    log.debug(f"removing {name}")
     del commands[name]
 
 
@@ -237,21 +237,21 @@ class BaseModule(threading.Thread):
 
         :param msg: The error to log.
         """
-        logger.error(f"({self._name}) - {msg}")
+        log.error(f"({self._name}) - {msg}")
 
     def log_i(self, msg: str):
         """Log info alongside the module's name to the window.
 
         :param msg: The message to log.
         """
-        logger.info(f"({self._name}) - {msg}")
+        log.info(f"({self._name}) - {msg}")
 
     def log_d(self, msg: str):
         """Log a debug message alongside the module's name to the window.
 
         :param msg: The debug info to log.
         """
-        logger.debug(f"({self._name}) - {msg}")
+        log.debug(f"({self._name}) - {msg}")
 
     def get_args(self, message: Message) -> list:
         """Consume `self.consumes` arguments from `message` for use as command arguments.
@@ -278,7 +278,7 @@ def module_add(name: str):
 
     :param name: The path to the module. Path is relative to the `modules` folder.
     """
-    logger.debug(f"importing module {name}")
+    log.debug(f"importing module {name}")
 
     try:
         # Create spec and import from directory.
@@ -296,7 +296,7 @@ def module_add(name: str):
         raise ModuleNotFoundError(name)
 
     except Exception:
-        logger.error(f"failed to import module {name} with error trace:")
+        log.error(f"failed to import module {name} with error trace:")
         traceback.print_exc()
         raise ModuleNotFoundError(name)
 
@@ -306,7 +306,7 @@ def module_del(name: str):
 
     :param name: The name of the module.
     """
-    logger.debug(f"unimporting module {name}")
+    log.debug(f"unimporting module {name}")
 
     if name not in modules:
         return

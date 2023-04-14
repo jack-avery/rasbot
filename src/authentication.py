@@ -7,7 +7,7 @@ import webbrowser
 from src.config import BASE_CONFIG_PATH, read, write
 from src.definitions import Singleton
 
-logger = logging.getLogger("rasbot")
+log = logging.getLogger("rasbot")
 
 AUTH_SKELETON = {
     "user_id": None,
@@ -55,15 +55,15 @@ class OAuth2Handler(Singleton):
 
         link = f"{self.oauth_grant_uri}?client_id={self.cfg['client_id']}&redirect_uri=http://localhost{f':{self.callback_port}' if self.callback_port else ''}&response_type=code&scope={' '.join(self.scopes)}"
         webbrowser.open(link, new=2)
-        logger.info(
+        log.info(
             f"See your web browser to continue setting up your '{self.name}' OAuth2."
         )
 
         self.__oauth_grant_listen()
-        logger.info("Got the temporary code! Getting your initial OAuth token...")
+        log.info("Got the temporary code! Getting your initial OAuth token...")
 
         self.__get_initial_token()
-        logger.info(f"Success! OAuth2 session '{self.name}' set up.")
+        log.info(f"Success! OAuth2 session '{self.name}' set up.")
 
     def __oauth_grant_listen(self):
         """Create a local HTTP server and listen for exactly one request, and return the obtained authorization code."""
@@ -93,7 +93,7 @@ class OAuth2Handler(Singleton):
         if "token" not in self.cfg:
             return
 
-        logger.debug("refreshing OAuth token")
+        log.debug("refreshing OAuth token")
 
         data = {
             "client_id": self.cfg["client_id"],
@@ -112,7 +112,7 @@ class OAuth2Handler(Singleton):
         token = post(self.oauth_token_uri, headers=headers, json=data)
 
         if not token.status_code == 200:
-            logger.error(f"OAuth token grab failed! ({token.json()})")
+            log.error(f"OAuth token grab failed! ({token.json()})")
             return
 
         self.cfg["token"] = token.json()
@@ -135,14 +135,14 @@ class OAuth2Handler(Singleton):
             "Accept": "application/json",
         }
 
-        logger.debug(url, headers)
+        log.debug(url, headers)
 
         if data:
             response = method(url, headers=headers, json=data)
         else:
             response = method(url, headers=headers)
 
-        logger.debug(response.json())
+        log.debug(response.json())
 
         if response.status_code == 200:
             return response.json()
@@ -157,7 +157,7 @@ class OAuth2Handler(Singleton):
 
     def setup(self):
         """Perform a guided setup for this OAuth2. By default just logs an error and does nothing."""
-        logger.error(
+        log.error(
             f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
         )
         return False
