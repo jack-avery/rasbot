@@ -19,19 +19,19 @@ AUTH_SKELETON = {
 
 
 class OAuth2Handler(Singleton):
-    name = "twitch"
+    name = ""
     """Discriminator for this OAuth2Handler."""
     default_config = None
     """Default configuration for this OAuth2Handler."""
     callback_port = None
     """Callback port to http://localhost for auth code grabbing."""
-    scopes = ["moderator:read:chatters"]
-    """A list of scopes that are used by the handler. Default is for Twitch."""
-    oauth_grant_uri = "https://id.twitch.tv/oauth2/authorize"
+    scopes = []
+    """A list of scopes that are used by the handler."""
+    oauth_grant_uri = ""
     """Base URL of the website to get the user authorization grant from."""
-    oauth_token_uri = "https://id.twitch.tv/oauth2/token"
+    oauth_token_uri = ""
     """API endpoint to get/refresh the OAuth token at."""
-    api = "https://api.twitch.tv/helix"
+    api = ""
     """Base URL of the API."""
 
     def __init__(self, cfgpath: int):
@@ -182,6 +182,48 @@ oauth_code = ""
 """Global variable so that `OAuth2ListenHandler` can communicate with `OAuth2Handler.__oauth_grant_listen`..."""
 
 
+class TwitchOAuth2Helper(OAuth2Handler):
+    name = "twitch"
+    """Discriminator for this OAuth2Handler."""
+    default_config = None
+    """Default configuration for this OAuth2Handler."""
+    callback_port = None
+    """Callback port to http://localhost for auth code grabbing."""
+    scopes = ["moderator:read:chatters"]
+    """A list of scopes that are used by the handler. Default is for Twitch."""
+    oauth_grant_uri = "https://id.twitch.tv/oauth2/authorize"
+    """Base URL of the website to get the user authorization grant from."""
+    oauth_token_uri = "https://id.twitch.tv/oauth2/token"
+    """API endpoint to get/refresh the OAuth token at."""
+    api = "https://api.twitch.tv/helix"
+    """Base URL of the API."""
+
+    def get_all_chatters(self, channel_id: int, user_id: int):
+        """Return a list of `user_login` for all users in the current channel.
+
+        Automatically paginates and returns all users.
+        
+        :param channel_id: The channel ID to get chatters for.
+        :param user_id: The User ID of the current OAuth2 session user.
+        """
+        results = []
+        query = self._get(f"/chat/chatters?broadcaster_id={channel_id}&moderator_id={user_id}&first=1000")
+
+        # nothing there. return empty list here to prevent errors
+        if len(query["data"]) == 0:
+            return results
+
+        results += [user["user_login"] for user in query["data"]]
+
+        # paginate, if applicable
+        # query["pagination"] should be empty (== False) if no more than 1000
+        while query["pagination"]:
+            query = self._get(f"/chat/chatters?broadcaster_id={channel_id}&moderator_id={user_id}&first=1000&after={query['pagination']['cursor']}")
+            results += [user["user_login"] for user in query["data"]]
+        
+        return results
+
+
 class Authentication:
     file: str
     """The path to the file containing the given Twitch authentication"""
@@ -195,8 +237,8 @@ class Authentication:
     """Twitch OAuth token for IRC connections."""
     oauth: str
     """Twitch OAuth token for API requests."""
-    oauth2: OAuth2Handler
-    """Twitch OAuth2 handler."""
+    oauth2: TwitchOAuth2Helper
+    """Twitch OAuth2 helper instance."""
 
     def __init__(self, file: str):
         """Create a new authentication identity.
@@ -206,7 +248,7 @@ class Authentication:
         self.file = file
 
         auth = read(self.file, AUTH_SKELETON)
-        self.oauth2 = OAuth2Handler(self.file)
+        self.oauth2 = TwitchOAuth2Helper(self.file)
 
         try:
             self.user_id = auth["user_id"]
