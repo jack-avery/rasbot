@@ -11,7 +11,7 @@ from update import check
 
 import src.commands as commands
 from src.config import write, read_channel, read_global
-from src.authentication import Authentication, AuthenticationDeniedError
+from src.authentication import Authentication, TwitchOAuth2Helper, AuthenticationDeniedError
 from src.definitions import Author, Message
 
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
@@ -21,6 +21,7 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     auth: Authentication
+    oauth2: TwitchOAuth2Helper
     channel_id: int
     channel_name: str
     channel: str
@@ -67,6 +68,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Initialize authentication
         self.auth = auth
+        self.oauth2 = TwitchOAuth2Helper(auth.file)
         logger.info(f"Starting as {self.auth.user_id}...")
 
         # Import channel info

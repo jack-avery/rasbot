@@ -80,7 +80,7 @@ class Module(BaseModule):
         # Create a new connection for this thread
         thread_db = sqlite3.connect(self.db_path)
 
-        users = self._bot.auth.oauth2.get_all_chatters(self._bot.channel_id, self._bot.user_id)
+        users = self._bot.oauth2.get_all_chatters(self._bot.channel_id, self._bot.user_id)
 
         # Give XP to each user
         for user in users:

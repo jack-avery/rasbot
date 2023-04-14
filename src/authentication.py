@@ -190,7 +190,7 @@ class TwitchOAuth2Helper(OAuth2Handler):
     callback_port = None
     """Callback port to http://localhost for auth code grabbing."""
     scopes = ["moderator:read:chatters"]
-    """A list of scopes that are used by the handler. Default is for Twitch."""
+    """A list of scopes that are used by the handler."""
     oauth_grant_uri = "https://id.twitch.tv/oauth2/authorize"
     """Base URL of the website to get the user authorization grant from."""
     oauth_token_uri = "https://id.twitch.tv/oauth2/token"
@@ -237,8 +237,6 @@ class Authentication:
     """Twitch OAuth token for IRC connections."""
     oauth: str
     """Twitch OAuth token for API requests."""
-    oauth2: TwitchOAuth2Helper
-    """Twitch OAuth2 helper instance."""
 
     def __init__(self, file: str):
         """Create a new authentication identity.
@@ -248,7 +246,6 @@ class Authentication:
         self.file = file
 
         auth = read(self.file, AUTH_SKELETON)
-        self.oauth2 = TwitchOAuth2Helper(self.file)
 
         try:
             self.user_id = auth["user_id"]
