@@ -4,8 +4,6 @@ import webbrowser
 
 class OsuAPIv2Helper(src.authentication.OAuth2Handler):
     name = "osu2"
-    """Discriminator for this OAuth2Handler."""
-
     default_config = {
         # Your osu! user ID. Owner of the application.
         "osu_user_id": "",
@@ -15,22 +13,11 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
         "client_secret": "",
         # The remainder of the info is obtained automatically by the OsuAPIv2Helper.
     }
-    """Default configuration for this OAuth2Handler."""
-
     callback_port = 27274
-    """Callback port to http://localhost for auth code grabbing."""
-
     scopes = ["chat.write", "public"]
-    """A list of scopes that are used by the handler. Default is for Twitch."""
-
     oauth_grant_uri = "https://osu.ppy.sh/oauth/authorize"
-    """Base URL of the website to get the user authorization grant from."""
-
     oauth_token_uri = "https://osu.ppy.sh/oauth/token"
-    """API endpoint to get/refresh the OAuth token at."""
-
     api = "https://osu.ppy.sh/api/v2"
-    """Base URL of the API."""
 
     def setup(self):
         print("osu! API v2 setup")

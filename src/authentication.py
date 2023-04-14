@@ -182,19 +182,12 @@ class OAuth2Handler(Singleton):
 
 class TwitchOAuth2Helper(OAuth2Handler):
     name = "twitch"
-    """Discriminator for this OAuth2Handler."""
     default_config = None
-    """Default configuration for this OAuth2Handler."""
     callback_port = None
-    """Callback port to http://localhost for auth code grabbing."""
     scopes = ["moderator:read:chatters"]
-    """A list of scopes that are used by the handler."""
     oauth_grant_uri = "https://id.twitch.tv/oauth2/authorize"
-    """Base URL of the website to get the user authorization grant from."""
     oauth_token_uri = "https://id.twitch.tv/oauth2/token"
-    """API endpoint to get/refresh the OAuth token at."""
     api = "https://api.twitch.tv/helix"
-    """Base URL of the API."""
 
     def get_all_chatters(self, channel_id: int, user_id: int):
         """Return a list of `user_login` for all users in the current channel.
