@@ -1,6 +1,6 @@
 import logging
 from requests import get, post
-import http.server
+import socket
 import time
 import webbrowser
 
@@ -59,10 +59,10 @@ class OAuth2Handler(Singleton):
             f"See your web browser to continue setting up your '{self.name}' OAuth2."
         )
 
-        self.__oauth_grant_listen()
+        auth_code = self.__oauth_grant_listen()
         log.info("Got the temporary code! Getting your initial OAuth token...")
 
-        self.__get_initial_token()
+        self.__get_initial_token(auth_code)
         log.info(f"Success! OAuth2 session '{self.name}' set up.")
 
     def __oauth_grant_listen(self):
@@ -71,10 +71,27 @@ class OAuth2Handler(Singleton):
         if self.callback_port:
             port = self.callback_port
 
-        with http.server.HTTPServer(("localhost", port), OAuth2ListenHandler) as server:
-            server.handle_request()
+        with socket.create_server(("localhost", port)) as listener:
+            conn, addr = listener.accept()
+            auth_code = conn.recv(4096)
 
-    def __get_initial_token(self):
+            # Strip request bytes to strictly the code
+            auth_code = auth_code[auth_code.find(b"code=") + 5 :]
+
+            # TODO: handle this better...
+            andex = auth_code.find(b"&")
+            if andex == -1:
+                auth_code = auth_code[: auth_code.find(b" ")]
+            else:
+                auth_code = auth_code[: andex]
+
+            auth_code = auth_code.decode("ASCII")
+
+            # Inform the user in-browser
+            conn.send(b"Got the temporary code! You can now close this window.")
+            return auth_code
+
+    def __get_initial_token(self, auth_code: str):
         """Get the initial token for this OAuth2 session.
 
         :param auth_code: The auth code as gotten from the callback.
@@ -82,7 +99,7 @@ class OAuth2Handler(Singleton):
         data = {
             "client_id": self.cfg["client_id"],
             "client_secret": self.cfg["client_secret"],
-            "code": oauth_code,
+            "code": auth_code,
             "grant_type": "authorization_code",
             "redirect_uri": f"http://localhost{f':{self.callback_port}' if self.callback_port else ''}",
         }
@@ -161,25 +178,6 @@ class OAuth2Handler(Singleton):
             f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
         )
         return False
-
-
-class OAuth2ListenHandler(http.server.SimpleHTTPRequestHandler):
-    def do_GET(self):
-        global oauth_code
-        code = self.path
-        code = code[code.find("=") + 1 :]
-
-        andex = code.find("&")
-        if andex == -1:
-            oauth_code = code
-            return
-
-        code = code[:andex]
-        oauth_code = code
-
-
-oauth_code = ""
-"""Global variable so that `OAuth2ListenHandler` can communicate with `OAuth2Handler.__oauth_grant_listen`..."""
 
 
 class TwitchOAuth2Helper(OAuth2Handler):
