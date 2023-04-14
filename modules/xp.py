@@ -80,12 +80,11 @@ class Module(BaseModule):
         # Create a new connection for this thread
         thread_db = sqlite3.connect(self.db_path)
 
-        # TODO: support more than 1k users through pagination
         users = self._bot.auth.oauth2.get_all_chatters(self._bot.channel_id, self._bot.user_id)
 
         # Give XP to each user
-        for user in users["data"]:
-            user = user["user_login"].lower()
+        for user in users:
+            user = user.lower()
             if user in self.cfg_get("omit_users"):
                 continue
 
