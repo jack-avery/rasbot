@@ -169,9 +169,7 @@ def update_after_updater():
     # Check for new requirements
     do_files("", ["requirements.txt"])
 
-    subprocess.check_call(
-        [sys.executable, "-m", "pip", "install", "-r", "requirements.txt"]
-    )
+    subprocess.call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
     print("All requirements checked.\n")
 
     # Update README files
