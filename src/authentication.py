@@ -129,7 +129,7 @@ class OAuth2Handler(Singleton):
         token = post(self.oauth_token_uri, headers=headers, json=data)
 
         if not token.status_code == 200:
-            log.error(f"OAuth token grab failed! ({token.json()})")
+            log.error(f"'{self.name}' OAuth token grab failed! ({token.json()})")
             return
 
         self.token = token.json()
