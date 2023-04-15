@@ -42,8 +42,9 @@ class OAuth2Handler(Singleton):
         if "token" not in self.cfg:
             self.__get_auth()
         else:
-            # refresh token on every startup
-            self.__refresh_token()
+            # refresh token automatically if expired
+            if self.token["expiry"] < time.time():
+                self.__refresh_token()
 
     def __save(self):
         write(self.cfgpath, self.jsonify())
