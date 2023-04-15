@@ -2,7 +2,6 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
-import requests
 import datetime
 import time
 
@@ -13,13 +12,8 @@ class Module(BaseModule):
     def main(self, message):
         # TODO understand what I was doing when I wrote this and document it better...
 
-        r = requests.get(
-            f"https://api.twitch.tv/helix/streams?user_id={self._bot.channel_id}",
-            headers=self._bot.auth.get_headers(),
-        ).json()
-        try:
-            time_start = r["data"][0]["started_at"]
-        except IndexError:
+        r = self._bot.auth.get_stream(self._bot.channel_id)
+        if not r:
             return f"{self._bot.channel_name} is not currently live."
 
         time_start = datetime.datetime.strptime(

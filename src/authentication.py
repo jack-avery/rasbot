@@ -9,19 +9,14 @@ from src.definitions import Singleton
 
 log = logging.getLogger("rasbot")
 
-AUTH_SKELETON = {
-    "user_id": None,
-    "client_id": None,
-    "client_secret": None,
-    "irc_oauth": None,
-    "oauth": None,
-}
-
 
 class OAuth2Handler(Singleton):
     name = ""
     """Discriminator for this OAuth2Handler."""
-    default_config = None
+    default_config = {
+        "client_id": None,
+        "client_secret": None,
+    }
     """Default configuration for this OAuth2Handler."""
     callback_port = None
     """Callback port to http://localhost for auth code grabbing."""
@@ -42,22 +37,27 @@ class OAuth2Handler(Singleton):
         self.cfgpath = f"{BASE_CONFIG_PATH}/{cfgpath}"
         self.cfg = read(self.cfgpath, self.default_config)
 
+        self.set_fields()
+
         if "token" not in self.cfg:
             self.__get_auth()
+        else:
+            # refresh token on every startup
+            self.__refresh_token()
+
+    def __save(self):
+        write(self.cfgpath, self.jsonify())
 
     def __get_auth(self):
         """Opens the Application Authorization page to get the auth code, and gets the initial token."""
-        if not self.cfg["client_id"] or not self.cfg["client_secret"]:
+        if not self.client_id or not self.client_secret:
             setup_complete = self.setup()
 
             if not setup_complete:
                 return
 
-        link = f"{self.oauth_grant_uri}?client_id={self.cfg['client_id']}&redirect_uri=http://localhost{f':{self.callback_port}' if self.callback_port else ''}&response_type=code&scope={' '.join(self.scopes)}"
+        link = f"{self.oauth_grant_uri}?client_id={self.client_id}&redirect_uri=http://localhost{f':{self.callback_port}' if self.callback_port else ''}&response_type=code&scope={' '.join(self.scopes)}"
         webbrowser.open(link, new=2)
-        log.info(
-            f"See your web browser to continue setting up your '{self.name}' OAuth2."
-        )
 
         auth_code = self.__oauth_grant_listen()
         log.info("Got the temporary code! Getting your initial OAuth token...")
@@ -83,7 +83,7 @@ class OAuth2Handler(Singleton):
             if andex == -1:
                 auth_code = auth_code[: auth_code.find(b" ")]
             else:
-                auth_code = auth_code[: andex]
+                auth_code = auth_code[:andex]
 
             auth_code = auth_code.decode("ASCII")
 
@@ -97,8 +97,8 @@ class OAuth2Handler(Singleton):
         :param auth_code: The auth code as gotten from the callback.
         """
         data = {
-            "client_id": self.cfg["client_id"],
-            "client_secret": self.cfg["client_secret"],
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
             "code": auth_code,
             "grant_type": "authorization_code",
             "redirect_uri": f"http://localhost{f':{self.callback_port}' if self.callback_port else ''}",
@@ -107,16 +107,16 @@ class OAuth2Handler(Singleton):
 
     def __refresh_token(self):
         """Refresh the token using the existing OAuth tokens' refresh code."""
-        if "token" not in self.cfg:
+        if not self.token:
             return
 
-        log.debug("refreshing OAuth token")
+        log.debug(f"refreshing '{self.name}' OAuth token")
 
         data = {
-            "client_id": self.cfg["client_id"],
-            "client_secret": self.cfg["client_secret"],
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
             "grant_type": "refresh_token",
-            "refresh_token": self.cfg["token"]["refresh_token"],
+            "refresh_token": self.token["refresh_token"],
         }
         self.__get_token(data)
 
@@ -132,34 +132,34 @@ class OAuth2Handler(Singleton):
             log.error(f"OAuth token grab failed! ({token.json()})")
             return
 
-        self.cfg["token"] = token.json()
-        self.cfg["token"]["expiry"] = self.cfg["token"]["expires_in"] + time.time()
-        write(self.cfgpath, self.cfg)
+        self.token = token.json()
+        self.token["expiry"] = self.token["expires_in"] + time.time()
+        self.__save()
 
     def __request(self, method, endpoint: str, data: dict = None):
-        if "token" not in self.cfg:
+        if not self.token:
             return False
 
-        if time.time() >= dict.get(self.cfg["token"], "expiry", 0):
+        if time.time() >= dict.get(self.token, "expiry", 0):
             self.__refresh_token()
 
         url = self.api + endpoint
 
         headers = {
-            "Authorization": f"{str.capitalize(self.cfg['token']['token_type'])} {self.cfg['token']['access_token']}",
-            "Client-Id": self.cfg["client_id"],
+            "Authorization": f"{str.capitalize(self.token['token_type'])} {self.token['access_token']}",
+            "Client-Id": self.client_id,
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
 
-        log.debug(url, headers)
+        log.debug(f"{method.__name__} {url}")
 
         if data:
             response = method(url, headers=headers, json=data)
         else:
             response = method(url, headers=headers)
 
-        log.debug(response.json())
+        log.debug(response.status_code, response.json())
 
         if response.status_code == 200:
             return response.json()
@@ -179,26 +179,121 @@ class OAuth2Handler(Singleton):
         )
         return False
 
+    def set_fields(self):
+        self.client_id = dict.get(self.cfg, "client_id", None)
+        self.client_secret = dict.get(self.cfg, "client_secret", None)
+        self.token = dict.get(self.cfg, "token", None)
+
+    def jsonify(self):
+        return {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "token": self.token,
+        }
+
 
 class TwitchOAuth2Helper(OAuth2Handler):
     name = "twitch"
-    default_config = None
+    default_config = {
+        "user_id": None,
+        "client_id": None,
+        "client_secret": None,
+        "irc_oauth": None,
+    }
     callback_port = None
     scopes = ["moderator:read:chatters"]
     oauth_grant_uri = "https://id.twitch.tv/oauth2/authorize"
     oauth_token_uri = "https://id.twitch.tv/oauth2/token"
     api = "https://api.twitch.tv/helix"
 
+    def set_fields(self):
+        super().set_fields()
+
+        self.user_id = dict.get(self.cfg, "user_id", None)
+        self.irc_oauth = dict.get(self.cfg, "irc_oauth", None)
+
+    def setup(self):
+        # Getting Twitch username
+        self.user_id = input("Your Twitch username: ").lower()
+
+        # Asking to set up Twitch 2FA
+        print(f"\nHello, {self.user_id}!")
+        print(
+            "You'll need to make sure you have Twitch.tv mobile two-factor authentication enabled:"
+        )
+        print("1. Go to your Twitch account settings, Security and Privacy.")
+        print(
+            "2. Scroll to Security and click 'Set Up Two-Factor Authentication' and follow the steps."
+        )
+        input("Press [Enter] once you've set that up.")
+
+        # Getting Client ID and Secret
+        print("\nNow, go to dev.twitch.tv and log in:")
+        print("1. Click on 'Your Console' in the top right.")
+        print("2. On the right side pane, click Register Your Application.")
+        print("3. Give it a name. Doesn't matter what.")
+        print("4. Create an OAuth redirect for http://localhost and click 'Add'.")
+        print("5. Set the Category to Chat Bot.")
+        print("6. Click 'Create', and then click 'Manage'.")
+        self.client_id = input("Enter the Client ID: ")
+
+        print("\nNow, click on 'New Secret'.")
+        self.client_secret = input("Enter the Client Secret: ")
+
+        # Getting IRC OAuth
+        print("\nAlmost done! Now, go to twitchapps.com/tmi/ and log in.")
+
+        # Making sure the key is stripped
+        self.irc_oauth = input("Enter the text it gives you: ")
+        if self.irc_oauth.startswith("oauth:"):
+            self.irc_oauth = self.irc_oauth[6:]
+
+        return True
+
+    def get_stream(self, user_id: int = None, user_login: str = None):
+        """Return the stream information for `user_id` or `user_login`.
+
+        Prioritizes `user_id` first.
+        """
+        if user_id:
+            query = self._get(f"/streams?user_id={user_id}")
+
+            if len(query["data"]) == 0:
+                return False
+
+            return query["data"][0]
+
+        if user_login:
+            query = self._get(f"/streams?user_login={user_login}")
+
+            if len(query["data"]) == 0:
+                return False
+
+            return query["data"][0]
+
+        raise ValueError("get_stream requires either user_id or user_login")
+
+    def get_user_id(self, user_login: int):
+        """Return the user ID for `user_login`."""
+        query = self._get(f"/users?login={user_login}")
+
+        if len(query["data"]) == 0:
+            return False
+
+        return query["data"][0]["id"]
+
     def get_all_chatters(self, channel_id: int, user_id: int):
         """Return a list of `user_login` for all users in the current channel.
 
         Automatically paginates and returns all users.
-        
+
         :param channel_id: The channel ID to get chatters for.
         :param user_id: The User ID of the current OAuth2 session user.
         """
         results = []
-        query = self._get(f"/chat/chatters?broadcaster_id={channel_id}&moderator_id={user_id}&first=1000")
+        query = self._get(
+            f"/chat/chatters?broadcaster_id={channel_id}&moderator_id={user_id}&first=1000"
+        )
 
         # nothing there. return empty list here to prevent errors
         if len(query["data"]) == 0:
@@ -209,87 +304,18 @@ class TwitchOAuth2Helper(OAuth2Handler):
         # paginate, if applicable
         # query["pagination"] should be empty (== False) if no more than 1000
         while query["pagination"]:
-            query = self._get(f"/chat/chatters?broadcaster_id={channel_id}&moderator_id={user_id}&first=1000&after={query['pagination']['cursor']}")
+            query = self._get(
+                f"/chat/chatters?broadcaster_id={channel_id}&moderator_id={user_id}&first=1000&after={query['pagination']['cursor']}"
+            )
             results += [user["user_login"] for user in query["data"]]
-        
+
         return results
 
-
-class Authentication:
-    file: str
-    """The path to the file containing the given Twitch authentication"""
-    user_id: str
-    """The Twitch username of the application owner."""
-    client_id: str
-    """The application client ID."""
-    client_secret: str
-    """The application client secret."""
-    irc_oauth: str
-    """Twitch OAuth token for IRC connections."""
-    oauth: str
-    """Twitch OAuth token for API requests."""
-
-    def __init__(self, file: str):
-        """Create a new authentication identity.
-
-        :param file: The file to pull auth from
-        """
-        self.file = file
-
-        auth = read(self.file, AUTH_SKELETON)
-
-        try:
-            self.user_id = auth["user_id"]
-            self.client_id = auth["client_id"]
-            self.client_secret = auth["client_secret"]
-            self.irc_oauth = auth["irc_oauth"]
-            self.oauth = auth["oauth"]
-
-        except KeyError as key:
-            raise KeyError(key)
-
-    def get_headers(self) -> dict:
-        """Returns headers for Twitch API calls.
-        For use in some queries, e.g. the `uptime` module.
-
-        :return: A dictionary for use with the `headers` param of `requests.get()`
-        """
+    def jsonify(self):
         return {
-            "Client-ID": self.client_id,
-            "Authorization": f"Bearer {self.oauth}",
-            "Accept": "application/vnd.twitchtv.v5+json",
+            "user_id": self.user_id,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "irc_oauth": self.irc_oauth,
+            "token": self.token,
         }
-
-    def refresh_oauth(self):
-        """Attempts to automatically refresh the OAuth for the given user, then save to file."""
-        # Request new oauth token from Twitch
-        r = post(
-            f"https://id.twitch.tv/oauth2/token"
-            + f"?client_id={self.client_id}"
-            + f"&client_secret={self.client_secret}"
-            + "&grant_type=client_credentials"
-        ).json()
-
-        # Set oauth and write the file
-        try:
-            self.oauth = r["access_token"]
-
-            data = {
-                "user_id": self.user_id,
-                "client_id": self.client_id,
-                "client_secret": self.client_secret,
-                "irc_oauth": self.irc_oauth,
-                "oauth": self.oauth,
-            }
-
-            write(self.file, data)
-
-        # If it can't find the key...
-        except KeyError:
-            raise AuthenticationDeniedError(
-                "got error response status" + f"{r['status']}, message '{r['message']}'"
-            )
-
-
-class AuthenticationDeniedError(Exception):
-    pass

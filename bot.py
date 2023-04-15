@@ -2,7 +2,6 @@ import click
 import irc.bot
 import logging
 import os
-import requests
 import sys
 import time
 import traceback
@@ -11,7 +10,7 @@ from update import check
 
 import src.commands as commands
 from src.config import write, read_channel, read_global
-from src.authentication import Authentication, TwitchOAuth2Helper, AuthenticationDeniedError
+from src.authentication import TwitchOAuth2Helper
 from src.definitions import Author, Message
 
 # TODO refactor this and on_pubmsg, probably. or at least make it look better
@@ -20,8 +19,7 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
 
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
-    auth: Authentication
-    oauth2: TwitchOAuth2Helper
+    auth: TwitchOAuth2Helper
     channel_id: int
     channel_name: str
     channel: str
@@ -32,7 +30,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     always_import_list: list
     """List of modules to always import, regardless of whether they're used in commands."""
 
-    def __init__(self, auth: Authentication, channel_name: str, debug: bool = False):
+    def __init__(
+        self, auth: TwitchOAuth2Helper, channel_name: str, debug: bool = False
+    ):
         """Create a new `TwitchBot`.
 
         :param auth: The Authentication object to use.
@@ -68,12 +68,15 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Initialize authentication
         self.auth = auth
-        self.oauth2 = TwitchOAuth2Helper(auth.file)
         log.info(f"Starting as {self.auth.user_id}...")
 
         # Import channel info
-        self.channel_id = self.resolve_channel_id(channel_name)
-        self.user_id = self.resolve_channel_id(self.auth.user_id)
+        self.channel_id = self.auth.get_user_id(channel_name)
+
+        self.user_id = self.channel_id
+        if channel_name != self.auth.user_id:
+            self.user_id = self.auth.get_user_id(self.auth.user_id)
+
         self.cfgpath = f"{self.channel_id}/config.txt"
         self.reload()
 
@@ -159,36 +162,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             }
 
         write(self.cfgpath, data)
-
-    def resolve_channel_id(self, channel: str) -> int:
-        # Resolve ID from channel name
-        channel_id = False
-        url = f"https://api.twitch.tv/helix/users?login={channel}"
-        while not channel_id:
-            r = requests.get(url, headers=self.auth.get_headers()).json()
-            try:
-                channel_id = int(f"{r['data'][0]['id']}")
-            except KeyError:
-                # If it errors with a 401 we try to refresh the oauth key
-                if r["status"] == 401:
-                    log.info(
-                        "OAuth key is invalid or expired. Attempting a refresh..."
-                    )
-                    try:
-                        self.auth.refresh_oauth()
-                        r = requests.get(url, headers=self.auth.get_headers()).json()
-
-                    except AuthenticationDeniedError as err:
-                        # If THAT fails, we throw our hands in the air and tell them to restart.
-                        log.error(f"Authentication Denied: {err}")
-                        log.error("Please ensure that your credentials are valid.")
-                        log.error("You may need to re-run setup.py.\n")
-                        log.error(
-                            "This error is unrecoverable. rasbot will now exit."
-                        )
-                        sys.exit(1)
-
-        return channel_id
 
     def unimport_all_modules(self):
         """Teardown all modules in preparation for closing."""
@@ -304,7 +277,7 @@ def main(channel=None, authfile=None, debug=False):
         authfile = cfg_global["default_authfile"]
 
     try:
-        auth = Authentication(authfile)
+        auth = TwitchOAuth2Helper(authfile)
     except FileNotFoundError as err:
         logging.error(f"userdata/{err} not found! Did you run setup?")
         logging.error("This error is unrecoverable. rasbot will now exit.")

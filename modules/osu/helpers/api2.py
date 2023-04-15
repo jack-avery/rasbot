@@ -19,11 +19,16 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
     oauth_token_uri = "https://osu.ppy.sh/oauth/token"
     api = "https://osu.ppy.sh/api/v2"
 
+    def set_fields(self):
+        super().set_fields()
+
+        self.osu_user_id = dict.get(self.cfg, "osu_user_id", None)
+
     def setup(self):
         print("osu! API v2 setup")
 
         print("Go to your osu! profile on the website.")
-        osu_user_id = input(
+        self.osu_user_id = input(
             "Your osu! User ID (https://osu.ppy.sh/users/[this number]): "
         )
 
@@ -37,12 +42,8 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
             "Enter a name and set the Application Callback URL to http://localhost:27274."
         )
 
-        client_id = input("Client ID: ")
-        client_secret = input("Client Secret: ")
-
-        self.cfg["osu_user_id"] = osu_user_id
-        self.cfg["client_id"] = client_id
-        self.cfg["client_secret"] = client_secret
+        self.client_id = input("Client ID: ")
+        self.client_secret = input("Client Secret: ")
 
         return True
 
@@ -72,3 +73,11 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
         """Send `message` to osu! User ID `target`."""
         data = {"target_id": target_id, "message": message, "is_action": False}
         self._post("/chat/new", data)
+
+    def jsonify(self):
+        return {
+            "osu_user_id": self.osu_user_id,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "token": self.token,
+        }
