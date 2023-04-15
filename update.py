@@ -26,10 +26,16 @@ BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 RASBOT_BASE_UPDATER = "update.py"
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE = ["bot.py", "setup.py"]
+RASBOT_BASE = ["main.py"]
 """Remaining built-in base files to update after the updater."""
 
-RASBOT_SRC = ["authentication.py", "commands.py", "config.py", "definitions.py"]
+RASBOT_SRC = [
+    "authentication.py",
+    "bot.py",
+    "commands.py",
+    "config.py",
+    "definitions.py",
+]
 """Files inside `./src` to update."""
 
 BUILTIN_MODULES = [

@@ -5,7 +5,6 @@ import threading
 import time
 import traceback
 
-from bot import TwitchBot
 from src.config import read, write
 from src.definitions import Message
 
@@ -161,7 +160,7 @@ class BaseModule(threading.Thread):
     consumes = 0
     """How many message arguments to consume. Any negative value for all remaining."""
 
-    def __init__(self, bot: TwitchBot, name):
+    def __init__(self, bot, name):
         """Initialize a module. If a `cfgdefault` is given,
         it will drop the given default into the user's config directory.
         """
@@ -324,7 +323,7 @@ def do_on_pubmsg(message: Message):
         module.on_pubmsg(message)
 
 
-def pass_bot_ref(ref: TwitchBot):
+def pass_bot_ref(ref):
     """Pass the bot reference so that modules can have a reference to it"""
     global bot
     bot = ref
@@ -336,5 +335,5 @@ commands = dict()
 modules = dict()
 """All currently imported modules."""
 
-bot: TwitchBot
+bot = object
 """The TwitchBot to pass to modules"""
