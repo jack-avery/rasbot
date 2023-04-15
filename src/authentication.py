@@ -280,7 +280,7 @@ class TwitchOAuth2Helper(OAuth2Handler):
         if len(query["data"]) == 0:
             return False
 
-        return query["data"][0]["id"]
+        return int(query["data"][0]["id"])
 
     def get_all_chatters(self, channel_id: int, user_id: int):
         """Return a list of `user_login` for all users in the current channel.
