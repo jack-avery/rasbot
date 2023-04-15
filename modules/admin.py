@@ -18,11 +18,18 @@ class Module(BaseModule):
         # Mostly for debugging.
     }
 
+    def __init__(self, bot, name):
+        BaseModule.__init__(self, bot, name)
+
+        # Add channel owner to admin enabled UIDs
+        grant_uids = self.cfg_get("grant_uids")
+        if self._bot.channel_id not in grant_uids:
+            grant_uids.append(self._bot.channel_id)
+            self.cfg_set("grant_uids", grant_uids)
+
     def main(self, message: Message):
-        # only the channel owner can run admin commands
-        if not message.author.is_host or str(message.author.uid) not in self.cfg_get(
-            "grant_uids"
-        ):
+        # only permitted users may use debug commands
+        if message.author.uid not in self.cfg_get("grant_uids"):
             return NO_MESSAGE_SIGNAL
 
         args = self.get_args_lower(message)
@@ -35,24 +42,28 @@ class Module(BaseModule):
                 if not message.author.is_host:
                     return "only broadcaster can grant admin privileges"
 
+                uid = int(args[1])
+
                 admins = self.cfg_get("grant_uids")
-                admins.append(args[1])
+                admins.append(uid)
                 self.cfg_set("grant_uids", admins)
 
-                return f"added {args[1]} to admins"
+                return f"added {uid} to admins"
 
             case "revoke":
                 if not message.author.is_host:
                     return "only broadcaster can revoke admin privileges"
 
+                uid = int(args[1])
+
                 admins = self.cfg_get("grant_uids")
-                if args[1] not in admins:
+                if uid not in admins:
                     return "user not in admins"
 
-                del admins[admins.index(args[1])]
+                del admins[admins.index(uid)]
                 self.cfg_set("grant_uids", admins)
 
-                return f"removed {args[1]} from admins"
+                return f"removed {uid} from admins"
 
             case "import":
                 self._bot.commands.module_add(args[1])
