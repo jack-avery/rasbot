@@ -15,8 +15,8 @@ rasbot is intended to run locally on your account, so it has access to *your* Tw
 2. Download the Source Code:
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/jack-avery/rasbot` <br/>
 > Or, click on **Code** at the top right and **Download ZIP**.
-3. Run `setup.py` and follow the steps to set up your authentication.
-4. Run `bot.py`.
+3. Run `setup.py` to install dependencies.
+4. Run `bot.py`. If this is your first time, you will have a guided setup for your authentication.
 
 *If you set up rasbot correctly, it will log some information and print something similar to:*
 ```
