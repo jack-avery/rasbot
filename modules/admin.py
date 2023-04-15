@@ -38,6 +38,13 @@ class Module(BaseModule):
             return NO_MESSAGE_SIGNAL
 
         match args[0]:
+            case "uid":
+                user = args[1]
+                if user.startswith("@"):
+                    user = user[1:]
+
+                return self._bot.auth.get_user_id(user)
+
             case "grant":
                 if not message.author.is_host:
                     return "only broadcaster can grant admin privileges"
