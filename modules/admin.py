@@ -20,7 +20,7 @@ class Module(BaseModule):
 
     def main(self, message: Message):
         # only the channel owner can run admin commands
-        if not message.author.is_host and str(message.author.uid) not in self.cfg_get(
+        if not message.author.is_host or str(message.author.uid) not in self.cfg_get(
             "grant_uids"
         ):
             return NO_MESSAGE_SIGNAL
