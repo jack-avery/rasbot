@@ -22,14 +22,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     always_import_list: list
     """List of modules to always import, regardless of whether they're used in commands."""
 
-    def __init__(
-        self, auth: TwitchOAuth2Helper, channel_name: str, debug: bool = False
-    ):
+    def __init__(self, auth: TwitchOAuth2Helper, channel_name: str):
         """Create a new `TwitchBot`.
 
         :param auth: The Authentication object to use.
         :param channel_name: The channel name. Channel ID is resolved in `__init__`.
-        :param debug: Whether logging should be `DEBUG` level.
         """
         # Grab channels
         self.channel_name = channel_name

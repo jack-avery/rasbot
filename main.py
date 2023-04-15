@@ -92,7 +92,7 @@ def main(channel=None, authfile=None, debug=False):
 
     # start the bot
     try:
-        tb = TwitchBot(auth, channel, debug)
+        tb = TwitchBot(auth, channel)
         tb.start()
 
     # catch ctrl+C and force unimport modules;
