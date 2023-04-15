@@ -57,4 +57,4 @@ Feel free to [create a new issue](https://github.com/jack-avery/rasbot/issues), 
 
 > If you're reporting a bug, it's most useful to me if you can get what the console outputs for me.<br/>
 > If rasbot is crashing instantly on launch, you'll need to start it from Command Prompt / another terminal:<br/>
-> You can use the command `bot.py --debug` for rasbot to show more information during startup.
+> You can use the command `main.py --debug` for rasbot to show more information during startup.
