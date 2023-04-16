@@ -46,8 +46,30 @@ class OAuth2Handler(Singleton):
             if self.token["expiry"] < time.time():
                 self.__refresh_token()
 
+    def set_fields(self):
+        """Set the fields obtained from reading `self.cfgpath` to fields of this `OAuth2Handler`."""
+        self.client_id = dict.get(self.cfg, "client_id", None)
+        self.client_secret = dict.get(self.cfg, "client_secret", None)
+        self.token = dict.get(self.cfg, "token", None)
+
+    def jsonify(self) -> dict:
+        """Returns a `dict` ("json-ified") with the fields of this `OAuth2Handler`."""
+        return {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "token": self.token,
+        }
+
     def __save(self):
+        """Write the result of `self.jsonify()` to `self.cfgpath`."""
         write(self.cfgpath, self.jsonify())
+
+    def setup(self) -> None:
+        """Perform a guided setup for this OAuth2. By default just logs an error and does nothing."""
+        log.error(
+            f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
+        )
+        return False
 
     def __get_auth(self):
         """Opens the Application Authorization page to get the auth code, and gets the initial token."""
@@ -66,8 +88,12 @@ class OAuth2Handler(Singleton):
         self.__get_initial_token(auth_code)
         log.info(f"Success! OAuth2 session '{self.name}' set up.")
 
-    def __oauth_grant_listen(self):
-        """Create a local HTTP server and listen for exactly one request, and return the obtained authorization code."""
+    def __oauth_grant_listen(self) -> str:
+        """Create a local HTTP server on `self.callback_port` (80 if None),
+        listen for exactly one request, and return the obtained authorization code.
+
+        :return: The OAuth grant code for use in `self.__get_initial_token()`.
+        """
         port = 80
         if self.callback_port:
             port = self.callback_port
@@ -95,7 +121,7 @@ class OAuth2Handler(Singleton):
     def __get_initial_token(self, auth_code: str):
         """Get the initial token for this OAuth2 session.
 
-        :param auth_code: The auth code as gotten from the callback.
+        :param auth_code: The auth code as obtained from `__oauth_grant_listen()`.
         """
         data = {
             "client_id": self.client_id,
@@ -107,7 +133,7 @@ class OAuth2Handler(Singleton):
         self.__get_token(data)
 
     def __refresh_token(self):
-        """Refresh the token using the existing OAuth tokens' refresh code."""
+        """Refresh `self.token` using its' refresh code."""
         if not self.token:
             return
 
@@ -122,7 +148,10 @@ class OAuth2Handler(Singleton):
         self.__get_token(data)
 
     def __get_token(self, data):
-        """Get a new token or refresh an existing one using `data`."""
+        """Get a new token or refresh an existing one using `data`.
+
+        :param data: The json data to send in the POST.
+        """
         headers = {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -138,6 +167,16 @@ class OAuth2Handler(Singleton):
         self.__save()
 
     def __request(self, method, endpoint: str, data: dict = None):
+        """Send a request to an endpoint of `self.api`.
+
+        Returns `False` if the request was unsuccessful (e.g. 401, 404).
+
+        :param method: `requests` method to use.
+        :param endpoint: Endpoint relative to `self.api` to call.
+        :param data: The json data to send in the request, frequently used in POST requests.
+
+        :return: The json data of the response, or `False` if unsuccessful.
+        """
         if not self.token:
             return False
 
@@ -162,35 +201,34 @@ class OAuth2Handler(Singleton):
 
         log.debug(response.status_code, response.json())
 
-        if response.status_code == 200:
+        if str(response.status_code).startswith("2"):
             return response.json()
 
-    def _get(self, endpoint: str = None, data: dict = None):
+        return False
+
+    def _get(self, endpoint: str = None, data: dict = None) -> bool | dict:
+        """Send a GET request to `endpoint` of `self.api`.
+
+        :param endpoint: Endpoint relative to `self.api` to call.
+        :param data: The json data to send in the GET.
+
+        :return: The json data of the response, or `False` if unsuccessful.
+        """
         if data:
             return self.__request(get, endpoint, data)
         return self.__request(get, endpoint)
 
-    def _post(self, endpoint: str = None, data: dict = None):
+    def _post(self, endpoint: str = None, data: dict = None) -> bool | dict:
+        """Send a POST request to `endpoint` of `self.api`.
+
+        Returns `False` if unsuccessful.
+
+        :param endpoint: Endpoint relative to `self.api` to call.
+        :param data: The json data to send in the POST.
+
+        :return: The json data of the response, or `False` if unsuccessful.
+        """
         return self.__request(post, endpoint, data)
-
-    def setup(self):
-        """Perform a guided setup for this OAuth2. By default just logs an error and does nothing."""
-        log.error(
-            f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
-        )
-        return False
-
-    def set_fields(self):
-        self.client_id = dict.get(self.cfg, "client_id", None)
-        self.client_secret = dict.get(self.cfg, "client_secret", None)
-        self.token = dict.get(self.cfg, "token", None)
-
-    def jsonify(self):
-        return {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "token": self.token,
-        }
 
 
 class TwitchOAuth2Helper(OAuth2Handler):
@@ -212,6 +250,15 @@ class TwitchOAuth2Helper(OAuth2Handler):
 
         self.user_id = dict.get(self.cfg, "user_id", None)
         self.irc_oauth = dict.get(self.cfg, "irc_oauth", None)
+
+    def jsonify(self):
+        return {
+            "user_id": self.user_id,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "irc_oauth": self.irc_oauth,
+            "token": self.token,
+        }
 
     def setup(self):
         # Getting Twitch username
@@ -251,10 +298,15 @@ class TwitchOAuth2Helper(OAuth2Handler):
 
         return True
 
-    def get_stream(self, user_id: int = None, user_login: str = None):
+    def get_stream(self, user_id: int = None, user_login: str = None) -> bool | dict:
         """Return the stream information for `user_id` or `user_login`.
 
         Prioritizes `user_id` first.
+
+        :param user_id: The User ID of the user to get stream information for.
+        :param user_login: The User Login of the user to get stream information for.
+
+        :return: Stream information, or `False` if no result/query failed.
         """
         if user_id:
             query = self._get(f"/streams?user_id={user_id}")
@@ -274,8 +326,13 @@ class TwitchOAuth2Helper(OAuth2Handler):
 
         raise ValueError("get_stream requires either user_id or user_login")
 
-    def get_user_id(self, user_login: int):
-        """Return the user ID for `user_login`."""
+    def get_user_id(self, user_login: str) -> bool | int:
+        """Return the user ID for `user_login`.
+
+        :param user_login: The User Login of the user to get the User ID for.
+
+        :return: The User ID of the user, or `False` if no result/query failed.
+        """
         query = self._get(f"/users?login={user_login}")
 
         if len(query["data"]) == 0:
@@ -283,13 +340,15 @@ class TwitchOAuth2Helper(OAuth2Handler):
 
         return int(query["data"][0]["id"])
 
-    def get_all_chatters(self, channel_id: int, user_id: int):
+    def get_all_chatters(self, channel_id: int, user_id: int) -> bool | list:
         """Return a list of `user_login` for all users in the current channel.
 
         Automatically paginates and returns all users.
 
         :param channel_id: The channel ID to get chatters for.
         :param user_id: The User ID of the current OAuth2 session user.
+
+        :return: A `list` of all `user_login` connected to the chat for `channel_id`.
         """
         results = []
         query = self._get(
@@ -311,12 +370,3 @@ class TwitchOAuth2Helper(OAuth2Handler):
             results += [user["user_login"] for user in query["data"]]
 
         return results
-
-    def jsonify(self):
-        return {
-            "user_id": self.user_id,
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "irc_oauth": self.irc_oauth,
-            "token": self.token,
-        }

@@ -191,8 +191,14 @@ class BaseModule(threading.Thread):
         """Read the given config dict key. If it fails to read it will fill it in with the default.
 
         :param key: The key to grab the value of
+
+        :return: The value of `self._cfg[key]`
         """
         if key not in self._cfg:
+            if key not in self.default_config:
+                self.log_e(f"attempt to grab invalid key {key}? ignoring")
+                return False
+
             self.log_e(
                 f"config missing searched key '{key}', saving default '{self.default_config[key]}'"
             )

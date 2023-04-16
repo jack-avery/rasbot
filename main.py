@@ -24,7 +24,6 @@ from src.config import read_global
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
 
-# TODO refactor this and on_pubmsg, probably. or at least make it look better
 log = logging.getLogger("rasbot")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
 
