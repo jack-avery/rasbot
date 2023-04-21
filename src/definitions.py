@@ -4,12 +4,12 @@
 
 
 class Author:
-    name = str
-    uid = str
-    is_mod = bool
-    is_sub = bool
-    is_vip = bool
-    is_host = bool
+    name: str
+    uid: str
+    is_mod: bool
+    is_sub: bool
+    is_vip: bool
+    is_host: bool
 
     def __init__(
         self,
