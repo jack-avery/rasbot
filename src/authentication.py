@@ -381,6 +381,9 @@ class TwitchOAuth2Helper(OAuth2Handler):
         :return: A `list` of all `[user_id, user_login]` in `channels` currently live on Twitch.
         """
         # TODO: support more than 100 streams, but really, that should never happen for a single installation?
+        # in meantime cull to 100
+        channels = channels[:100]
+
         results = []
         query = self._get(
             f"/streams?{'&'.join([f'user_id={id}' for id in channels])}&type=live&first=100"
