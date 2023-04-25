@@ -4,19 +4,11 @@
 
 from src.commands import BaseModule
 from src.config import BASE_CONFIG_PATH
-from src.definitions import Message
+from src.definitions import Message, RepeatTimer
 
 import os
 import random
 import sqlite3
-import threading
-
-
-class RepeatTimer(threading.Timer):
-    # See https://stackoverflow.com/a/48741004
-    def run(self):
-        while not self.finished.wait(self.interval):
-            self.function(*self.args, **self.kwargs)
 
 
 class Module(BaseModule):

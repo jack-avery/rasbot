@@ -1,3 +1,5 @@
+import threading
+
 ##
 # Helper classes.
 ##
@@ -122,3 +124,10 @@ class Singleton:
         if not hasattr(cls.spaces, name):
             cls.spaces[name] = super(Singleton, cls).__new__(cls)
         return cls.spaces[name]
+
+
+class RepeatTimer(threading.Timer):
+    # See https://stackoverflow.com/a/48741004
+    def run(self):
+        while not self.finished.wait(self.interval):
+            self.function(*self.args, **self.kwargs)
