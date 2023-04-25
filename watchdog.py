@@ -80,7 +80,7 @@ def main(authfile=None, debug=False):
             # kick up new instances for ids without an instance
             for id, login in streams:
                 if not instances[id]:
-                    instance = TwitchBot(auth, login)
+                    instance = TwitchBot(auth, login, id)
                     instance.start()
 
                     instances[id] = instance
@@ -101,6 +101,9 @@ def main(authfile=None, debug=False):
         for bot in instances.values():
             if bot:
                 bot.unimport_all_modules()
+                bot.__del__()
+
+            sys.exit(0)
 
 
 if __name__ == "__main__":

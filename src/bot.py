@@ -22,7 +22,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     always_import_list: list
     """List of modules to always import, regardless of whether they're used in commands."""
 
-    def __init__(self, auth: TwitchOAuth2Helper, channel_name: str):
+    def __init__(
+        self, auth: TwitchOAuth2Helper, channel_name: str, channel_id: int = None
+    ):
         """Create a new `TwitchBot`.
 
         :param auth: The Authentication object to use.
@@ -37,7 +39,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         log.info(f"Starting as {self.auth.user_id}...")
 
         # Import channel info
-        self.channel_id = self.auth.get_user_id(channel_name)
+        self.channel_id = channel_id
+        if not channel_id:
+            self.channel_id = self.auth.get_user_id(channel_name)
 
         self.user_id = self.channel_id
         if channel_name != self.auth.user_id:
