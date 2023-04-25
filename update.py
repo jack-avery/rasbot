@@ -24,7 +24,7 @@ except:
 BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
-RASBOT_BASE_UPDATER = ["update.py", "src/manifests/rasbot.manifest"]
+RASBOT_BASE_UPDATER = "update.py"
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 # TODO: customization for which to update maybe? idk?
 
@@ -106,7 +106,7 @@ def prompt():
 
 def force_update():
     """Update the updater and the rest of rasbot without opening a new instance of the updater."""
-    do_files("", RASBOT_BASE_UPDATER)
+    do_file("", RASBOT_BASE_UPDATER)
     update_after_updater()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
@@ -118,7 +118,7 @@ def force_update():
 
 def update():
     """Updates the rasbot updater first, then updates the rest."""
-    do_files("", RASBOT_BASE_UPDATER)
+    do_file("", RASBOT_BASE_UPDATER)
     print("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
@@ -134,6 +134,9 @@ def update():
 
 
 def update_after_updater():
+    # Get updated manifest
+    do_file("src/manifests", "rasbot.manifest")
+
     for manifest in os.listdir("src/manifests"):
         do_manifest(manifest)
 
@@ -148,7 +151,7 @@ def update_after_updater():
 def do_manifest(manifest: str):
     """Perform update from a manifest.
 
-    :param manifest: Name of the manifest.
+    :param manifest: Name of the manifest within `src/manifests`.
     """
     with open(f"src/manifests/{manifest}") as file:
         data = json.loads(file.read())
@@ -169,26 +172,25 @@ def do_manifest(manifest: str):
                 local.write(req.text)
 
 
-def do_files(path: str, files: list):
-    """Update multiple files at once.
+def do_file(path: str, file: list):
+    """Update a file.
 
     :param path: The path to the folder of the files.
 
-    :param files: The list of files to update, including extensions.
+    :param file: The file to update, including extension.
     """
-    for file in files:
-        print(f"Updating {path}{file}...")
-        verify_folder_exists(f"{path}{file}")
+    print(f"Updating {path}{file}...")
+    verify_folder_exists(f"{path}{file}")
 
-        # if the file doesn't exist don't write anything
-        req = requests.get(f"{BASE_URL}{path}{file}")
-        if req.status_code == 404:
-            print("Failed to fetch: ignoring...")
-            continue
+    # if the file doesn't exist don't write anything
+    req = requests.get(f"{BASE_URL}{path}{file}")
+    if req.status_code == 404:
+        print("Failed to fetch: ignoring...")
+        return
 
-        # write the text to file
-        with io.open(f"{path}{file}", "w", encoding="utf8") as local:
-            local.write(req.text)
+    # write the text to file
+    with io.open(f"{path}{file}", "w", encoding="utf8") as local:
+        local.write(req.text)
 
 
 def verify_folder_exists(path: str):
