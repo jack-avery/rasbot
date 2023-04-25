@@ -3,6 +3,8 @@ import logging
 import os
 import re
 import sys
+import threading
+
 import time
 from update import check
 
@@ -12,6 +14,16 @@ from src.bot import TwitchBot
 
 log = logging.getLogger("rasbot")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
+
+
+class InstanceHandler(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        self.bot = kwargs["bot"]
+        kwargs.pop("bot")
+        super(InstanceHandler, self).__init__(*args, **kwargs)
+
+    def stop(self):
+        self.bot.__del__()
 
 
 @click.command()
@@ -72,38 +84,37 @@ def main(authfile=None, debug=False):
         f"Found these configured instances: {', '.join([i for i in instances.keys()])}"
     )
 
-    try:
-        while True:
-            log.info("Checking for live streams...")
-            streams = auth.get_live_streams(instances)
+    while True:
+        # check for new instances
+        log.info("Checking for live streams...")
+        streams = auth.get_live_streams(instances)
 
-            # kick up new instances for ids without an instance
-            for id, login in streams:
-                if not instances[id]:
-                    instance = TwitchBot(auth, login, id)
-                    instance.start()
+        # kick up new instances for ids without an instance
+        for id, login in streams:
+            if not instances[id]:
+                log.info(f"Kicking up instance for {login} ({id})")
+                instance = TwitchBot(auth, login, id)
+                instances[id] = InstanceHandler(
+                    target=lambda: instance.start(), bot=instance
+                )
+                instances[id].start()
 
-                    instances[id] = instance
+        # kill instances for missing ids (offline streams)
+        live_ids = [stream[0] for stream in streams]
+        for id, bot in instances.items():
+            if isinstance(bot, InstanceHandler) and id not in live_ids:
+                log.info(f"Killing instance for {login} ({id})")
+                bot.stop()
 
-            # kill instances for missing ids (offline streams)
-            live_ids = [stream[0] for stream in streams]
-            for instance, bot in instances.items():
-                if isinstance(bot, TwitchBot) and instance not in live_ids:
-                    bot.unimport_all_modules()
-                    bot.__del__()
+                instances[id] = False
 
-                    instances[instance] = False
+        # inform of which streams are running
+        log.info(
+            f"Running instances: {', '.join([i for i, b in instances.items() if isinstance(b, InstanceHandler)])}"
+        )
 
-            # check once a minute
-            time.sleep(60)
-
-    except KeyboardInterrupt:
-        for bot in instances.values():
-            if isinstance(bot, TwitchBot):
-                bot.unimport_all_modules()
-                bot.__del__()
-
-            sys.exit(0)
+        # check once a minute
+        time.sleep(60)
 
 
 if __name__ == "__main__":

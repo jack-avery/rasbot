@@ -88,7 +88,7 @@ def main(channel=None, authfile=None, debug=False):
     # catch ctrl+C and force unimport modules;
     # speeds up ctrl+C exiting with timed modules
     except KeyboardInterrupt:
-        tb.unimport_all_modules()
+        tb.__del__()
         sys.exit(0)
 
 

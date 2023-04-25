@@ -1,5 +1,6 @@
 import irc.bot
 import logging
+from threading import Timer
 import traceback
 
 import src.commands as commands
@@ -22,6 +23,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     always_import_list: list
     """List of modules to always import, regardless of whether they're used in commands."""
 
+    CONNECTION_ATTEMPT_LIMIT = 3
+    """Maximum number of connection attempts before giving up."""
+    CONNECTION_ATTEMPT_TIMER = 5
+    """Time between connection attempts, in seconds."""
+
     def __init__(
         self, auth: TwitchOAuth2Helper, channel_name: str, channel_id: int = None
     ):
@@ -30,6 +36,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         :param auth: The Authentication object to use.
         :param channel_name: The channel name. Channel ID is resolved in `__init__`.
         """
+        self.__joined = False
+        self.__connection_tries = 0
+
         # Grab channels
         self.channel_name = channel_name
         self.channel = f"#{channel_name}"
@@ -50,16 +59,33 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.cfgpath = f"{self.channel_id}/config.txt"
         self.reload()
 
-        # Create IRC bot connection
-        server = "irc.twitch.tv"
-        port = 80
-        log.info("Connecting to " + server + " on port " + str(port) + "...")
-        irc.bot.SingleServerIRCBot.__init__(
-            self,
-            [(server, port, f"oauth:{self.auth.irc_oauth}")],
-            self.auth.user_id,
-            self.auth.user_id,
-        )
+        self.attempt_connect()
+
+    def attempt_connect(self):
+        """Connect to the chat.
+
+        Wait `CONNECTION_ATTEMPT_TIMER` seconds between attempts, to a maximum of `CONNECTION_ATTEMPT_LIMIT`.
+        """
+        if self.__connection_tries > self.CONNECTION_ATTEMPT_LIMIT:
+            log.error(
+                f"Connection attempts exceeded limit of {self.CONNECTION_ATTEMPT_LIMIT}. Exiting..."
+            )
+            self.__del__()
+
+        if not self.__joined:
+            # Create IRC bot connection
+            server = "irc.twitch.tv"
+            port = 80
+            log.info("Connecting to " + server + " on port " + str(port) + "...")
+            irc.bot.SingleServerIRCBot.__init__(
+                self,
+                [(server, port, f"oauth:{self.auth.irc_oauth}")],
+                self.auth.user_id,
+                self.auth.user_id,
+            )
+
+            self.__connection_tries += 1
+            Timer(self.CONNECTION_ATTEMPT_TIMER, function=self.attempt_connect).start()
 
     def reload(self):
         """Reload the config for the current channel."""
@@ -126,11 +152,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         write(self.cfgpath, data)
 
-    def unimport_all_modules(self):
+    def __del__(self):
         """Teardown all modules in preparation for closing."""
         modules = [k for k in self.commands.modules.keys()]
         for module in modules:
             self.commands.module_del(module)
+
+        del self
 
     def on_welcome(self, c, e):
         # You must request specific capabilities before you can use them
@@ -139,6 +167,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.cap("REQ", ":twitch.tv/commands")
         c.join(f"{self.channel}")
 
+        self.__joined = True
         log.info(f"Joined {self.channel}! ({self.channel_id})\n")
 
     def on_pubmsg(self, c, e):
