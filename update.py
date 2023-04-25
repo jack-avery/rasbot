@@ -1,3 +1,4 @@
+import hashlib
 import io
 import json
 import os
@@ -150,11 +151,20 @@ def update_after_updater():
     # attempt_migrate_config()
 
 
+def identical(file1: str, file2: str):
+    """Compare the contents of `file1` to `file2` using SHA256."""
+    file1hash = hashlib.sha256(str.encode(file1)).hexdigest()
+    file2hash = hashlib.sha256(str.encode(file2)).hexdigest()
+
+    return file1hash == file2hash
+
+
 def do_manifest(manifest: str):
     """Perform update from a manifest.
 
     :param manifest: Name of the manifest within `src/manifests`.
     """
+    print(f"Updating using {manifest}...")
     with open(f"src/manifests/{manifest}") as file:
         data = json.loads(file.read())
 
@@ -162,16 +172,24 @@ def do_manifest(manifest: str):
             print(f"Updating {item['file']}...")
             verify_folder_exists(item["file"])
 
-            # if the file doesn't exist don't write anything
+            # get remote file
             source = item["source"].replace("$BRANCH", branch)
             req = requests.get(source)
             if req.status_code == 404:
                 print("Failed to fetch: ignoring...")
                 continue
+            remote = req.text
+
+            if os.path.exists(item["file"]):
+                with io.open(item["file"], "r", encoding="utf8") as localfile:
+                    local = localfile.read()
+
+                if identical(local, remote):
+                    continue
 
             # write the text to file
-            with io.open(item["file"], "w", encoding="utf8") as local:
-                local.write(req.text)
+            with io.open(item["file"], "w", encoding="utf8") as localfile:
+                localfile.write(remote)
 
 
 def do_file(file: str):
