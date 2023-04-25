@@ -370,3 +370,26 @@ class TwitchOAuth2Helper(OAuth2Handler):
             results += [user["user_login"] for user in query["data"]]
 
         return results
+
+    def get_live_streams(self, channels: list) -> list:
+        """Return a list of live streams from a list of `user_id`.
+
+        Automatically paginates and returns all live streams in `channels`.
+
+        :param channels: The list of `user_id` to get live channels for.
+
+        :return: A `list` of all `[user_id, user_login]` in `channels` currently live on Twitch.
+        """
+        # TODO: support more than 100 streams, but really, that should never happen for a single installation?
+        results = []
+        query = self._get(
+            f"/streams?{'&'.join([f'user_id={id}' for id in channels])}&type=live&first=100"
+        )
+
+        # nothing there. return empty list here to prevent errors
+        if len(query["data"]) == 0:
+            return results
+
+        results += [[user["user_id"], user["user_login"]] for user in query["data"]]
+
+        return results
