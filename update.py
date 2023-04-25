@@ -26,7 +26,9 @@ BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 
 RASBOT_BASE_UPDATER = "update.py"
 """The rasbot updater. This needs to be updated first for the update to work fully."""
-# TODO: customization for which to update maybe? idk?
+
+RASBOT_BASE_MANIFEST = "src/manifests/rasbot.manifest"
+"""Manifest of all items to update within rasbot and their source."""
 
 
 @click.command()
@@ -106,7 +108,7 @@ def prompt():
 
 def force_update():
     """Update the updater and the rest of rasbot without opening a new instance of the updater."""
-    do_file("", RASBOT_BASE_UPDATER)
+    do_file(RASBOT_BASE_UPDATER)
     update_after_updater()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
@@ -118,7 +120,7 @@ def force_update():
 
 def update():
     """Updates the rasbot updater first, then updates the rest."""
-    do_file("", RASBOT_BASE_UPDATER)
+    do_file(RASBOT_BASE_UPDATER)
     print("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
@@ -135,7 +137,7 @@ def update():
 
 def update_after_updater():
     # Get updated manifest
-    do_file("src/manifests/", "rasbot.manifest")
+    do_file(RASBOT_BASE_MANIFEST)
 
     for manifest in os.listdir("src/manifests"):
         do_manifest(manifest)
@@ -172,24 +174,22 @@ def do_manifest(manifest: str):
                 local.write(req.text)
 
 
-def do_file(path: str, file: list):
+def do_file(file: str):
     """Update a file.
 
-    :param path: The path to the folder of the files.
-
-    :param file: The file to update, including extension.
+    :param file: The path to the file to update, including extension.
     """
-    print(f"Updating {path}{file}...")
-    verify_folder_exists(f"{path}{file}")
+    print(f"Updating {file}...")
+    verify_folder_exists(f"{file}")
 
     # if the file doesn't exist don't write anything
-    req = requests.get(f"{BASE_URL}{path}{file}")
+    req = requests.get(f"{BASE_URL}{file}")
     if req.status_code == 404:
         print("Failed to fetch: ignoring...")
         return
 
     # write the text to file
-    with io.open(f"{path}{file}", "w", encoding="utf8") as local:
+    with io.open(f"{file}", "w", encoding="utf8") as local:
         local.write(req.text)
 
 
