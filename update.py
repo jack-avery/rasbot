@@ -135,7 +135,7 @@ def update():
 
 def update_after_updater():
     # Get updated manifest
-    do_file("src/manifests", "rasbot.manifest")
+    do_file("src/manifests/", "rasbot.manifest")
 
     for manifest in os.listdir("src/manifests"):
         do_manifest(manifest)
