@@ -68,8 +68,13 @@ def main(authfile=None, debug=False):
             if "config.txt" in os.listdir(f"{BASE_CONFIG_PATH}/{file}"):
                 instances[file] = False
 
+    log.info(
+        f"Found these configured instances: {', '.join([i for i in instances.keys()])}"
+    )
+
     try:
         while True:
+            log.info("Checking for live streams...")
             streams = auth.get_live_streams(instances)
 
             # kick up new instances for ids without an instance
