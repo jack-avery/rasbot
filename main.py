@@ -74,16 +74,7 @@ def main(channel=None, authfile=None, debug=False):
     if not authfile:
         authfile = cfg_global["default_authfile"]
 
-    try:
-        auth = TwitchOAuth2Helper(authfile)
-    except FileNotFoundError as err:
-        logging.error(f"userdata/{err} not found! Did you run setup?")
-        logging.error("This error is unrecoverable. rasbot will now exit.")
-        sys.exit(1)
-    except KeyError as key:
-        logging.error(f"Error setting '{key}' from authfile. Did you run setup?")
-        logging.error("This error is unrecoverable. rasbot will now exit.")
-        sys.exit(1)
+    auth = TwitchOAuth2Helper(authfile)
 
     # use self as channel if no channel given
     if not channel:
