@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import time
+from update import check
 
 from src.config import read_global, BASE_CONFIG_PATH
 from src.authentication import TwitchOAuth2Helper
@@ -24,6 +25,9 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
     default=False,
 )
 def main(authfile=None, debug=False):
+    # Check for updates first!
+    check(silent=True)
+
     # read global config
     cfg_global = read_global()
 
