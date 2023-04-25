@@ -294,7 +294,6 @@ class Module(BaseModule):
                 self.log_d(f"retrieving top diff info for beatmapset id {id}")
                 mapset = self.api_helper.get_beatmapset(id)
                 maps = mapset["beatmaps"]
-                print(maps)
                 # sort mapset descending by difficulty so req[0] gives top diff
                 maps.sort(key=lambda m: m["difficulty_rating"], reverse=True)
                 map = maps[0]
