@@ -97,5 +97,10 @@
     {
         "file": "modules/osu/helpers/api2.py",
         "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/helpers/api2.py"
+    },
+
+    {
+        "file": "version",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/version"
     }
 ]
