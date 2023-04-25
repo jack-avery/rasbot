@@ -87,7 +87,7 @@ def main(authfile=None, debug=False):
     while True:
         # check for new instances
         log.info("Checking for live streams...")
-        streams = auth.get_live_streams(instances)
+        streams = auth.get_live_streams(list(instances.keys()))
 
         # kick up new instances for ids without an instance
         for id, login in streams:
