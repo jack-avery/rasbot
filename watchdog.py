@@ -88,7 +88,7 @@ def main(authfile=None, debug=False):
             # kill instances for missing ids (offline streams)
             live_ids = [stream[0] for stream in streams]
             for instance, bot in instances.items():
-                if bot and instance not in live_ids:
+                if isinstance(bot, TwitchBot) and instance not in live_ids:
                     bot.unimport_all_modules()
                     bot.__del__()
 
@@ -99,7 +99,7 @@ def main(authfile=None, debug=False):
 
     except KeyboardInterrupt:
         for bot in instances.values():
-            if bot:
+            if isinstance(bot, TwitchBot):
                 bot.unimport_all_modules()
                 bot.__del__()
 
