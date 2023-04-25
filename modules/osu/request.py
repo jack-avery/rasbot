@@ -311,10 +311,14 @@ class Module(BaseModule):
         else:
             # beatmapset
             self.log_d(f"retrieving top diff info for beatmapset id {id}")
-            maps = self.api_helper.get_beatmapset(id)
+            mapset = self.api_helper.get_beatmapset(id)
+            maps = mapset["beatmaps"]
+            print(maps)
             # sort mapset descending by difficulty so req[0] gives top diff
-            maps.sort(key=lambda m: m["difficultyrating"], reverse=True)
-            map = req[0]
+            maps.sort(key=lambda m: m["difficulty_rating"], reverse=True)
+            map = maps[0]
+            # set map mapset to mapset for use within formatting
+            map["beatmapset"] = mapset
 
         if not map:
             return "Could not retrieve beatmap information."
