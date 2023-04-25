@@ -13,10 +13,8 @@ from src.definitions import Author, Message
 
 from modules.osu.helpers.api2 import OsuAPIv2Helper
 
-OSU_BEATMAPSETID_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/[\w#]+\/(\d+)$"
-OSU_B_RE = r"^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$"
-
-OSU_BEATMAPSET_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)$"
+OSU_LONG_RE = r"^https:\/\/osu.ppy.sh\/beatmapsets\/(\d+)\/?(?:#[a-z]+\/(\d+))?$"
+OSU_SHORT_RE = r"^https:\/\/osu.ppy.sh\/b(?:eatmaps)?\/(\d+)$"
 
 # See https://github.com/ppy/osu-api/wiki#response for more info
 OSU_STATUSES = [
@@ -123,24 +121,18 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
+        # set up
+        self.cooldown = self.cfg_get("cd_per_user")
+        self.author_cds = dict()
+
         # get api v2 helper
         self.api_helper = OsuAPIv2Helper(
             f"{self._bot.channel_id}/modules/osu/helpers/api2.txt"
         )
 
         # compile mapID regex
-        beatmapsetid_re = re.compile(OSU_BEATMAPSETID_RE)
-        b_re = re.compile(OSU_B_RE)
-
-        # compile mapsetID regex
-        beatmapset_re = re.compile(OSU_BEATMAPSET_RE)
-
-        # create regex lists for easy iterating
-        self.beatmap_res = [beatmapsetid_re, b_re]
-        self.beatmapset_res = [beatmapset_re]
-
-        self.cooldown = self.cfg_get("cd_per_user")
-        self.author_cds = dict()
+        self.beatmap_re = re.compile(OSU_LONG_RE)
+        self.b_re = re.compile(OSU_SHORT_RE)
 
         # resolve username
         self.username = self.resolve_username(self.cfg_get("osu_trgt_id"))
@@ -283,42 +275,41 @@ class Module(BaseModule):
         if len(args) > 1:
             mods = self.generate_mods_string(args[1].upper())
 
-        # resolve mapID
-        is_id = False
-        id = False
-        for beatmap_re in self.beatmap_res:
-            if beatmap_re.match(req):
-                id = beatmap_re.findall(req)[0]
-                is_id = True
-                break
+        # get map info; use full re first as it's more common
+        if self.beatmap_re.match(req):
+            # returns [()]? oh well, grab [0] so we have ()
+            ids = self.beatmap_re.findall(req)[0]
 
-        # if couldn't get mapid from mapID res, use mapsetID
-        if not id:
-            for beatmapset_re in self.beatmapset_res:
-                if beatmapset_re.match(req):
-                    id = beatmapset_re.findall(req)[0]
-                    break
+            # if mapid isn't empty use it
+            if ids[1]:
+                # beatmap
+                id = ids[1]
+                self.log_d(f"retrieving osu map info for beatmap id {id}")
+                map = self.api_helper.get_beatmap(id)
 
-            # if couldn't get mapid from either mapID or mapsetID res, give up
-            if not id:
-                return "Could not resolve beatmap link format."
+            # if mapid is empty use mapsetid
+            else:
+                # beatmapset
+                id = ids[0]
+                self.log_d(f"retrieving top diff info for beatmapset id {id}")
+                mapset = self.api_helper.get_beatmapset(id)
+                maps = mapset["beatmaps"]
+                print(maps)
+                # sort mapset descending by difficulty so req[0] gives top diff
+                maps.sort(key=lambda m: m["difficulty_rating"], reverse=True)
+                map = maps[0]
+                # set map mapset to mapset for use within formatting
+                map["beatmapset"] = mapset
 
-        # retrieve beatmap information
-        if is_id:
-            # beatmap
+        # use short re? (osu.ppy.sh/b/id)
+        elif self.b_re.match(req):
+            id = self.b_re.findall(req)[0]
             self.log_d(f"retrieving osu map info for beatmap id {id}")
             map = self.api_helper.get_beatmap(id)
+
+        # give up
         else:
-            # beatmapset
-            self.log_d(f"retrieving top diff info for beatmapset id {id}")
-            mapset = self.api_helper.get_beatmapset(id)
-            maps = mapset["beatmaps"]
-            print(maps)
-            # sort mapset descending by difficulty so req[0] gives top diff
-            maps.sort(key=lambda m: m["difficulty_rating"], reverse=True)
-            map = maps[0]
-            # set map mapset to mapset for use within formatting
-            map["beatmapset"] = mapset
+            return "Could not resolve beatmap link format."
 
         if not map:
             return "Could not retrieve beatmap information."
