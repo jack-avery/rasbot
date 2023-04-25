@@ -169,7 +169,6 @@ def do_manifest(manifest: str):
         data = json.loads(file.read())
 
         for item in data:
-            print(f"Updating {item['file']}...")
             verify_folder_exists(item["file"])
 
             # get remote file
@@ -180,6 +179,7 @@ def do_manifest(manifest: str):
                 continue
             remote = req.text
 
+            # if the file exists, do nothing if the hashes are identical
             if os.path.exists(item["file"]):
                 with io.open(item["file"], "r", encoding="utf8") as localfile:
                     local = localfile.read()
@@ -187,7 +187,8 @@ def do_manifest(manifest: str):
                 if identical(local, remote):
                     continue
 
-            # write the text to file
+            # if it doesn't or the files aren't identical overwrite with remote
+            print(f"Updating {item['file']}...")
             with io.open(item["file"], "w", encoding="utf8") as localfile:
                 localfile.write(remote)
 
