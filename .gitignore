@@ -11,6 +11,10 @@
 # https://github.com/jack-avery/rasbot-modules
 /modules/_additional
 
+# updater manifests
+/src/manifests/*
+!/src/manifests/rasbot.manifest
+
 # compiler generated
 *.spec
 /build

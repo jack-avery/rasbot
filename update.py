@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import requests
 import subprocess
@@ -23,39 +24,8 @@ except:
 BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
-RASBOT_BASE_UPDATER = "update.py"
+RASBOT_BASE_UPDATER = ["update.py", "src/manifests/rasbot.manifest"]
 """The rasbot updater. This needs to be updated first for the update to work fully."""
-
-RASBOT_BASE = [
-    "main.py",
-    "watchdog.py",
-]
-"""Remaining built-in base files to update after the updater."""
-
-RASBOT_SRC = [
-    "authentication.py",
-    "bot.py",
-    "commands.py",
-    "config.py",
-    "definitions.py",
-]
-"""Files inside `./src` to update."""
-
-BUILTIN_MODULES = [
-    "admin.py",
-    "caller.py",
-    "cmd.py",
-    "help.py",
-    "prefix.py",
-    "sample.py",
-    "uptime.py",
-    "target.py",
-    "xp.py",
-    "osu/request.py",
-    "osu/np.py",
-    "osu/helpers/api2.py",
-]
-"""Modules to always update alongside rasbot."""
 # TODO: customization for which to update maybe? idk?
 
 
@@ -136,7 +106,7 @@ def prompt():
 
 def force_update():
     """Update the updater and the rest of rasbot without opening a new instance of the updater."""
-    do_files("", [RASBOT_BASE_UPDATER])
+    do_files("", RASBOT_BASE_UPDATER)
     update_after_updater()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
@@ -148,7 +118,7 @@ def force_update():
 
 def update():
     """Updates the rasbot updater first, then updates the rest."""
-    do_files("", [RASBOT_BASE_UPDATER])
+    do_files("", RASBOT_BASE_UPDATER)
     print("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
@@ -164,34 +134,39 @@ def update():
 
 
 def update_after_updater():
-    # Update base files
-    do_files("", RASBOT_BASE)
-
-    # Update source files
-    do_files("src/", RASBOT_SRC)
-    print("Finished updating rasbot.\n")
-
-    # Update commands
-    do_files("modules/", BUILTIN_MODULES)
-    print("Finished updating built-in modules.\n")
-
-    # Check for new requirements
-    do_files("", ["requirements.txt"])
+    for manifest in os.listdir("src/manifests"):
+        do_manifest(manifest)
 
     subprocess.call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
     print("All requirements checked.\n")
 
-    # Update README files
-    do_files("", ["README.md"])
-    do_files("modules/", ["README.md"])
-    print("Finished updating README files.\n")
-
-    # Increment version
-    do_files("", ["version"])
-
     # Perform config migrations if they exist
-    print("Attempting to migrate existing configuration to new standard...")
-    attempt_migrate_config()
+    # print("Attempting to migrate existing configuration to new standard...")
+    # attempt_migrate_config()
+
+
+def do_manifest(manifest: str):
+    """Perform update from a manifest.
+
+    :param manifest: Name of the manifest.
+    """
+    with open(f"src/manifests/{manifest}") as file:
+        data = json.loads(file.read())
+
+        for item in data:
+            print(f"Updating {item['file']}...")
+            verify_folder_exists(item["file"])
+
+            # if the file doesn't exist don't write anything
+            source = item["source"].replace("$BRANCH", branch)
+            req = requests.get(source)
+            if req.status_code == 404:
+                print("Failed to fetch: ignoring...")
+                continue
+
+            # write the text to file
+            with io.open(item["file"], "w", encoding="utf8") as local:
+                local.write(req.text)
 
 
 def do_files(path: str, files: list):
@@ -210,11 +185,6 @@ def do_files(path: str, files: list):
         if req.status_code == 404:
             print("Failed to fetch: ignoring...")
             continue
-
-        # make the folder if it doesn't exist
-        if not path == "":
-            if not os.path.exists(path):
-                os.mkdir(path)
 
         # write the text to file
         with io.open(f"{path}{file}", "w", encoding="utf8") as local:

@@ -1,0 +1,101 @@
+[
+    {
+        "file": ".gitignore",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/.gitignore"
+    },
+
+    {
+        "file": "README.md",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/README.md"
+    },
+    {
+        "file": "modules/README.md",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/README.md"
+    },
+
+    {
+        "file": "requirements.txt",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/requirements.txt"
+    },
+
+    {
+        "file": "main.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/main.py"
+    },
+    {
+        "file": "watchdog.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/watchdog.py"
+    },
+    {
+        "file": "src/authentication.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/authentication.py"
+    },
+    {
+        "file": "src/bot.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/bot.py"
+    },
+    {
+        "file": "src/commands.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/commands.py"
+    },
+    {
+        "file": "src/config.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/config.py"
+    },
+    {
+        "file": "src/definitions.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/definitions.py"
+    },
+    {
+        "file": "modules/admin.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/admin.py"
+    },
+    {
+        "file": "modules/admin.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/admin.py"
+    },
+    {
+        "file": "modules/caller.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/caller.py"
+    },
+    {
+        "file": "modules/cmd.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/cmd.py"
+    },
+    {
+        "file": "modules/help.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/help.py"
+    },
+    {
+        "file": "modules/prefix.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/prefix.py"
+    },
+    {
+        "file": "modules/sample.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/sample.py"
+    },
+    {
+        "file": "modules/uptime.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/uptime.py"
+    },
+    {
+        "file": "modules/target.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/target.py"
+    },
+    {
+        "file": "modules/xp.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/xp.py"
+    },
+    {
+        "file": "modules/osu/request.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/request.py"
+    },
+    {
+        "file": "modules/osu/np.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/np.py"
+    },
+    {
+        "file": "modules/osu/helpers/api2.py",
+        "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/helpers/api2.py"
+    }
+]
