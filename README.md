@@ -4,9 +4,9 @@
 
 </div>
 
-**rasbot** is a Python-based Twitch bot that lets you see and modify **everything** going on behind the scenes.<br/>
+**rasbot** is a self-hosted Twitch bot that provides an easy-to-use interface for extending your bot with custom Python code.<br/>
 
-rasbot is intended to run locally on your account, so it has access to *your* Twitch emotes, and any potential game companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion):
+rasbot is intended to run locally, so it has access to your Twitch emotes, and companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion):
 
 ![image](https://cdn.discordapp.com/attachments/488850419301220352/1063993678575714335/image.png)
 
