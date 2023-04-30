@@ -199,7 +199,7 @@ class BaseModule(threading.Thread):
                 self.log_e(f"attempt to grab invalid key {key}? ignoring")
                 return False
 
-            self.log_e(
+            self.log_w(
                 f"config missing searched key '{key}', saving default '{self.default_config[key]}'"
             )
 
@@ -243,6 +243,13 @@ class BaseModule(threading.Thread):
         :param msg: The error to log.
         """
         log.error(f"({self._name}) - {msg}")
+
+    def log_w(self, msg: str):
+        """Log a warning alongside the module's name to the window.
+
+        :param msg: The warning to log.
+        """
+        log.warning(f"{self._name} - {msg}")
 
     def log_i(self, msg: str):
         """Log info alongside the module's name to the window.
