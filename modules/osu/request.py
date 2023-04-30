@@ -114,6 +114,8 @@ class Module(BaseModule):
         "submode": False,
         # Whether or not ALL messages posted in chat should be parsed for beatmap links.
         "parse_all_messages": True,
+        # Whether or not to inform user of requests handled using parse_all_messages.
+        "respond_all_messages": True,
     }
 
     consumes = 2
@@ -213,12 +215,7 @@ class Module(BaseModule):
     def main(self, message: Message):
         args = self.get_args(message)
 
-        fail_msg = self.process_request(message.author, args)
-
-        if fail_msg:
-            return fail_msg
-
-        return "Request sent!"
+        return self.process_request(message.author, args)
 
     def on_pubmsg(self, message: Message):
         if not self.cfg_get("parse_all_messages"):
@@ -232,7 +229,13 @@ class Module(BaseModule):
         for i, word in enumerate(words):
             if "osu.ppy.sh" in word:
                 args = words[i:]
-                self.process_request(message.author, args)
+                response = self.process_request(message.author, args)
+                if self.cfg_get("respond_all_messages"):
+                    # TODO: make this use command response format from a request command?
+                    self._bot.send_message(f"@{message.author.name} > {response}")
+
+                # only process first map
+                return
 
     def process_request(self, author: Author, args):
         # do not continue if either username or target failed to resolve
@@ -322,7 +325,7 @@ class Module(BaseModule):
         self.send_osu_message(message)
         self.author_cds[author.uid] = time.time()
 
-        return False
+        return f"{map['beatmapset']['artist']} - {map['beatmapset']['title']} | Request sent!"
 
     def send_osu_message(self, msg: str):
         """Send `msg` as an osu! message to `target` as `username`
