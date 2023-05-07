@@ -4,7 +4,7 @@ import socket
 import time
 import webbrowser
 
-from src.config import BASE_CONFIG_PATH, read, write
+from src.config import ConfigHandler, BASE_CONFIG_PATH
 from src.definitions import Singleton
 
 log = logging.getLogger("rasbot")
@@ -34,8 +34,10 @@ class OAuth2Handler(Singleton):
 
         :param cfgpath: The path to save/load APIv2 Config for.
         """
-        self.cfgpath = f"{BASE_CONFIG_PATH}/{cfgpath}"
-        self.cfg = read(self.cfgpath, self.default_config)
+        self.cfg_handler = ConfigHandler(
+            f"{BASE_CONFIG_PATH}/{cfgpath}", self.default_config
+        )
+        self.cfg = self.cfg_handler.read()
 
         self.set_fields()
 
@@ -62,7 +64,7 @@ class OAuth2Handler(Singleton):
 
     def __save(self):
         """Write the result of `self.jsonify()` to `self.cfgpath`."""
-        write(self.cfgpath, self.jsonify())
+        self.cfg_handler.write(self.jsonify())
 
     def setup(self) -> None:
         """Perform a guided setup for this OAuth2. By default just logs an error and does nothing."""

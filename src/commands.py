@@ -5,7 +5,7 @@ import threading
 import time
 import traceback
 
-from src.config import read, write
+from src.config import ConfigHandler
 from src.definitions import Message
 
 log = logging.getLogger("rasbot")
@@ -168,7 +168,9 @@ class BaseModule(threading.Thread):
         self._bot = bot
         self._name = name
 
-        self._cfg_path = f"{self._bot.channel_id}/modules/{name}.txt"
+        self._cfghandler = ConfigHandler(
+            f"{self._bot.channel_id}/modules/{name}.txt", self.default_config
+        )
 
         self.reload_config()
 
@@ -181,11 +183,11 @@ class BaseModule(threading.Thread):
 
     def reload_config(self):
         """Completely reload this module's config from file."""
-        self._cfg = read(self._cfg_path, self.default_config)
+        self._cfg = self._cfghandler.read()
 
     def save_config(self):
         """Save the current form of this module's `self.cfg` attribute to file."""
-        write(self._cfg_path, self._cfg)
+        self._cfghandler.write(self._cfg)
 
     def cfg_get(self, key: str):
         """Read the given config dict key. If it fails to read it will fill it in with the default.
@@ -198,10 +200,6 @@ class BaseModule(threading.Thread):
             if key not in self.default_config:
                 self.log_e(f"attempt to grab invalid key {key}? ignoring")
                 return False
-
-            self.log_w(
-                f"config missing searched key '{key}', saving default '{self.default_config[key]}'"
-            )
 
             self.cfg_set(key, self.default_config[key])
 

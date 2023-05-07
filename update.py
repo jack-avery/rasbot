@@ -9,7 +9,7 @@ import sys
 import click
 import semantic_version
 
-import src.config as config
+from src.config import read_global
 
 # Master option to ALWAYS OPT OUT OF UPDATES and ignore any in the future!
 # Set this to True if you want, but things might break eventually.
@@ -17,7 +17,7 @@ import src.config as config
 ALWAYS_OPT_OUT = False
 
 try:
-    cfg = config.read_global()
+    cfg = read_global()
     branch = cfg["release_branch"]
 except:
     branch = "main"

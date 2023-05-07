@@ -4,7 +4,7 @@ from threading import Timer
 import traceback
 
 import src.commands as commands
-from src.config import write, read_channel
+from src.config import ConfigHandler, DEFAULT_CHANNEL
 from src.authentication import TwitchOAuth2Helper
 from src.definitions import Author, Message
 from src.telemetry import report_exception
@@ -57,7 +57,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         if channel_name != self.auth.user_id:
             self.user_id = self.auth.get_user_id(self.auth.user_id)
 
-        self.cfgpath = f"{self.channel_id}/config.txt"
+        self.cfg_handler = ConfigHandler(
+            f"{self.channel_id}/config.txt", DEFAULT_CHANNEL
+        )
         self.reload()
 
         self.attempt_connect()
@@ -90,8 +92,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
     def reload(self):
         """Reload the config for the current channel."""
-        log.info(f"Reading config from {self.cfgpath}...")
-        cfg = read_channel(self.cfgpath)
+        log.info(f"Reading config from {self.cfg_handler._path}...")
+        cfg = self.cfg_handler.read()
 
         self.prefix = cfg["meta"]["prefix"]
         log.info(f"Prefix set as '{self.prefix}'")
@@ -151,7 +153,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 "response": command.response,
             }
 
-        write(self.cfgpath, data)
+        self.cfg_handler.write(data)
 
     def __del__(self):
         """Teardown all modules in preparation for closing."""
