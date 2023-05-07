@@ -143,13 +143,6 @@ def update_after_updater():
     for manifest in os.listdir("src/manifests"):
         do_manifest(manifest)
 
-    subprocess.call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-    print("All requirements checked.\n")
-
-    # Perform config migrations if they exist
-    # print("Attempting to migrate existing configuration to new standard...")
-    # attempt_migrate_config()
-
 
 def identical(file1: str, file2: str):
     """Compare the contents of `file1` to `file2` using SHA256."""
@@ -231,15 +224,6 @@ def verify_folder_exists(path: str):
     for folder in folders:
         if not os.path.exists(folder):
             os.mkdir(folder)
-
-
-def attempt_migrate_config():
-    """Attempt to automatically migrate any existing config to a new standard.
-
-    2.31.0 - string replacement moved from & to more often used % -- allows links with multiple & to be used in commands
-    """
-    # TODO: add version checks and perform config migrations in order automatically depending on previous version to current.
-    # also don't have them on same branch as rasbot main -- different repo w/ alg to get migrations required?
 
 
 if __name__ == "__main__":
