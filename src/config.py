@@ -77,7 +77,15 @@ def verify_folder_exists(path: str):
 
 def read_global() -> dict:
     """Reads the global config file."""
-    return read(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
+    globalcfg = read(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
+
+    for key in DEFAULT_GLOBAL:
+        if key not in globalcfg:
+            globalcfg[key] = DEFAULT_GLOBAL[key]
+
+            write(GLOBAL_CONFIG_FILE, globalcfg)
+
+    return globalcfg
 
 
 def read_channel(path: str) -> dict:
