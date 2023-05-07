@@ -141,7 +141,8 @@ def update_after_updater():
     do_file(RASBOT_BASE_MANIFEST)
 
     for manifest in os.listdir("src/manifests"):
-        do_manifest(manifest)
+        if manifest.endswith(".manifest"):
+            do_manifest(manifest)
 
 
 def identical(file1: str, file2: str):
