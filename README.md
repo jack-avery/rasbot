@@ -25,11 +25,16 @@ Joined #raspy_on_osu! (57511738)
 > rasbot checks for and performs updates automatically with each start and will let you know if one is ready! <br/>
 > You can disable auto-update checking and notifications **entirely** in `update.py`.
 
+> Please note that rasbot will automatically report any exceptions for debugging purposes. You can disable this by setting `enable_telemetry` in `userdata/rasbot.txt` to `false`.
+
 # Managing Commands 📋
 
 ```
-Create/update a command:
-r!cmd add <name> <cooldown?> <parameters?> <response>
+Create a command:
+r!cmd add <command name> <cooldown?> <parameters?> <response>
+
+Edit a command:
+r!cmd edit <command name> <name/cooldown/modonly/hidden/response> <value?>
 
 Remove a command:
 r!cmd remove <name>

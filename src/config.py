@@ -49,6 +49,7 @@ DEFAULT_GLOBAL = {
     "always_debug": False,
     "default_authfile": "auth.txt",
     "release_branch": "main",
+    "enable_telemetry": True,
 }
 
 

@@ -7,6 +7,7 @@ import src.commands as commands
 from src.config import write, read_channel
 from src.authentication import TwitchOAuth2Helper
 from src.definitions import Author, Message
+from src.telemetry import report_exception
 
 log = logging.getLogger("rasbot")
 
@@ -235,6 +236,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 + "A full stack trace has been output to the command window."
             )
             traceback.print_exc()
+            # report the error to the webhook as well for debugging
+            report_exception(traceback.format_exc(), self.channel_name)
 
     def send_message(self, msg: str):
         """Sends a message to the public chat. For easy use within modules.
