@@ -18,11 +18,11 @@ ALWAYS_OPT_OUT = False
 
 try:
     cfg = read_global()
-    branch = cfg["release_branch"]
+    rasbot_branch = cfg["release_branch"]
 except:
-    branch = "main"
+    rasbot_branch = "main"
 
-BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{branch}/"
+BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{rasbot_branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
 RASBOT_BASE_UPDATER = "update.py"
@@ -124,7 +124,7 @@ def update():
 
 
 def get_updated_manifest(manifest):
-    request = requests.get(manifest["source"])
+    request = requests.get(manifest["source"].replace("$BRANCH", rasbot_branch))
 
     if not str(request.status_code).startswith("2"):
         return False
@@ -135,7 +135,7 @@ def get_updated_manifest(manifest):
 def check_update_ready(manifest):
     current = semantic_version.Version(manifest["version"])
 
-    latest_manifest = get_updated_manifest(manifest["file"])
+    latest_manifest = get_updated_manifest(manifest)
     if not latest_manifest:
         return False
 
@@ -176,7 +176,7 @@ def do_manifest(manifest: str):
             verify_folder_exists(item["file"])
 
             # get remote file
-            source = item["source"].replace("$BRANCH", branch)
+            source = item["source"].replace("$BRANCH", rasbot_branch)
             req = requests.get(source)
             if req.status_code == 404:
                 print("Failed to fetch: ignoring...")
