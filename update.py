@@ -60,7 +60,7 @@ def check(silent=False, force=False, l=False):
     if force:
         force_update()
     if l:
-        update_after_updater()
+        update_from_manifests()
 
     if ALWAYS_OPT_OUT:
         return
@@ -97,7 +97,7 @@ def prompt():
 def force_update():
     """Update the updater and the rest of rasbot without opening a new instance of the updater."""
     do_file(RASBOT_BASE_UPDATER)
-    update_after_updater()
+    update_from_manifests()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
     input(
@@ -143,16 +143,44 @@ def check_update_ready(manifest):
     return current < latest
 
 
-def update_after_updater():
+def update_from_manifests():
     for manifestfile in os.listdir("src/manifests"):
         if not manifestfile.endswith(".manifest"):
             continue
 
-        with open(f"src/manifests/{manifestfile}") as file:
+        with open(f"src/manifests/{manifestfile}", "r") as file:
             manifest = json.loads(file.read())
 
             if not check_update_ready(manifest):
                 continue
+
+            print(f"Updating using {manifest}...")
+            for item in manifest["files"]:
+                verify_folder_exists(item["file"])
+
+                # get remote file
+                source = item["source"].replace("$BRANCH", rasbot_branch)
+                req = requests.get(source)
+                if req.status_code == 404:
+                    print("Failed to fetch: ignoring...")
+                    continue
+                remote = req.text
+
+                # if the file exists, do nothing if the hashes are identical
+                if os.path.exists(item["file"]):
+                    with io.open(item["file"], "r", encoding="utf8") as localfile:
+                        local = localfile.read()
+
+                    if identical(local, remote):
+                        continue
+
+                # if it doesn't or the files aren't identical overwrite with remote
+                print(f"Updating {item['file']}...")
+                with io.open(item["file"], "w", encoding="utf8") as localfile:
+                    localfile.write(remote)
+
+        with open(f"src/manifests/{manifestfile}", "w") as file:
+            file.write(json.dumps(manifest, indent=4))
 
 
 def identical(file1: str, file2: str):
@@ -161,40 +189,6 @@ def identical(file1: str, file2: str):
     file2hash = hashlib.sha256(str.encode(file2)).hexdigest()
 
     return file1hash == file2hash
-
-
-def do_manifest(manifest: str):
-    """Perform update from a manifest.
-
-    :param manifest: Name of the manifest within `src/manifests`.
-    """
-    print(f"Updating using {manifest}...")
-    with open(f"src/manifests/{manifest}") as file:
-        data = json.loads(file.read())
-
-        for item in data["files"]:
-            verify_folder_exists(item["file"])
-
-            # get remote file
-            source = item["source"].replace("$BRANCH", rasbot_branch)
-            req = requests.get(source)
-            if req.status_code == 404:
-                print("Failed to fetch: ignoring...")
-                continue
-            remote = req.text
-
-            # if the file exists, do nothing if the hashes are identical
-            if os.path.exists(item["file"]):
-                with io.open(item["file"], "r", encoding="utf8") as localfile:
-                    local = localfile.read()
-
-                if identical(local, remote):
-                    continue
-
-            # if it doesn't or the files aren't identical overwrite with remote
-            print(f"Updating {item['file']}...")
-            with io.open(item["file"], "w", encoding="utf8") as localfile:
-                localfile.write(remote)
 
 
 def do_file(file: str):
