@@ -71,7 +71,11 @@ def check(silent=False, force=False, l=False):
         print("Checking for updates...")
         print(f"You are running on rasbot version: {current}")
 
-    latest = semantic_version.Version(requests.get(f"{BASE_URL}/version").text)
+    try:
+        latest = semantic_version.Version(requests.get(f"{BASE_URL}/version").text)
+    except ValueError:
+        # probably moved version to manifest. use placeholder version to let update happen
+        latest = semantic_version.Version("3.0.0")
 
     if current < latest:
         prompt()
