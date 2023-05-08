@@ -124,6 +124,7 @@ def update():
 
 
 def get_updated_manifest(manifest):
+    # TODO: remove this once most people have updated
     source = f"{BASE_URL}{RASBOT_BASE_MANIFEST}"
     if "source" in manifest:
         source = manifest["source"].replace("$BRANCH", rasbot_branch)
