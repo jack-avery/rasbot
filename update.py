@@ -124,7 +124,11 @@ def update():
 
 
 def get_updated_manifest(manifest):
-    request = requests.get(manifest["source"].replace("$BRANCH", rasbot_branch))
+    source = f"{BASE_URL}{RASBOT_BASE_MANIFEST}"
+    if "source" in manifest:
+        source = manifest["source"].replace("$BRANCH", rasbot_branch)
+
+    request = requests.get(source)
 
     if not str(request.status_code).startswith("2"):
         return False
@@ -158,6 +162,9 @@ def update_from_manifests():
                 continue
 
             manifest = get_updated_manifest(manifest)
+
+            if not manifest:
+                continue
 
             print(f"Updating from {manifestfile}...")
             for item in manifest["files"]:
