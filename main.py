@@ -10,7 +10,7 @@ subprocess.call(
         "--disable-pip-version-check",
         "-qqq",
         "-r",
-        "requirements.txt",
+        "src/requirements.txt",
     ]
 )
 
