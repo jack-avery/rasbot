@@ -157,6 +157,8 @@ def update_from_manifests():
             if not check_update_ready(manifest):
                 continue
 
+            manifest = get_updated_manifest(manifest)
+
             print(f"Updating from {manifestfile}...")
             for item in manifest["files"]:
                 verify_folder_exists(item["file"])
@@ -183,7 +185,7 @@ def update_from_manifests():
                     localfile.write(remote)
 
         with open(f"src/manifests/{manifestfile}", "w") as file:
-            file.write(json.dumps(get_updated_manifest(manifest), indent=4))
+            file.write(json.dumps(manifest, indent=4))
 
 
 def identical(file1: str, file2: str):
