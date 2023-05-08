@@ -154,7 +154,7 @@ def update_from_manifests():
             if not check_update_ready(manifest):
                 continue
 
-            print(f"Updating using {manifest}...")
+            print(f"Updating from {manifestfile}...")
             for item in manifest["files"]:
                 verify_folder_exists(item["file"])
 
