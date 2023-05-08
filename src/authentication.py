@@ -206,6 +206,7 @@ class OAuth2Handler(Singleton):
         if str(response.status_code).startswith("2"):
             return response.json()
 
+        log.debug(response.json())
         return False
 
     def _get(self, endpoint: str = None, data: dict = None) -> bool | dict:
