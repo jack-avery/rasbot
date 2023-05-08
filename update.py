@@ -133,6 +133,9 @@ def get_updated_manifest(manifest):
 
 
 def check_update_ready(manifest):
+    if "version" not in manifest:
+        return True
+
     current = semantic_version.Version(manifest["version"])
 
     latest_manifest = get_updated_manifest(manifest)
