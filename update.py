@@ -65,32 +65,19 @@ def check(silent=False, force=False, l=False):
     if ALWAYS_OPT_OUT:
         return
 
-    current = get_current_version()
+    with open(RASBOT_BASE_MANIFEST, "r") as file:
+        manifest = json.loads(file.read())
 
     if not silent:
         print("Checking for updates...")
-        print(f"You are running on rasbot version: {current}")
+        print(f"You are running on rasbot version: {manifest['version']}")
 
-    latest = semantic_version.Version(requests.get(f"{BASE_URL}/version").text)
-
-    if current < latest:
+    if check_update_ready(manifest):
         prompt()
 
     else:
         if not silent:
             input()
-
-
-def get_current_version():
-    """Read the version file and return the contents."""
-    with open("version", "r") as verfile:
-        try:
-            return semantic_version.Version(verfile.read())
-        except ValueError:
-            input(
-                "Your version file is invalid.\nYou can use the command 'update.py --force' to fix your installation."
-            )
-            sys.exit(1)
 
 
 def prompt():
@@ -136,13 +123,36 @@ def update():
     sys.exit(0)
 
 
-def update_after_updater():
-    # Get updated manifest
-    do_file(RASBOT_BASE_MANIFEST)
+def get_updated_manifest(manifest):
+    request = requests.get(manifest["source"])
 
-    for manifest in os.listdir("src/manifests"):
-        if manifest.endswith(".manifest"):
-            do_manifest(manifest)
+    if not str(request.status_code).startswith("2"):
+        return False
+
+    return json.loads(request.text)
+
+
+def check_update_ready(manifest):
+    current = semantic_version.Version(manifest["version"])
+
+    latest_manifest = get_updated_manifest(manifest["file"])
+    if not latest_manifest:
+        return False
+
+    latest = semantic_version.Version(latest_manifest["version"])
+    return current < latest
+
+
+def update_after_updater():
+    for manifestfile in os.listdir("src/manifests"):
+        if not manifestfile.endswith(".manifest"):
+            continue
+
+        with open(f"src/manifests/{manifestfile}") as file:
+            manifest = json.loads(file.read())
+
+            if not check_update_ready(manifest):
+                continue
 
 
 def identical(file1: str, file2: str):
@@ -162,7 +172,7 @@ def do_manifest(manifest: str):
     with open(f"src/manifests/{manifest}") as file:
         data = json.loads(file.read())
 
-        for item in data:
+        for item in data["files"]:
             verify_folder_exists(item["file"])
 
             # get remote file
