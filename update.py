@@ -76,7 +76,7 @@ def check(silent=False, force=False, l=False):
         prompt()
 
     else:
-        if not silent:
+        if not silent and not l:
             input()
 
 
