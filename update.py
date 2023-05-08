@@ -180,7 +180,7 @@ def update_from_manifests():
                     localfile.write(remote)
 
         with open(f"src/manifests/{manifestfile}", "w") as file:
-            file.write(json.dumps(manifest, indent=4))
+            file.write(json.dumps(get_updated_manifest(manifest), indent=4))
 
 
 def identical(file1: str, file2: str):

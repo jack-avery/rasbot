@@ -2,13 +2,11 @@
     "version": "2.37.0-beta.1",
     "file": "src/manifests/rasbot.manifest",
     "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/manifests/rasbot.manifest",
-
     "files": [
         {
             "file": ".gitignore",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/.gitignore"
         },
-
         {
             "file": "README.md",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/README.md"
@@ -17,12 +15,10 @@
             "file": "modules/README.md",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/README.md"
         },
-
         {
             "file": "requirements.txt",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/requirements.txt"
         },
-
         {
             "file": "main.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/main.py"
@@ -55,7 +51,6 @@
             "file": "src/telemetry.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/telemetry.py"
         },
-
         {
             "file": "modules/admin.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/admin.py"
@@ -96,7 +91,6 @@
             "file": "modules/xp.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/xp.py"
         },
-
         {
             "file": "modules/osu/request.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/request.py"
