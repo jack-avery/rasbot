@@ -1,10 +1,12 @@
 # This module contains debug commands mostly used for development purposes.
 # This will likely grow as more cases for admin commands are needed.
 
+import json
 import semantic_version
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
 from src.definitions import Message
+from update import RASBOT_BASE_MANIFEST
 
 
 class Module(BaseModule):
@@ -97,11 +99,9 @@ class Module(BaseModule):
                 return f"{args[1]} removed from always import list (restart or use 'admin reload' to take effect)"
 
             case "version":
-                with open("version", "r") as verfile:
-                    try:
-                        return semantic_version.Version(verfile.read())
-                    except ValueError:
-                        return "version file is invalid?"
+                with open(RASBOT_BASE_MANIFEST, "r") as manifestfile:
+                    manifest = json.loads(manifestfile.read())
+                    return manifest["version"]
 
             case "save":
                 self._bot.save()
