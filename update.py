@@ -137,6 +137,21 @@ def get_updated_manifest(manifest):
     return json.loads(request.text)
 
 
+def get_rasbot_current_version():
+    if not os.path.exists(RASBOT_BASE_MANIFEST):
+        # assume old version 2.34 if no manifest
+        return semantic_version.Version("2.34")
+
+    with open(RASBOT_BASE_MANIFEST, "r") as file:
+        manifest = json.loads(file.read())
+
+    if "version" not in manifest:
+        # assume old version 2.36 if manifest missing version
+        return semantic_version.Version("2.36")
+
+    return manifest["version"]
+
+
 def check_update_ready(manifest):
     if "version" not in manifest:
         return True
