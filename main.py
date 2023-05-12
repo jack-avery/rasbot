@@ -24,7 +24,7 @@ from update import check
 from src.config import ConfigHandler, GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
-from src.telemetry import report_exception
+from src.telemetry import report_exception, notify_instance
 
 log = logging.getLogger("rasbot")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
@@ -87,6 +87,7 @@ def main(channel=None, authfile=None, debug=False):
         # ask about telemetry if we haven't
         if cfg_global["telemetry"] == -1:
             cfg_global["telemetry"] = 0
+
             # just errors
             if (
                 input(
@@ -109,6 +110,8 @@ def main(channel=None, authfile=None, debug=False):
 
         # start the bot
         try:
+            notify_instance(auth.user_id)
+
             tb = TwitchBot(auth, channel)
             tb.start()
 
