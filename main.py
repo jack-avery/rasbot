@@ -21,7 +21,7 @@ import time
 import traceback
 from update import check
 
-from src.config import read_global
+from src.config import ConfigHandler, GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
 from src.telemetry import report_exception
@@ -47,7 +47,8 @@ def main(channel=None, authfile=None, debug=False):
         check(silent=True)
 
         # read global config
-        cfg_global = read_global()
+        gcfg_handler = ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
+        cfg_global = gcfg_handler.read()
 
         # Set up logging
         if cfg_global["always_debug"]:
@@ -82,6 +83,29 @@ def main(channel=None, authfile=None, debug=False):
         # use self as channel if no channel given
         if not channel:
             channel = auth.user_id
+
+        # ask about telemetry if we haven't
+        if cfg_global["telemetry"] == -1:
+            cfg_global["telemetry"] = 0
+            # just errors
+            if (
+                input(
+                    "Would you like to send errors to help us improve rasbot? (y/n) - "
+                ).lower()
+                == "y"
+            ):
+                cfg_global["telemetry"] = 1
+
+                # usage statistics
+                if (
+                    input(
+                        "Would you like to additionally send usage statistics? (y/n) - "
+                    ).lower()
+                    == "y"
+                ):
+                    cfg_global["telemetry"] = 2
+
+            gcfg_handler.write(cfg_global)
 
         # start the bot
         try:

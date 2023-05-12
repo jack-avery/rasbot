@@ -49,7 +49,7 @@ DEFAULT_GLOBAL = {
     "always_debug": False,
     "default_authfile": "auth.txt",
     "release_branch": "main",
-    "enable_telemetry": False,
+    "telemetry": -1,
 }
 
 read_global = lambda: ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL).read()
