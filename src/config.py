@@ -122,7 +122,7 @@ class ConfigHandler:
         except FileNotFoundError:
             if self._default:
                 log.debug(f"{self._path} not found, writing default;")
-                return self.write(self._path, self._default)
+                return self.write(self._default)
 
             # No default; return empty dict to prevent errors
             return dict()
