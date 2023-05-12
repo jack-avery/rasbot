@@ -3,7 +3,7 @@ from discord import SyncWebhook
 from src.config import read_global
 from update import get_rasbot_current_version
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1104885792779812906/U0sYFISyGGRU7TcNNqAjpSH300mQBRPLhxUoVCnX7iKKaeUmUVvJbv6tU0l2n7zu5dlA"
+WEBHOOK_URL = "https://discord.com/api/webhooks/1106454348172632155/GAT0mrLq-BB651fy4GtxulQuBf6LJgKuUALTmV_C8lXeQgoMrBMCktRJnH-lTiinnMBa"
 # Please don't do anything weird with this! This webhook is for private exception reporting so anyone noted as a developer can take a look.
 
 WEBHOOK = SyncWebhook.from_url(WEBHOOK_URL)
