@@ -115,7 +115,23 @@ class ConfigHandler:
             log.error(f"\nFailed to read config file at path {self._path}:")
             log.error(f"{err.msg} (line {err.lineno}, column {err.colno})\n")
             log.error("The file likely has a formatting error somewhere.")
-            log.error("Find and fix the error, then re-launch rasbot.")
+
+            if not self._default:
+                log.fatal(
+                    "This error is unrecoverable. Fix the error, and relaunch rasbot."
+                )
+
+            log.warn(
+                "The config does have a default, but anything saved will be deleted."
+            )
+            if (
+                input(
+                    "Would you like to overwrite the existing file with the default?"
+                ).lower()
+                == "y"
+            ):
+                self.write(self._default)
+                return self._default
 
         # If no config file is found, write the default,
         # and return a basic config dict.
