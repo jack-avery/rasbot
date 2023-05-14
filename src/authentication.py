@@ -147,7 +147,8 @@ class OAuth2Handler(Singleton):
             "grant_type": "refresh_token",
             "refresh_token": self.token["refresh_token"],
         }
-        self.__get_token(data)
+        if not self.__get_token(data):
+            self.__get_auth()
 
     def __get_token(self, data):
         """Get a new token or refresh an existing one using `data`.
@@ -162,11 +163,12 @@ class OAuth2Handler(Singleton):
 
         if not token.status_code == 200:
             log.error(f"'{self.name}' OAuth token grab failed! ({token.json()})")
-            return
+            return False
 
         self.token = token.json()
         self.token["expiry"] = self.token["expires_in"] + time.time()
         self.__save()
+        return True
 
     def __request(self, method, endpoint: str, data: dict = None):
         """Send a request to an endpoint of `self.api`.
