@@ -43,6 +43,8 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
 )
 def main(channel=None, authfile=None, debug=False):
     try:
+        tb = None
+
         # Check for updates first!
         check(silent=True)
 
@@ -108,18 +110,16 @@ def main(channel=None, authfile=None, debug=False):
 
             gcfg_handler.write(cfg_global)
 
+        notify_instance(auth.user_id)
+
         # start the bot
-        try:
-            notify_instance(auth.user_id)
+        tb = TwitchBot(auth, channel)
+        tb.start()
 
-            tb = TwitchBot(auth, channel)
-            tb.start()
-
-        # catch ctrl+C and force unimport modules;
-        # speeds up ctrl+C exiting with timed modules
-        except KeyboardInterrupt:
+    except KeyboardInterrupt:
+        if isinstance(tb, TwitchBot):
             tb.__del__()
-            sys.exit(0)
+        sys.exit(0)
 
     except:
         userid = "Unknown User"
