@@ -44,6 +44,7 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
 def main(channel=None, authfile=None, debug=False):
     try:
         tb = None
+        auth = None
 
         # Check for updates first!
         check(silent=True)
@@ -123,7 +124,7 @@ def main(channel=None, authfile=None, debug=False):
 
     except:
         userid = "Unknown User"
-        if auth:
+        if isinstance(auth, TwitchOAuth2Helper):
             userid = auth.user_id
 
         # report the exception
