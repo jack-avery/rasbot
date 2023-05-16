@@ -44,7 +44,6 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
 def main(channel=None, authfile=None, debug=False):
     try:
         tb = None
-        auth = None
 
         # Check for updates first!
         check(silent=True)
@@ -111,7 +110,7 @@ def main(channel=None, authfile=None, debug=False):
 
             gcfg_handler.write(cfg_global)
 
-        notify_instance(auth.user_id)
+        notify_instance()
 
         # start the bot
         tb = TwitchBot(auth, channel)
@@ -123,12 +122,8 @@ def main(channel=None, authfile=None, debug=False):
         sys.exit(0)
 
     except:
-        userid = "Unknown User"
-        if isinstance(auth, TwitchOAuth2Helper):
-            userid = auth.user_id
-
         # report the exception
-        report_exception(traceback.format_exc(), userid)
+        report_exception(traceback.format_exc())
 
 
 if __name__ == "__main__":

@@ -239,7 +239,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             )
             traceback.print_exc()
             # report the error to the webhook as well for debugging
-            report_exception(traceback.format_exc(), self.channel_name)
+            report_exception(traceback.format_exc())
 
     def send_message(self, msg: str):
         """Sends a message to the public chat. For easy use within modules.

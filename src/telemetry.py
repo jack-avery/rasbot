@@ -15,8 +15,10 @@ GLOBAL_CONFIG = read_global()
 HOME_PATH_WIN_RE = r"\"C:\\Users\\\w+"
 HOME_PATH_LINUX_RE = r"\"/home/\w+"
 
+USERNAME = "rasbot"
 
-def report_exception(message: str, username: str):
+
+def report_exception(message: str):
     # Turn this off if you don't want it, but it helps me fix issues.
     if not GLOBAL_CONFIG["telemetry"] > 0:
         return
@@ -25,13 +27,13 @@ def report_exception(message: str, username: str):
     message = re.sub(HOME_PATH_WIN_RE, '"~', message)
     message = re.sub(HOME_PATH_LINUX_RE, '"~', message)
 
-    WEBHOOK.send(content=message, username=username)
+    WEBHOOK.send(content=message, username=USERNAME)
 
 
-def notify_instance(username: str):
+def notify_instance():
     # Nice to have for me to know who is using it as well as what version.
     if not GLOBAL_CONFIG["telemetry"] > 1:
         return
 
     message = f"New instance started with version {get_rasbot_current_version()}"
-    WEBHOOK.send(content=message, username=username)
+    WEBHOOK.send(content=message, username=USERNAME)
