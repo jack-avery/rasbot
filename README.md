@@ -22,7 +22,7 @@ rasbot is intended to run locally, so it has access to your Twitch emotes, and c
 Joined #raspy_on_osu! (57511738)
 ```
 
-> You will be asked about telemetry when you first start rasbot. I would appreciate at least error reporting so I can fix bugs. <br/>
+> You will be asked about telemetry when you first start rasbot. I would appreciate at least error reporting. <br/>
 > **All telemetry is completely anonymous.** You can see exactly what is sent [here](https://github.com/jack-avery/rasbot/blob/main/src/telemetry.py).
 
 > rasbot checks for and performs updates automatically with each start and will let you know if one is ready! <br/>
