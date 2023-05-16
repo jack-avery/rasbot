@@ -12,8 +12,8 @@ WEBHOOK = SyncWebhook.from_url(WEBHOOK_URL)
 
 GLOBAL_CONFIG = read_global()
 
-HOME_PATH_WIN_RE = r"^C:\\Users\\\w+"
-HOME_PATH_LINUX_RE = r"^/home/\w+"
+HOME_PATH_WIN_RE = r"\"C:\\Users\\\w+"
+HOME_PATH_LINUX_RE = r"\"/home/\w+"
 
 
 def report_exception(message: str, username: str):
@@ -22,8 +22,8 @@ def report_exception(message: str, username: str):
         return
 
     # Remove potential personal information
-    message = re.sub(HOME_PATH_WIN_RE, "~", message)
-    message = re.sub(HOME_PATH_LINUX_RE, "~", message)
+    message = re.sub(HOME_PATH_WIN_RE, '"~', message)
+    message = re.sub(HOME_PATH_LINUX_RE, '"~', message)
 
     WEBHOOK.send(content=message, username=username)
 
