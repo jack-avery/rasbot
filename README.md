@@ -42,7 +42,7 @@ r!cmd remove <name>
 ```
 
 Valid parameters include:<br/>
-`-modonly`: Set the command to be moderator/broadcaster use only.<br/>
+`-{status}only`: Set the command to be usable by {status} only, e.g. `-modonly` for Moderators and above, `-subonly` for Subscribers and above.<br/>
 `-hidden`: Set the command to be hidden from the `help` command.
 
 # Modules 📦
