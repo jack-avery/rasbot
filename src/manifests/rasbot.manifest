@@ -1,5 +1,5 @@
 {
-    "version": "2.37.0-beta.3",
+    "version": "2.37.0",
     "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/manifests/rasbot.manifest",
     "files": [
         {
