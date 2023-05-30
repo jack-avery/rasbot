@@ -35,7 +35,7 @@ Create a command:
 r!cmd add <command name> <cooldown?> <parameters?> <response>
 
 Edit a command:
-r!cmd edit <command name> <name/cooldown/modonly/hidden/response> <value?>
+r!cmd edit <command name> <name/cooldown/privilege/hidden/response> <value?>
 
 Remove a command:
 r!cmd remove <name>
