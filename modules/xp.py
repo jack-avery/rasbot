@@ -4,7 +4,7 @@
 
 from src.commands import BaseModule
 from src.config import BASE_CONFIG_PATH
-from src.definitions import Message, RepeatTimer
+from src.definitions import Author, Message, RepeatTimer
 
 import os
 import random
@@ -283,7 +283,7 @@ class Module(BaseModule):
 
         # XP moderation tools
         if arg == "mod":
-            if not message.author.is_mod:
+            if not message.author.priv >= Author.Privilege.MOD:
                 return "You must be a moderator to do that."
 
             return self.mod_user(args)

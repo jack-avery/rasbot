@@ -180,9 +180,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Gauranteeing broadcaster all traits
         if uid == self.channel_id:
-            ismod = True
-            issub = True
-            isvip = True
             ishost = True
 
         # Create author object
