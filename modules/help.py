@@ -2,7 +2,7 @@
 # Please do not modify this unless you really know what you're doing.
 
 from src.commands import BaseModule
-from src.definitions import Message
+from src.definitions import Author, Message
 
 
 class Module(BaseModule):
@@ -20,7 +20,7 @@ class Module(BaseModule):
                 [
                     n
                     for n, c in self._bot.commands.commands.items()
-                    if not c.hidden and not c.requires_mod
+                    if not c.hidden and not c.privilege > Author.Privilege.VIP
                 ]
             )
             # list of all commands (not hidden, mod-only)
@@ -28,7 +28,7 @@ class Module(BaseModule):
                 [
                     n
                     for n, c in self._bot.commands.commands.items()
-                    if not c.hidden and c.requires_mod
+                    if not c.hidden and c.privilege > Author.Privilege.VIP
                 ]
             )
 
@@ -44,7 +44,6 @@ class Module(BaseModule):
 
             # if not a module and resolves to a command...
             elif name in self._bot.commands.commands:
-
                 # see if it mentions any modules
                 command_modules = self._bot.commands.commands[name].get_used_modules()
 

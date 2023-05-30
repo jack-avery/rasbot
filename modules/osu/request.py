@@ -9,7 +9,7 @@ from threading import Thread
 import time
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Author, Message
+from src.definitions import Author, Message, status_from_user_privilege
 
 from modules.osu.helpers.api2 import OsuAPIv2Helper
 
@@ -77,7 +77,7 @@ MESSAGE_OPTIONS = {
     "songtitleunicode": lambda m: m["beatmapset"]["title_unicode"],
     # requests specific additions
     "requester": lambda m: m["sender"].name,
-    "requesterstatus": lambda m: m["sender"].user_status(),
+    "requesterstatus": lambda m: status_from_user_privilege(m["sender"].priv),
     "mods": lambda m: m["mods"],
 }
 

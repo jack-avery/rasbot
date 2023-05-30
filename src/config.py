@@ -12,31 +12,31 @@ DEFAULT_CHANNEL = {
     "commands": {
         "help": {
             "cooldown": 10,
-            "requires_mod": False,
+            "privilege": 0,
             "hidden": False,
             "response": "@%caller% > %help%",
         },
         "uptime": {
             "cooldown": 10,
-            "requires_mod": False,
+            "privilege": 0,
             "hidden": False,
             "response": "@%caller% > %uptime%",
         },
         "cmd": {
             "cooldown": 0,
-            "requires_mod": True,
+            "privilege": 0,
             "hidden": False,
             "response": "@%caller% > %cmd%",
         },
         "prefix": {
             "cooldown": 0,
-            "requires_mod": True,
+            "privilege": 3,
             "hidden": False,
             "response": "@%caller% > %prefix%",
         },
         "admin": {
             "cooldown": 0,
-            "requires_mod": True,
+            "privilege": 3,
             "hidden": True,
             "response": "@%caller% > %admin%",
         },

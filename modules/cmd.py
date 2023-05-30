@@ -4,7 +4,12 @@
 import re
 
 from src.commands import BaseModule
-from src.definitions import Message
+from src.definitions import (
+    Author,
+    Message,
+    user_privilege_from_status,
+    status_from_user_privilege,
+)
 
 VALID_COMMAND_RE = re.compile(r"[a-z0-9_]+")
 """Regex to compare given command names to for validation."""
@@ -33,6 +38,9 @@ class Module(BaseModule):
 
     def main(self, message: Message):
         cmd = self.get_args(message)
+
+        if not cmd:
+            return self.helpmsg
 
         if len(cmd) < 2:
             return "Not enough parameters given."
@@ -115,7 +123,7 @@ class Module(BaseModule):
                     value = int(cmd[0])
                     if value < 0:
                         raise ValueError
-                except (ValueError | IndexError):
+                except ValueError | IndexError:
                     return "Cooldown must be a positive integer."
 
                 self._bot.commands.command_mod(cmd_name, "cooldown", value)
@@ -149,12 +157,37 @@ class Module(BaseModule):
                 return f"Response for {cmd_name} set to {value}."
 
             if key in ["mod", "requires_mod"]:
-                value = not self._bot.commands.commands[cmd_name].requires_mod
+                priv = self._bot.commands.commands[cmd_name].privilege
+                if priv not in [Author.Privilege.USER, Author.Privilege.MOD]:
+                    return "Command uses a new privilege setting. requires_mod will not work. Aborting"
 
-                self._bot.commands.command_mod(cmd_name, "requires_mod", value)
+                value = (
+                    Author.Privilege.USER
+                    if priv == Author.Privilege.MOD
+                    else Author.Privilege.MOD
+                )
+
+                self._bot.commands.command_mod(cmd_name, "privilege", value)
                 self._bot.save()
 
-                return f"Mod requirement for {cmd_name} toggled to {value}."
+                return f"Mod requirement for {cmd_name} toggled to {value == Author.Privilege.MOD}."
+
+            if key in ["privs", "priv", "privilege"]:
+                if not cmd:
+                    return "Please provide a privilege value. 0=User, 1=Sub, 2=VIP, 3=Mod, 4=Host."
+
+                try:
+                    value = int(cmd[0])
+                except ValueError:
+                    value = user_privilege_from_status(cmd[0])
+
+                if value == -1 or status_from_user_privilege(value) == -1:
+                    return "Please provide a privilege value. 0=User, 1=Sub, 2=VIP, 3=Mod, 4=Host."
+
+                self._bot.commands.command_mod(cmd_name, "privilege", value)
+                self._bot.save()
+
+                return f"Privilege requirement for '{cmd_name}' set to '{status_from_user_privilege(value)}' and above only."
 
             if key in ["hide", "hidden"]:
                 value = not self._bot.commands.commands[cmd_name].hidden
