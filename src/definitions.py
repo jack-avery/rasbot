@@ -12,6 +12,7 @@ class Author:
     is_sub: bool
     is_vip: bool
     is_host: bool
+    priv: int
 
     class Privilege:
         USER = 0
@@ -28,7 +29,6 @@ class Author:
         is_sub: bool = False,
         is_vip: bool = False,
         is_host: bool = False,
-        priv: int = 0,
     ):
         """Create a new `Author`.
 

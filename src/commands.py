@@ -103,10 +103,7 @@ def command_add(
     Automatically attempts to import any unimported modules.
 
     :param name: The name of the command.
-    :param cooldown: The cooldown of the command in seconds.
-    :param response: The text response of the command. Encapsulate custom commands in %%.
-    :param requires_mod: Whether this command requires moderator access to use.
-    :param hidden: Whether to hide this command from the `help` module.
+    :param command: dict representing the command.
     """
     log.debug(f"adding {name} ({command})")
 

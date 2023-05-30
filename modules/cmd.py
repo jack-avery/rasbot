@@ -21,7 +21,10 @@ class Module(BaseModule):
     default_config = {
         # The parameters to be given, after cooldown, before response
         # to indicate this command should be mod-only or hidden from !help
+        "subonly_arg": "-subonly",
+        "viponly_arg": "-viponly",
         "modonly_arg": "-modonly",
+        "hostonly_arg": "-hostonly",
         "hidden_arg": "-hidden",
         # The default cooldown to apply to a command if none is specified
         "default_cooldown": 5,
@@ -32,7 +35,10 @@ class Module(BaseModule):
     def __init__(self, bot, name):
         BaseModule.__init__(self, bot, name)
 
+        self.SUBONLY_ARG = self.cfg_get("subonly_arg")
+        self.VIPONLY_ARG = self.cfg_get("viponly_arg")
         self.MODONLY_ARG = self.cfg_get("modonly_arg")
+        self.HOSTONLY_ARG = self.cfg_get("hostonly_arg")
         self.HIDDEN_ARG = self.cfg_get("hidden_arg")
         self.DEFAULT_COOLDOWN = self.cfg_get("default_cooldown")
 
@@ -65,7 +71,10 @@ class Module(BaseModule):
 
             # check for parameters and consume if found
             params = {
+                self.SUBONLY_ARG: False,
+                self.VIPONLY_ARG: False,
                 self.MODONLY_ARG: False,
+                self.HOSTONLY_ARG: False,
                 self.HIDDEN_ARG: False,
             }
             for _ in params:
@@ -74,6 +83,17 @@ class Module(BaseModule):
                         params[param] = True
                         cmd.pop(0)
 
+            if params[self.HOSTONLY_ARG]:
+                cmd_priv = Author.Privilege.HOST
+            elif params[self.MODONLY_ARG]:
+                cmd_priv = Author.Privilege.MOD
+            elif params[self.VIPONLY_ARG]:
+                cmd_priv = Author.Privilege.VIP
+            elif params[self.SUBONLY_ARG]:
+                cmd_priv = Author.Privilege.SUB
+            else:
+                cmd_priv = Author.Privilege.USER
+
             # verify all parameters are valid
             if not VALID_COMMAND_RE.match(cmd_name):
                 return "Command name can only use alphanumeric characters and underscores (_)."
@@ -81,15 +101,17 @@ class Module(BaseModule):
             if cmd_cooldown < 0:
                 return "Command cooldown must be a positive integer."
 
+            command = {
+                "name": cmd_name,
+                "cooldown": cmd_cooldown,
+                "response": " ".join(cmd),
+                "hidden": params[self.HIDDEN_ARG],
+                "privilege": cmd_priv,
+            }
+
             # add command and write config
             try:
-                self._bot.commands.command_add(
-                    cmd_name,
-                    cmd_cooldown,
-                    " ".join(cmd),
-                    params[self.MODONLY_ARG],
-                    params[self.HIDDEN_ARG],
-                )
+                self._bot.commands.command_add(cmd_name, command)
                 self._bot.save()
 
                 return f"Command {cmd_name} added successfully."
