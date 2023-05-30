@@ -123,6 +123,7 @@ def main(channel=None, authfile=None, debug=False):
 
     except:
         # report the exception
+        traceback.print_exc()
         report_exception(traceback.format_exc())
 
 
