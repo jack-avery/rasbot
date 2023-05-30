@@ -125,7 +125,7 @@ class ConfigHandler:
             )
             if (
                 input(
-                    "Would you like to overwrite the existing file with the default?"
+                    "Would you like to overwrite the existing file with the default? (y/n) > "
                 ).lower()
                 == "y"
             ):
