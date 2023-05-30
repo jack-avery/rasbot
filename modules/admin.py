@@ -2,7 +2,6 @@
 # This will likely grow as more cases for admin commands are needed.
 
 import json
-import semantic_version
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
 from src.definitions import Message

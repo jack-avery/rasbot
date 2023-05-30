@@ -1,6 +1,6 @@
-import json
 import logging
 import os
+import yaml
 
 log = logging.getLogger("rasbot")
 
@@ -92,7 +92,7 @@ class ConfigHandler:
         # Attempt to read config
         try:
             with open(self._path, "r") as cfgfile:
-                data = json.loads(cfgfile.read())
+                data = yaml.safe_load(cfgfile.read())
 
                 if not data:
                     raise FileNotFoundError
@@ -106,12 +106,11 @@ class ConfigHandler:
                             f"{self._path} - missing default key '{key}', saving default '{self._default[key]}'"
                         )
                         data[key] = self._default[key]
-                        self.write(data)
 
-                return data
+                return self.write(data)
 
         # If the json fails to load...
-        except json.decoder.JSONDecodeError as err:
+        except yaml.YAMLError as err:
             log.error(f"\nFailed to read config file at path {self._path}:")
             log.error(f"{err.msg} (line {err.lineno}, column {err.colno})\n")
             log.error("The file likely has a formatting error somewhere.")
@@ -150,6 +149,6 @@ class ConfigHandler:
         """
         with open(self._path, "w") as cfgfile:
             log.debug(f"writing {self._path}")
-            cfgfile.write(json.dumps(cfg, indent=4, skipkeys=True))
+            cfgfile.write(yaml.safe_dump(cfg, indent=4))
 
         return cfg
