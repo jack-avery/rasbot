@@ -50,7 +50,7 @@ rasbot is designed modularly and allows you to add to the base application easil
 
 To include a module as part of a command, encompass the module name in `%`, e.g.:
 ```
-r!cmd add np %np%
+r!cmd add np %osu/np%
 ```
 
 *For documentation on configuring modules or creating your own, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*
