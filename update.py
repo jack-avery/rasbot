@@ -2,11 +2,11 @@ import hashlib
 import io
 import json
 import os
-import requests
 import subprocess
 import sys
 
 import click
+import requests
 import semantic_version
 
 from src.config import read_global

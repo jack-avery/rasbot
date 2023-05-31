@@ -1,3 +1,7 @@
+import json
+import os
+import subprocess
+import sys
 import threading
 
 ##
@@ -169,3 +173,26 @@ class RepeatTimer(threading.Timer):
     def run(self):
         while not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
+
+
+def check_all_dependencies():
+    manifests = [
+        manifest
+        for manifest in os.listdir("src/manifests")
+        if manifest.endswith(".manifest")
+    ]
+    for manifest in manifests:
+        with open(f"src/manifests/{manifest}", "r") as manifestfile:
+            manifest = json.loads(manifestfile.read())
+        if "requirements" in manifest:
+            subprocess.call(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--disable-pip-version-check",
+                    "-q",
+                    *manifest["requirements"].split(" "),
+                ]
+            )
