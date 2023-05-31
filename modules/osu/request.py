@@ -225,16 +225,20 @@ class Module(BaseModule):
 
         words = message.text_raw.split(" ")
         for i, word in enumerate(words):
-            if "osu.ppy.sh" in word:
-                args = words[i:]
-                response = self.process_request(message.author, args)
-                if self.cfg_get("respond_all_messages"):
-                    # TODO: make this use command response format from a request command?
-                    if NO_MESSAGE_SIGNAL not in response:
-                        self._bot.send_message(f"@{message.author.name} > {response}")
+            if "osu.ppy.sh/b" not in word:
+                continue
 
-                # only process first map
-                return
+            args = words[i:]
+            response = self.process_request(message.author, args)
+            if (
+                self.cfg_get("respond_all_messages")
+                and NO_MESSAGE_SIGNAL not in response
+            ):
+                # TODO: make this use command response format from a request command?
+                self._bot.send_message(f"@{message.author.name} > {response}")
+
+            # only process first map
+            return
 
     def process_request(self, author: Author, args):
         # do not continue if either username or target failed to resolve
