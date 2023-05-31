@@ -340,6 +340,13 @@ def do_on_pubmsg(message: Message):
         module.on_pubmsg(message)
 
 
+def find_first_command_using_module(module: str) -> Command:
+    for command in commands.values():
+        if module in command.get_used_modules():
+            return command
+    return None
+
+
 def pass_bot_ref(ref):
     """Pass the bot reference so that modules can have a reference to it"""
     global bot
