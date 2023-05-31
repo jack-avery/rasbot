@@ -230,7 +230,8 @@ class Module(BaseModule):
                 response = self.process_request(message.author, args)
                 if self.cfg_get("respond_all_messages"):
                     # TODO: make this use command response format from a request command?
-                    self._bot.send_message(f"@{message.author.name} > {response}")
+                    if NO_MESSAGE_SIGNAL not in response:
+                        self._bot.send_message(f"@{message.author.name} > {response}")
 
                 # only process first map
                 return
@@ -248,6 +249,13 @@ class Module(BaseModule):
             if time_passed < self.cooldown:
                 self.log_d(f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
+
+        # honor privileges
+        if (
+            author.priv
+            < self._bot.commands.find_first_command_using_module(self._name).privilege
+        ):
+            return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
         if not args:
