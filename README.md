@@ -10,6 +10,8 @@ rasbot is intended to run locally, so it has access to your Twitch emotes, and c
 
 ![image](https://cdn.discordapp.com/attachments/488850419301220352/1063993678575714335/image.png)
 
+Find rasbot useful? [Buy me a coffee ☕](https://ko-fi.com/raspy)!
+
 # How to Use ✍️
 1. Download and install [Python version 3.11.0+](https://www.python.org/downloads/), ensuring you tick "Add python.exe to PATH" at the bottom of the first screen.
 2. Download the Source Code:
