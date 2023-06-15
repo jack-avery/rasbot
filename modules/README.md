@@ -39,7 +39,7 @@ Your module must have a `Module` class that extends `commands.BaseModule`.<br/>
 > If you're overriding \_\_init__, be sure to call BaseModule.\_\_init__(self, bot, name).
 
 The code that replaces `%sample%` in the response goes in a function called `main`.<br/>
-You can find the `TwitchBot` instance as `self.bot`.<br/>
+You can find the `TwitchBot` instance as `self._bot`.<br/>
 
 If your module intends to use arguments, get them by setting the `consume` static variable and calling `self.get_args(message)`.<br/>
 *This helps bunch up arguments together, allowing multiple modules in the same command to interact predictably.*
@@ -48,6 +48,5 @@ Your module can have a help message, stored in the `helpmsg` static variable.<br
 Whatever it contains will be shown if the module is provided as an argument for the `help` command.
 
 Otherwise, you're free to add whatever you want to the module, as long as you know how to code it.
-> Wiki page containing more useful information about modules coming soon™️!
 
 ### **Be very careful as this can be abused!**<br/>

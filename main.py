@@ -1,26 +1,17 @@
-import subprocess
-import sys
+from src.definitions import check_all_dependencies
 
-subprocess.call(
-    [
-        sys.executable,
-        "-m",
-        "pip",
-        "install",
-        "--disable-pip-version-check",
-        "-qqq",
-        "-r",
-        "src/requirements.txt",
-    ]
-)
+# Automatically install dependencies listed in manifests
+check_all_dependencies()
 
-import click
 import logging
 import os
+import sys
 import time
 import traceback
-from update import check
 
+import click
+
+from update import check
 from src.config import ConfigHandler, GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
@@ -123,6 +114,7 @@ def main(channel=None, authfile=None, debug=False):
 
     except:
         # report the exception
+        traceback.print_exc()
         report_exception(traceback.format_exc())
 
 

@@ -9,7 +9,7 @@ from threading import Thread
 import time
 
 from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Author, Message
+from src.definitions import Author, Message, status_from_user_privilege
 
 from modules.osu.helpers.api2 import OsuAPIv2Helper
 
@@ -77,7 +77,7 @@ MESSAGE_OPTIONS = {
     "songtitleunicode": lambda m: m["beatmapset"]["title_unicode"],
     # requests specific additions
     "requester": lambda m: m["sender"].name,
-    "requesterstatus": lambda m: m["sender"].user_status(),
+    "requesterstatus": lambda m: status_from_user_privilege(m["sender"].priv),
     "mods": lambda m: m["mods"],
 }
 
@@ -110,8 +110,6 @@ class Module(BaseModule):
         "message_format": "%requester% (%requesterstatus%) requested: %map% %mods% (%length% @ %bpm%BPM, %stars%*, by %creator%)",
         # Per-user cooldown for requests (in seconds)
         "cd_per_user": 0,
-        # Whether or not requests should be for Subscribers, VIPs, and Mods only
-        "submode": False,
         # Whether or not ALL messages posted in chat should be parsed for beatmap links.
         "parse_all_messages": True,
         # Whether or not to inform user of requests handled using parse_all_messages.
@@ -227,15 +225,20 @@ class Module(BaseModule):
 
         words = message.text_raw.split(" ")
         for i, word in enumerate(words):
-            if "osu.ppy.sh" in word:
-                args = words[i:]
-                response = self.process_request(message.author, args)
-                if self.cfg_get("respond_all_messages"):
-                    # TODO: make this use command response format from a request command?
-                    self._bot.send_message(f"@{message.author.name} > {response}")
+            if "osu.ppy.sh/b" not in word:
+                continue
 
-                # only process first map
-                return
+            args = words[i:]
+            response = self.process_request(message.author, args)
+            if (
+                self.cfg_get("respond_all_messages")
+                and NO_MESSAGE_SIGNAL not in response
+            ):
+                # TODO: make this use command response format from a request command?
+                self._bot.send_message(f"@{message.author.name} > {response}")
+
+            # only process first map
+            return
 
     def process_request(self, author: Author, args):
         # do not continue if either username or target failed to resolve
@@ -244,12 +247,6 @@ class Module(BaseModule):
                 "Your username could not be resolved. Please check/fix configuration."
             )
 
-        # prevent normal users from requesting in submode
-        if self.cfg_get("submode") and not (
-            author.is_mod or author.is_sub or author.is_vip
-        ):
-            return NO_MESSAGE_SIGNAL
-
         # exit early if user requested within cooldown
         if author.uid in self.author_cds:
             time_passed = time.time() - self.author_cds[author.uid]
@@ -257,21 +254,19 @@ class Module(BaseModule):
                 self.log_d(f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
+        # honor privileges
+        if (
+            author.priv
+            < self._bot.commands.find_first_command_using_module(self._name).privilege
+        ):
+            return NO_MESSAGE_SIGNAL
+
         # do not continue if no args are provided
         if not args:
             return "Provide a map to request."
 
         # use first arg as request (or submode toggle)
         req = args[0].lower()
-
-        # allow mods to toggle submode
-        if req == "submode" and author.is_mod:
-            t = not self.cfg_get("submode")
-            self.cfg_set("submode", t)
-            if t:
-                return "Submode enabled"
-            else:
-                return "Submode disabled"
 
         # use second arg as mods
         mods = ""

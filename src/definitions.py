@@ -1,3 +1,7 @@
+import json
+import os
+import subprocess
+import sys
 import threading
 
 ##
@@ -12,6 +16,14 @@ class Author:
     is_sub: bool
     is_vip: bool
     is_host: bool
+    priv: int
+
+    class Privilege:
+        USER = 0
+        SUB = 1
+        VIP = 2
+        MOD = 3
+        HOST = 4
 
     def __init__(
         self,
@@ -38,25 +50,55 @@ class Author:
         self.is_vip = is_vip
         self.is_host = is_host
 
-    def user_status(self) -> str:
-        """Returns the highest privilege this user has.
-        `host > mod > vip > sub > none`
+        if is_host:
+            self.priv = self.Privilege.HOST
+        elif is_mod:
+            self.priv = self.Privilege.MOD
+        elif is_vip:
+            self.priv = self.Privilege.VIP
+        elif is_sub:
+            self.priv = self.Privilege.SUB
+        else:
+            self.priv = self.Privilege.USER
 
-        :return: A string representing this users' highest privilege level.
-        """
-        if self.is_host:
-            return "Host"
 
-        if self.is_mod:
-            return "Mod"
+def user_privilege_from_status(status: str) -> int:
+    """Returns the integer representing `status` privilege.
+    `host (4) > mod (3) > vip (2) > sub (1) > user (0)`
 
-        if self.is_vip:
-            return "VIP"
+    :return: An integer representing the status' privilege. -1 if not found.
+    """
+    status = status.lower()
+    if status in ["host", "broadcaster"]:
+        return Author.Privilege.HOST
+    if status in ["mod", "moderator", "janitor"]:
+        return Author.Privilege.MOD
+    if status in ["vip"]:
+        return Author.Privilege.VIP
+    if status in ["sub", "subscriber"]:
+        return Author.Privilege.SUB
+    if status in ["user", "pleb"]:
+        return Author.Privilege.USER
+    return -1
 
-        if self.is_sub:
-            return "Sub"
 
+def status_from_user_privilege(priv: int) -> int:
+    """Returns the integer representing `priv` status.
+    `host (4) > mod (3) > vip (2) > sub (1) > user (0)`
+
+    :return: An integer representing the privileges' status. -1 if not found.
+    """
+    if priv == Author.Privilege.HOST:
+        return "Host"
+    if priv == Author.Privilege.MOD:
+        return "Mod"
+    if priv == Author.Privilege.VIP:
+        return "VIP"
+    if priv == Author.Privilege.SUB:
+        return "Sub"
+    if priv == Author.Privilege.USER:
         return "User"
+    return -1
 
 
 class Message:
@@ -131,3 +173,26 @@ class RepeatTimer(threading.Timer):
     def run(self):
         while not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
+
+
+def check_all_dependencies():
+    manifests = [
+        manifest
+        for manifest in os.listdir("src/manifests")
+        if manifest.endswith(".manifest")
+    ]
+    for manifest in manifests:
+        with open(f"src/manifests/{manifest}", "r") as manifestfile:
+            manifest = json.loads(manifestfile.read())
+        if "requirements" in manifest:
+            subprocess.call(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--disable-pip-version-check",
+                    "-q",
+                    *manifest["requirements"].split(" "),
+                ]
+            )

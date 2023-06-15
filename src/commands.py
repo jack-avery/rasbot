@@ -6,7 +6,7 @@ import time
 import traceback
 
 from src.config import ConfigHandler
-from src.definitions import Message
+from src.definitions import Author, Message
 
 log = logging.getLogger("rasbot")
 
@@ -21,31 +21,35 @@ class Command:
     name: str
     cooldown: int
     response: str
-    requires_mod: bool
+    privilege: int
     hidden: bool
     """Whether this command is hidden from the `help` module."""
 
     def __init__(
         self,
         name: str,
-        cooldown: int = 5,
-        response: str = "",
-        requires_mod: bool = False,
-        hidden: bool = False,
+        command: dict = None,
     ):
         """Create a new `Command`.
 
         :param name: The name of the command.
-        :param cooldown: The cooldown of the command in seconds.
-        :param response: The text response of the command. Encapsulate custom commands in %, e.g. `%module%`.
-        :param requires_mod: Whether the command requires the user to be a mod.
-        :param hidden: Whether the command should be hidden from the `help` module.
+        :param command: The full dict representing the command.
         """
         self.name = name.lower()
-        self.cooldown = cooldown
-        self.response = response
-        self.requires_mod = requires_mod
-        self.hidden = hidden
+
+        self.cooldown = command["cooldown"]
+        self.response = command["response"]
+        self.hidden = command["hidden"]
+
+        # convert legacy requires_mod into new privilege system
+        if "requires_mod" in command:
+            self.privilege = Author.Privilege.USER
+            if command["requires_mod"]:
+                self.privilege = Author.Privilege.MOD
+            del command["requires_mod"]
+
+        else:
+            self.privilege = command["privilege"]
 
         self._last_used = 0
 
@@ -54,10 +58,12 @@ class Command:
 
         Runs all %% codes found in the command and returns the result.
         """
-        if not time.time() - self._last_used > self.cooldown:
+        # check cooldown
+        if time.time() - self._last_used < self.cooldown:
             return False
 
-        if not message.author.is_mod and self.requires_mod:
+        # check privilege
+        if message.author.priv < self.privilege:
             return False
 
         # Apply the main function for any modules found
@@ -80,36 +86,36 @@ class Command:
         """
         return [m[1] for m in MODULE_MENTION_RE.findall(self.response)]
 
+    def jsonify(self) -> dict:
+        return {
+            "cooldown": self.cooldown,
+            "privilege": self.privilege,
+            "hidden": self.hidden,
+            "response": self.response,
+        }
+
 
 def command_add(
     name: str,
-    cooldown: int = 5,
-    response: str = "",
-    requires_mod: bool = False,
-    hidden: bool = False,
+    command: dict = None,
 ):
     """Create a new command (or modifies an existing one).
     Automatically attempts to import any unimported modules.
 
     :param name: The name of the command.
-    :param cooldown: The cooldown of the command in seconds.
-    :param response: The text response of the command. Encapsulate custom commands in %%.
-    :param requires_mod: Whether this command requires moderator access to use.
-    :param hidden: Whether to hide this command from the `help` module.
+    :param command: dict representing the command.
     """
-    log.debug(
-        f"adding {name} (cd:{cooldown}s mo:{requires_mod} h:{hidden} res:{response})"
-    )
+    log.debug(f"adding {name} ({command})")
 
     # Resolve any modules the command mentions and import new ones
-    for _, module in MODULE_MENTION_RE.findall(response):
+    for _, module in MODULE_MENTION_RE.findall(command["response"]):
         if module not in modules:
             try:
                 module_add(module)
             except ModuleNotFoundError as err:
                 raise err
 
-    commands[name] = Command(name, cooldown, response, requires_mod, hidden)
+    commands[name] = Command(name, command)
 
 
 def command_mod(name: str, key: str, value):
@@ -126,8 +132,8 @@ def command_mod(name: str, key: str, value):
     elif key == "response":
         commands[name].response = value
 
-    elif key == "requires_mod":
-        commands[name].requires_mod = value
+    elif key == "privilege":
+        commands[name].privilege = value
 
     elif key == "hidden":
         commands[name].hidden = value
@@ -332,6 +338,13 @@ def do_on_pubmsg(message: Message):
     """
     for module in modules.values():
         module.on_pubmsg(message)
+
+
+def find_first_command_using_module(module: str) -> Command:
+    for command in commands.values():
+        if module in command.get_used_modules():
+            return command
+    return None
 
 
 def pass_bot_ref(ref):

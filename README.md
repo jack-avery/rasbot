@@ -37,14 +37,14 @@ Create a command:
 r!cmd add <command name> <cooldown?> <parameters?> <response>
 
 Edit a command:
-r!cmd edit <command name> <name/cooldown/modonly/hidden/response> <value?>
+r!cmd edit <command name> <name/cooldown/privilege/hidden/response> <value?>
 
 Remove a command:
 r!cmd remove <name>
 ```
 
 Valid parameters include:<br/>
-`-modonly`: Set the command to be moderator/broadcaster use only.<br/>
+`-{status}only`: Set the command to be usable by {status} only, e.g. `-modonly` for Moderators and above, `-subonly` for Subscribers and above.<br/>
 `-hidden`: Set the command to be hidden from the `help` command.
 
 # Modules 📦
@@ -52,7 +52,7 @@ rasbot is designed modularly and allows you to add to the base application easil
 
 To include a module as part of a command, encompass the module name in `%`, e.g.:
 ```
-r!cmd add np %np%
+r!cmd add np %osu/np%
 ```
 
 *For documentation on configuring modules or creating your own, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*

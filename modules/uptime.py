@@ -17,7 +17,7 @@ class Module(BaseModule):
             return f"{self._bot.channel_name} is not currently live."
 
         time_start = datetime.datetime.strptime(
-            f"{time_start[:-1]}", "%Y-%m-%dT%H:%M:%S"
+            f"{r['started_at'][:-1]}", "%Y-%m-%dT%H:%M:%S"
         )
         time_start = time_start.replace(tzinfo=datetime.timezone.utc).timestamp()
 

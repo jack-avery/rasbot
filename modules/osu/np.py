@@ -18,7 +18,8 @@ class Module(BaseModule):
 
     def main(self, message):
         try:
-            with open(self.cfg_get("path"), "r") as file:
+            path = self.cfg_get("path").replace("\\", "/")
+            with open(path, "r") as file:
                 return f"{file.readlines()[0]}"
         except (FileNotFoundError, IndexError):
             return "No NP data found."

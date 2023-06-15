@@ -6,7 +6,7 @@ import traceback
 import src.commands as commands
 from src.config import ConfigHandler, DEFAULT_CHANNEL
 from src.authentication import TwitchOAuth2Helper
-from src.definitions import Author, Message
+from src.definitions import Author, Message, status_from_user_privilege
 from src.telemetry import report_exception
 
 log = logging.getLogger("rasbot")
@@ -107,10 +107,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             try:
                 self.commands.command_add(
                     name,
-                    command["cooldown"],
-                    command["response"],
-                    command["requires_mod"],
-                    command["hidden"],
+                    command=command,
                 )
             except ModuleNotFoundError as mod:
                 log.error(
@@ -146,12 +143,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Adding commands
         for name, command in self.commands.commands.items():
-            data["commands"][name] = {
-                "cooldown": command.cooldown,
-                "requires_mod": command.requires_mod,
-                "hidden": command.hidden,
-                "response": command.response,
-            }
+            data["commands"][name] = command.jsonify()
 
         self.cfg_handler.write(data)
 
@@ -188,9 +180,6 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Gauranteeing broadcaster all traits
         if uid == self.channel_id:
-            ismod = True
-            issub = True
-            isvip = True
             ishost = True
 
         # Create author object
@@ -218,13 +207,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
                 log.debug(
-                    f"Ignoring invalid command call '{cmd}' from {name} ({author.user_status()})"
+                    f"Ignoring invalid command call '{cmd}' from {name} ({status_from_user_privilege(author.priv)})"
                 )
                 return
 
             # Run the command and string result message
             log.info(
-                f"Running command call '{cmd}' from {name} ({author.user_status()}) (args:{message.args})"
+                f"Running command call '{cmd}' from {name} ({status_from_user_privilege(author.priv)}) (args:{message.args})"
             )
             cmdresult = self.commands.commands[cmd].run(message)
 
