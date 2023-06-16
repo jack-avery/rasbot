@@ -254,12 +254,12 @@ class Module(BaseModule):
                 self.log_d(f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
+        command = self._bot.commands.find_first_command_using_module(self._name)
+
         # honor privileges
-        if (
-            author.priv
-            < self._bot.commands.find_first_command_using_module(self._name).privilege
-        ):
-            return NO_MESSAGE_SIGNAL
+        if command:
+            if author.priv < command.privilege:
+                return NO_MESSAGE_SIGNAL
 
         # do not continue if no args are provided
         if not args:
