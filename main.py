@@ -15,7 +15,7 @@ from update import check
 from src.config import ConfigHandler, GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
-from src.telemetry import report_exception, notify_instance
+from src.telemetry import report_exception, notify_instance, TelemetryLevel
 
 log = logging.getLogger("rasbot")
 formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
@@ -67,43 +67,39 @@ def main(channel=None, authfile=None, debug=False):
 
         log.setLevel(loglevel)
 
-        # read auth
         if not authfile:
             authfile = cfg_global["default_authfile"]
-
         auth = TwitchOAuth2Helper(authfile)
 
-        # use self as channel if no channel given
         if not channel:
             channel = auth.user_id
 
-        # ask about telemetry if we haven't
-        if cfg_global["telemetry"] == -1:
-            cfg_global["telemetry"] = 0
+        telemetry_setting = cfg_global["telemetry"]
+        if telemetry_setting == TelemetryLevel.NOT_ASKED:
+            telemetry_setting = TelemetryLevel.NONE
 
-            # just errors
-            if (
+            user_wants_send_errors = (
                 input(
                     "Would you like to send errors to help us improve rasbot? (y/n) - "
                 ).lower()
                 == "y"
-            ):
-                cfg_global["telemetry"] = 1
+            )
+            if not user_wants_send_errors:
+                telemetry_setting = TelemetryLevel.EXCEPTIONS_ONLY
 
-                # usage statistics
-                if (
+                user_wants_send_usage_data = (
                     input(
                         "Would you like to additionally send usage statistics? (y/n) - "
                     ).lower()
                     == "y"
-                ):
-                    cfg_global["telemetry"] = 2
+                )
+                if user_wants_send_usage_data:
+                    cfg_global["telemetry"] = TelemetryLevel.USAGE_DATA
 
+            cfg_global["telemetry"] = telemetry_setting
             gcfg_handler.write(cfg_global)
 
         notify_instance()
-
-        # start the bot
         tb = TwitchBot(auth, channel)
         tb.start()
 
@@ -113,7 +109,6 @@ def main(channel=None, authfile=None, debug=False):
         sys.exit(0)
 
     except:
-        # report the exception
         traceback.print_exc()
         report_exception(traceback.format_exc())
 

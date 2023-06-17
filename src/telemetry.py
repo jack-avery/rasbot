@@ -10,17 +10,21 @@ WEBHOOK_URL = "https://discord.com/api/webhooks/1106454348172632155/GAT0mrLq-BB6
 
 WEBHOOK = SyncWebhook.from_url(WEBHOOK_URL)
 
-GLOBAL_CONFIG = read_global()
-
 HOME_PATH_WIN_RE = r"\"C:\\Users\\\w+"
 HOME_PATH_LINUX_RE = r"\"/home/\w+"
 
 USERNAME = "rasbot"
 
 
+class TelemetryLevel:
+    NOT_ASKED = -1
+    NONE = 0
+    EXCEPTIONS_ONLY = 1
+    USAGE_DATA = 2
+
+
 def report_exception(message: str):
-    # Turn this off if you don't want it, but it helps me fix issues.
-    if not GLOBAL_CONFIG["telemetry"] > 0:
+    if read_global()["telemetry"] < TelemetryLevel.EXCEPTIONS_ONLY:
         return
 
     # Remove potential personal information
@@ -31,8 +35,7 @@ def report_exception(message: str):
 
 
 def notify_instance():
-    # Nice to have for me to know who is using it as well as what version.
-    if not GLOBAL_CONFIG["telemetry"] > 1:
+    if read_global()["telemetry"] < TelemetryLevel.USAGE_DATA:
         return
 
     message = f"New instance started with version {get_rasbot_current_version()}"
