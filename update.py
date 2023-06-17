@@ -111,7 +111,7 @@ def update():
         "See what's changed in the #news channel in the Discord https://discord.gg/qpyT4zx.\n"
         + "rasbot is now up to date, and will close to apply changes."
     )
-    exit(0)
+    exit()
 
 
 def get_manifest_list():
