@@ -201,6 +201,10 @@ def do_file(item: dict, force: bool = False):
     """
     file = item["file"]
     source = item["source"]
+
+    if "$BRANCH" in source:
+        source = source.replace("$BRANCH", rasbot_branch)
+
     verify_folder_exists(file)
 
     # if the file doesn't exist don't write anything
