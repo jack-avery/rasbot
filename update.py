@@ -28,7 +28,10 @@ BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{rasbot_branch}
 RASBOT_BASE_UPDATER = "update.py"
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE_MANIFEST = "src/manifests/rasbot.manifest"
+MANIFEST_DIR = "src/manifests/"
+"""Base directory that should contain all manifests."""
+
+RASBOT_BASE_MANIFEST = f"{MANIFEST_DIR}rasbot.manifest"
 """Manifest of all items to update within rasbot and their source."""
 
 
@@ -58,7 +61,7 @@ def check(silent=False, force=False, l=False):
     :param force: Whether or not to force an update.
     """
     if force:
-        force_update()
+        prompt(True)
     if l:
         update_from_manifests()
 
@@ -80,8 +83,10 @@ def check(silent=False, force=False, l=False):
             input()
 
 
-def prompt():
-    """Prompts the user to update rasbot."""
+def prompt(forced: bool = False):
+    """
+    Prompts the user to update rasbot.
+    """
     print("--")
     print("HEY! Your version of rasbot is running out of date!")
     print(
@@ -90,20 +95,14 @@ def prompt():
     print("This does not include anything found in your module config.")
     print("--\n")
 
-    if input("Would you like to update? (y/Y for yes): ").lower() == "y":
+    user_wants_update = True
+    if not forced:
+        user_wants_update = (
+            input("Would you like to update? (y/Y for yes): ").lower() == "y"
+        )
+
+    if user_wants_update:
         update()
-
-
-def force_update():
-    """Update the updater and the rest of rasbot without opening a new instance of the updater."""
-    do_file(RASBOT_BASE_UPDATER)
-    update_from_manifests()
-
-    # Close this process, so we don't use a broken bot.py from autoupdate
-    input(
-        "rasbot has reinstalled. You may need to run the updater again to fully fix your installation."
-    )
-    sys.exit(0)
 
 
 def update():
@@ -124,32 +123,28 @@ def update():
 
 
 def get_updated_manifest(manifest):
-    # TODO: remove this once most people have updated
-    source = f"{BASE_URL}{RASBOT_BASE_MANIFEST}"
-    if "source" in manifest:
-        source = manifest["source"].replace("$BRANCH", rasbot_branch)
+    source = manifest["source"].replace("$BRANCH", rasbot_branch)
 
     request = requests.get(source)
 
-    if not str(request.status_code).startswith("2"):
+    if request.status_code < 200 or request.status_code >= 300:
         return False
 
     return json.loads(request.text)
 
 
-def get_rasbot_current_version():
-    if not os.path.exists(RASBOT_BASE_MANIFEST):
-        # assume old version 2.34 if no manifest
-        return semantic_version.Version("2.34")
-
-    with open(RASBOT_BASE_MANIFEST, "r") as file:
+def get_manifest_current_version(manifest: str = "rasbot"):
+    path = f"{MANIFEST_DIR}{manifest}.manifest"
+    if not os.path.exists(path):
+        return False
+    with open(path, "r") as file:
         manifest = json.loads(file.read())
+    if "version" in manifest:
+        return manifest["version"]
+    return False
 
-    if "version" not in manifest:
-        # assume old version 2.36 if manifest missing version
-        return semantic_version.Version("2.36")
 
-    return manifest["version"]
+get_rasbot_current_version = lambda: get_manifest_current_version()
 
 
 def check_update_ready(manifest):

@@ -205,7 +205,7 @@ class OAuth2Handler(Singleton):
 
         log.debug(response.status_code, response.json())
 
-        if str(response.status_code).startswith("2"):
+        if response.status_code >= 200 or response.status_code < 300:
             return response.json()
 
         log.debug(response.json())

@@ -2,8 +2,6 @@ import logging
 import os
 import yaml
 
-from src.telemetry import TelemetryLevel
-
 log = logging.getLogger("rasbot")
 
 BASE_CONFIG_PATH = "userdata"
@@ -51,7 +49,7 @@ DEFAULT_GLOBAL = {
     "always_debug": False,
     "default_authfile": "auth.txt",
     "release_branch": "main",
-    "telemetry": TelemetryLevel.NOT_ASKED,
+    "telemetry": -1,
 }
 
 read_global = lambda: ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL).read()
