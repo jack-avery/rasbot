@@ -25,7 +25,10 @@ except:
 BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{rasbot_branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
-RASBOT_BASE_UPDATER = "update.py"
+RASBOT_BASE_UPDATER = {
+    "file": "update.py",
+    "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/update.py",
+}
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
 MANIFEST_DIR = "src/manifests/"
@@ -111,7 +114,7 @@ def update():
     print("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
-    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"])
+    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER["file"], "-l"])
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
@@ -120,6 +123,14 @@ def update():
         + "rasbot is now up to date, and will close to apply changes."
     )
     sys.exit(0)
+
+
+def get_manifest_list():
+    manifests = []
+    for manifestfile in os.listdir(MANIFEST_DIR):
+        if not manifestfile.endswith(".manifest"):
+            continue
+        manifests.append(manifestfile)
 
 
 def get_updated_manifest(manifest):
@@ -133,8 +144,8 @@ def get_updated_manifest(manifest):
     return json.loads(request.text)
 
 
-def get_manifest_current_version(manifest: str = "rasbot"):
-    path = f"{MANIFEST_DIR}{manifest}.manifest"
+def get_manifest_current_version(manifest: str = "rasbot.manifest"):
+    path = f"{MANIFEST_DIR}{manifest}"
     if not os.path.exists(path):
         return False
     with open(path, "r") as file:
@@ -162,75 +173,57 @@ def check_update_ready(manifest):
 
 
 def update_from_manifests():
-    for manifestfile in os.listdir("src/manifests"):
-        if not manifestfile.endswith(".manifest"):
-            continue
-
-        with open(f"src/manifests/{manifestfile}", "r") as file:
+    for manifestfile in get_manifest_list():
+        with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
             manifest = json.loads(file.read())
 
             if not check_update_ready(manifest):
                 continue
 
-            manifest = get_updated_manifest(manifest)
+            new_manifest = get_updated_manifest(manifest)
 
-            if not manifest:
+            if not new_manifest:
                 continue
 
             print(f"Updating from {manifestfile}...")
-            for item in manifest["files"]:
-                verify_folder_exists(item["file"])
+            for item in new_manifest["files"]:
+                do_file(item)
 
-                # get remote file
-                source = item["source"].replace("$BRANCH", rasbot_branch)
-                req = requests.get(source)
-                if req.status_code == 404:
-                    print("Failed to fetch: ignoring...")
-                    continue
-                remote = req.text
-
-                # if the file exists, do nothing if the hashes are identical
-                if os.path.exists(item["file"]):
-                    with io.open(item["file"], "r", encoding="utf8") as localfile:
-                        local = localfile.read()
-
-                    if identical(local, remote):
-                        continue
-
-                # if it doesn't or the files aren't identical overwrite with remote
-                print(f"Updating {item['file']}...")
-                with io.open(item["file"], "w", encoding="utf8") as localfile:
-                    localfile.write(remote)
-
-        with open(f"src/manifests/{manifestfile}", "w") as file:
-            file.write(json.dumps(manifest, indent=4))
+        with open(f"{MANIFEST_DIR}{manifestfile}", "w") as file:
+            file.write(json.dumps(new_manifest, indent=4))
 
 
-def identical(file1: str, file2: str):
-    """Compare the contents of `file1` to `file2` using SHA256."""
-    file1hash = hashlib.sha256(str.encode(file1)).hexdigest()
-    file2hash = hashlib.sha256(str.encode(file2)).hexdigest()
-
-    return file1hash == file2hash
-
-
-def do_file(file: str):
+def do_file(item: dict, force: bool = False):
     """Update a file.
 
     :param file: The path to the file to update, including extension.
     """
-    print(f"Updating {file}...")
-    verify_folder_exists(f"{file}")
+    file = item["file"]
+    source = item["source"]
+    verify_folder_exists(file)
 
     # if the file doesn't exist don't write anything
-    req = requests.get(f"{BASE_URL}{file}")
+    req = requests.get(source)
     if req.status_code == 404:
         print("Failed to fetch: ignoring...")
         return
+    remote = req.text
 
-    # write the text to file
-    with io.open(f"{file}", "w", encoding="utf8") as local:
-        local.write(req.text)
+    if not force:
+        if os.path.exists(file):
+            with io.open(file, "r", encoding="utf8") as localfile:
+                local = localfile.read()
+
+            shalocal = hashlib.sha256(str.encode(local)).hexdigest()
+            sharemote = hashlib.sha256(str.encode(remote)).hexdigest()
+
+            if shalocal == sharemote:
+                return
+
+    # if it doesn't or the files aren't identical overwrite with remote
+    print(f"Updating {file}...")
+    with io.open(file, "w", encoding="utf8") as localfile:
+        localfile.write(remote)
 
 
 def verify_folder_exists(path: str):
