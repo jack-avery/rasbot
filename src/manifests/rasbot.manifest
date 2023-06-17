@@ -90,18 +90,6 @@
         {
             "file": "modules/xp.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/xp.py"
-        },
-        {
-            "file": "modules/osu/request.py",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/request.py"
-        },
-        {
-            "file": "modules/osu/np.py",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/np.py"
-        },
-        {
-            "file": "modules/osu/helpers/api2.py",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/helpers/api2.py"
         }
     ]
 }
