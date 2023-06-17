@@ -108,6 +108,9 @@ def main(channel=None, authfile=None, debug=False):
             tb.__del__()
         sys.exit(0)
 
+    except SystemExit:
+        pass
+
     except:
         traceback.print_exc()
         report_exception(traceback.format_exc())
