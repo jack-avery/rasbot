@@ -88,7 +88,6 @@ def prompt(forced: bool = False, updated: str = None):
         print("--")
         print("These manifests indicate that updates are available:")
         print(f"{', '.join(updated)}")
-        print("Updating now will update from all manifests.")
         print("--\n")
         user_wants_update = (
             input("Would you like to update? (y/Y for yes): ").lower() == "y"
@@ -118,9 +117,8 @@ def update():
 def get_manifest_list():
     manifests = []
     for manifestfile in os.listdir(MANIFEST_DIR):
-        if not manifestfile.endswith(".manifest"):
-            continue
-        manifests.append(manifestfile)
+        if manifestfile.endswith(".manifest"):
+            manifests.append(manifestfile)
     return manifests
 
 
