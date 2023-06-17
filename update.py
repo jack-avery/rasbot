@@ -71,19 +71,11 @@ def check(silent=False, force=False, l=False):
     if ALWAYS_OPT_OUT:
         return
 
-    with open(RASBOT_BASE_MANIFEST, "r") as file:
-        manifest = json.loads(file.read())
-
     if not silent:
         print("Checking for updates...")
-        print(f"You are running on rasbot version: {manifest['version']}")
 
-    if check_update_ready(manifest):
+    if check_all_manifests_for_updates():
         prompt()
-
-    else:
-        if not silent and not l:
-            input()
 
 
 def prompt(forced: bool = False):
@@ -173,17 +165,24 @@ def check_update_ready(manifest):
     return current < latest
 
 
+def check_all_manifests_for_updates():
+    for manifestfile in get_manifest_list():
+        with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
+            manifest = json.loads(file.read())
+            if check_update_ready(manifest):
+                return
+
+    return False
+
+
 def update_from_manifests():
     for manifestfile in get_manifest_list():
         with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
             manifest = json.loads(file.read())
 
-            if not check_update_ready(manifest):
-                continue
-
             new_manifest = get_updated_manifest(manifest)
 
-            if not new_manifest:
+            if new_manifest == manifest:
                 continue
 
             print(f"Updating from {manifestfile}...")
