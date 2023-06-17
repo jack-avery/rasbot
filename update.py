@@ -209,7 +209,7 @@ def do_file(item: dict, force: bool = False):
 
     # if the file doesn't exist don't write anything
     req = requests.get(source)
-    if req.status_code == 404:
+    if req.status_code < 200 or req.status_code >= 300:
         print("Failed to fetch: ignoring...")
         return
     remote = req.text
