@@ -131,6 +131,7 @@ def get_manifest_list():
         if not manifestfile.endswith(".manifest"):
             continue
         manifests.append(manifestfile)
+    return manifests
 
 
 def get_updated_manifest(manifest):
