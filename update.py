@@ -170,7 +170,7 @@ def check_all_manifests_for_updates():
         with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
             manifest = json.loads(file.read())
             if check_update_ready(manifest):
-                return
+                return True
 
     return False
 
@@ -182,7 +182,7 @@ def update_from_manifests():
 
             new_manifest = get_updated_manifest(manifest)
 
-            if new_manifest == manifest:
+            if not new_manifest or new_manifest == manifest:
                 continue
 
             print(f"Updating from {manifestfile}...")
