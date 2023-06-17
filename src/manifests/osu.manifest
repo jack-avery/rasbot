@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "requirements": "",
+    "requirements": "irc==20.1.0",
     "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/manifests/osu.manifest",
     "files": [
         {

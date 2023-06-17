@@ -64,7 +64,7 @@ def check(silent=False, force=False, l=False):
     :param force: Whether or not to force an update.
     """
     if force:
-        prompt(True)
+        prompt(forced=True)
     if l:
         update_from_manifests()
 
@@ -74,24 +74,22 @@ def check(silent=False, force=False, l=False):
     if not silent:
         print("Checking for updates...")
 
-    if check_all_manifests_for_updates():
-        prompt()
+    updated = check_manifests_for_updates()
+    if updated:
+        prompt(updated=updated)
 
 
-def prompt(forced: bool = False):
+def prompt(forced: bool = False, updated: str = None):
     """
     Prompts the user to update rasbot.
     """
-    print("--")
-    print("HEY! Your version of rasbot is running out of date!")
-    print(
-        "Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with."
-    )
-    print("This does not include anything found in your module config.")
-    print("--\n")
-
     user_wants_update = True
     if not forced:
+        print("--")
+        print("These manifests indicate that updates are available:")
+        print(f"{', '.join(updated)}")
+        print("Updating now will update from all manifests.")
+        print("--\n")
         user_wants_update = (
             input("Would you like to update? (y/Y for yes): ").lower() == "y"
         )
@@ -114,7 +112,7 @@ def update():
         "See what's changed in the #news channel in the Discord https://discord.gg/qpyT4zx.\n"
         + "rasbot is now up to date, and will close to apply changes."
     )
-    sys.exit(0)
+    exit(0)
 
 
 def get_manifest_list():
@@ -165,14 +163,17 @@ def check_update_ready(manifest):
     return current < latest
 
 
-def check_all_manifests_for_updates():
+def check_manifests_for_updates():
+    updated_manifests = []
     for manifestfile in get_manifest_list():
         with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
             manifest = json.loads(file.read())
             if check_update_ready(manifest):
-                return True
+                updated_manifests.append(manifestfile)
 
-    return False
+    if len(updated_manifests) == 0:
+        return False
+    return updated_manifests
 
 
 def update_from_manifests():
