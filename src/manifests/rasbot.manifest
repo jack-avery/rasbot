@@ -16,10 +16,6 @@
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/README.md"
         },
         {
-            "file": "src/requirements.txt",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/requirements.txt"
-        },
-        {
             "file": "main.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/main.py"
         },
