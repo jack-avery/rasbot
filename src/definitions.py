@@ -16,6 +16,8 @@ def check_dependencies():
         with open(f"src/manifests/{manifest}", "r") as manifestfile:
             manifest = json.loads(manifestfile.read())
         if "requirements" in manifest:
+            if not manifest["requirements"]:
+                continue
             subprocess.call(
                 [
                     sys.executable,
