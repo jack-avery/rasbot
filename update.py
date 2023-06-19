@@ -115,6 +115,9 @@ def update():
 
 
 def get_manifest_list():
+    """
+    Returns all manifests contained in `src/manifests`.
+    """
     manifests = []
     for manifestfile in os.listdir(MANIFEST_DIR):
         if manifestfile.endswith(".manifest"):
@@ -123,6 +126,11 @@ def get_manifest_list():
 
 
 def get_manifest(manifest: str):
+    """
+    Returns the `dict` contents of `manifest`.
+
+    :param manifest: The filename of the manifest in `src/manifests`.
+    """
     try:
         with open(f"{MANIFEST_DIR}{manifest}", "r") as file:
             return json.loads(file.read())
@@ -131,6 +139,11 @@ def get_manifest(manifest: str):
 
 
 def get_updated_manifest(manifest):
+    """
+    Get the latest version of `manifest`.
+
+    :param manifest: The manifest to get the latest version for.
+    """
     source = manifest["source"].replace("$BRANCH", rasbot_branch)
 
     request = requests.get(source)
@@ -142,6 +155,11 @@ def get_updated_manifest(manifest):
 
 
 def get_manifest_current_version(manifest: str = "rasbot.manifest"):
+    """
+    Get the current version of `manifest`.
+
+    :param manifest: The filename of the manifest in `src/manifests`.
+    """
     path = f"{MANIFEST_DIR}{manifest}"
     if not os.path.exists(path):
         return False
@@ -156,6 +174,12 @@ get_rasbot_current_version = lambda: get_manifest_current_version()
 
 
 def check_update_ready(manifest):
+    """
+    Check for if `manifest` has a newer version available.
+    If this fails to grab the latest version, it will mark the manifest as having no update.
+
+    :param manifest: The manifest to check for updates.
+    """
     if "version" not in manifest:
         return True
 
@@ -170,6 +194,12 @@ def check_update_ready(manifest):
 
 
 def check_manifests_for_updates():
+    """
+    Using all manifests in `src/manifests`,
+    checks to make see if any manifests have a newer version.
+
+    If one does, that manifest is marked for updating.
+    """
     updated_manifests = []
     for manifestfile in get_manifest_list():
         manifest = get_manifest(manifestfile)
@@ -186,6 +216,12 @@ def check_manifests_for_updates():
 
 
 def check_manifests_files_exist():
+    """
+    Using all manifests in `src/manifests`,
+    checks to make sure all files defined in each manifest exists locally.
+
+    If a file does not exist, that manifest is marked for updating.
+    """
     missing_files = []
     for manifestfile in get_manifest_list():
         manifest = get_manifest(manifestfile)
@@ -203,6 +239,14 @@ def check_manifests_files_exist():
 
 
 def update_from_manifests():
+    """
+    Using all manifests in `src/manifests`, grabs the latest version of each manifest,
+    then checks to see if the latest version is newer than current.
+
+    If it is, it will update all files defined in the manifest, then the manifest itself.
+
+    Will not overwrite identical files.
+    """
     for manifestfile in get_manifest_list():
         manifest = get_manifest(manifestfile)
         if not manifest:
@@ -224,7 +268,17 @@ def update_from_manifests():
 def do_file(item: dict, force: bool = False):
     """Update a file.
 
-    :param file: The path to the file to update, including extension.
+    :param item: A `dict` with the file's information.
+
+    :param force: Whether to skip checking if the file is identical before updating.
+
+    See src/manifests/rasbot.manifest for samples:
+    ```
+    item {
+        "file": "relative path to file",
+        "source": "remote source, likely githubusercontent
+    }
+    ```
     """
     file = item["file"]
     source = item["source"]

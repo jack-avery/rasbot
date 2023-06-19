@@ -33,9 +33,8 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
     default=False,
 )
 def main(channel=None, authfile=None, debug=False):
+    tb = None
     try:
-        tb = None
-
         # Check for updates/missing files first!
         check_manifests()
 
@@ -66,6 +65,7 @@ def main(channel=None, authfile=None, debug=False):
         log.addHandler(stdout_handler)
 
         log.setLevel(loglevel)
+        log.info("Startup checks completed")
 
         if not authfile:
             authfile = cfg_global["default_authfile"]
