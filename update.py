@@ -40,9 +40,6 @@ RASBOT_BASE_MANIFEST = f"{MANIFEST_DIR}rasbot.manifest"
 
 @click.command()
 @click.option(
-    "--silent/--loud", help="Whether the update check should be silent.", default=False
-)
-@click.option(
     "--force/--no-force",
     help="Whether or not to force an update. Use if your installation is broken.",
     default=False,
@@ -52,41 +49,44 @@ RASBOT_BASE_MANIFEST = f"{MANIFEST_DIR}rasbot.manifest"
     help="For update order. Probably shouldn't manually set this.",
     default=False,
 )
-def main(silent=False, force=False, l=False):
-    check(silent, force, l)
+def main(force=False, l=False):
+    check_manifests(force, l)
 
 
-def check(silent=False, force=False, l=False):
+def check_manifests(force=False, l=False):
     """Checks for updates.
-
-    :param silent: Whether the check should announce itself.
 
     :param force: Whether or not to force an update.
     """
     if force:
-        prompt(forced=True)
+        prompt_update(forced=True)
     if l:
         update_from_manifests()
 
     if ALWAYS_OPT_OUT:
         return
 
-    if not silent:
-        print("Checking for updates...")
+    print("Checking for updates...")
 
     updated = check_manifests_for_updates()
     if updated:
-        prompt(updated=updated)
+        prompt_update(updated=updated)
+
+    missing = check_manifests_files_exist()
+    if missing:
+        prompt_update(updated=missing)
 
 
-def prompt(forced: bool = False, updated: str = None):
+def prompt_update(forced: bool = False, updated: str = None):
     """
     Prompts the user to update rasbot.
     """
     user_wants_update = True
     if not forced:
         print("--")
-        print("These manifests indicate that updates are available:")
+        print(
+            "These manifests indicate that updates are available (or files are missing):"
+        )
         print(f"{', '.join(updated)}")
         print("--\n")
         user_wants_update = (
@@ -120,6 +120,14 @@ def get_manifest_list():
         if manifestfile.endswith(".manifest"):
             manifests.append(manifestfile)
     return manifests
+
+
+def get_manifest(manifest: str):
+    try:
+        with open(f"{MANIFEST_DIR}{manifest}", "r") as file:
+            return json.loads(file.read())
+    except json.JSONDecodeError | FileNotFoundError:
+        return False
 
 
 def get_updated_manifest(manifest):
@@ -164,29 +172,50 @@ def check_update_ready(manifest):
 def check_manifests_for_updates():
     updated_manifests = []
     for manifestfile in get_manifest_list():
-        with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
-            manifest = json.loads(file.read())
-            if check_update_ready(manifest):
-                updated_manifests.append(manifestfile)
+        manifest = get_manifest(manifestfile)
+        if not manifest:
+            continue
+
+        if check_update_ready(manifest):
+            updated_manifests.append(manifestfile)
 
     if len(updated_manifests) == 0:
         return False
+
     return updated_manifests
+
+
+def check_manifests_files_exist():
+    missing_files = []
+    for manifestfile in get_manifest_list():
+        manifest = get_manifest(manifestfile)
+        if not manifest:
+            continue
+
+        for item in manifest["files"]:
+            if not os.path.exists(item["file"]):
+                missing_files.append(manifestfile)
+
+    if len(missing_files) == 0:
+        return False
+
+    return missing_files
 
 
 def update_from_manifests():
     for manifestfile in get_manifest_list():
-        with open(f"{MANIFEST_DIR}{manifestfile}", "r") as file:
-            manifest = json.loads(file.read())
+        manifest = get_manifest(manifestfile)
+        if not manifest:
+            continue
 
-            new_manifest = get_updated_manifest(manifest)
+        new_manifest = get_updated_manifest(manifest)
 
-            if not new_manifest or new_manifest == manifest:
-                continue
+        if not new_manifest or new_manifest == manifest:
+            continue
 
-            print(f"Updating from {manifestfile}...")
-            for item in new_manifest["files"]:
-                do_file(item)
+        print(f"Updating from {manifestfile}...")
+        for item in new_manifest["files"]:
+            do_file(item)
 
         with open(f"{MANIFEST_DIR}{manifestfile}", "w") as file:
             file.write(json.dumps(new_manifest, indent=4))

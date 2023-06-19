@@ -1,7 +1,7 @@
-from src.definitions import check_all_dependencies
+from src.definitions import check_dependencies
 
 # Automatically install dependencies listed in manifests
-check_all_dependencies()
+check_dependencies()
 
 import logging
 import os
@@ -11,7 +11,7 @@ import traceback
 
 import click
 
-from update import check
+from update import check_manifests
 from src.config import ConfigHandler, GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
@@ -36,8 +36,8 @@ def main(channel=None, authfile=None, debug=False):
     try:
         tb = None
 
-        # Check for updates first!
-        check(silent=True)
+        # Check for updates/missing files first!
+        check_manifests()
 
         # read global config
         gcfg_handler = ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
