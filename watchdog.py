@@ -12,9 +12,6 @@ from src.config import read_global, BASE_CONFIG_PATH
 from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
 
-log = logging.getLogger("rasbot")
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
-
 
 class InstanceHandler(threading.Thread):
     def __init__(self, *args, **kwargs):
@@ -58,14 +55,14 @@ def main(authfile=None, debug=False):
         )
         file_handler.setLevel(loglevel)
         file_handler.setFormatter(formatter)
-        log.addHandler(file_handler)
+        logging.addHandler(file_handler)
 
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setLevel(loglevel)
     stdout_handler.setFormatter(formatter)
-    log.addHandler(stdout_handler)
+    logging.addHandler(stdout_handler)
 
-    log.setLevel(loglevel)
+    logging.setLevel(loglevel)
 
     # read auth
     if not authfile:
@@ -80,19 +77,19 @@ def main(authfile=None, debug=False):
             if "config.txt" in os.listdir(f"{BASE_CONFIG_PATH}/{file}"):
                 instances[file] = False
 
-    log.info(
+    logging.info(
         f"Found these configured instances: {', '.join([i for i in instances.keys()])}"
     )
 
     while True:
         # check for new instances
-        log.info("Checking for live streams...")
+        logging.info("Checking for live streams...")
         streams = auth.get_live_streams(list(instances.keys()))
 
         # kick up new instances for ids without an instance
         for id, login in streams:
             if not instances[id]:
-                log.info(f"Kicking up instance for {login} ({id})")
+                logging.info(f"Kicking up instance for {login} ({id})")
                 instance = TwitchBot(auth, login, id)
                 instances[id] = InstanceHandler(
                     target=lambda: instance.start(), bot=instance
@@ -103,13 +100,13 @@ def main(authfile=None, debug=False):
         live_ids = [stream[0] for stream in streams]
         for id, bot in instances.items():
             if isinstance(bot, InstanceHandler) and id not in live_ids:
-                log.info(f"Killing instance for {login} ({id})")
+                logging.info(f"Killing instance for {login} ({id})")
                 bot.stop()
 
                 instances[id] = False
 
         # inform of which streams are running
-        log.info(
+        logging.info(
             f"Running instances: {', '.join([i for i, b in instances.items() if isinstance(b, InstanceHandler)])}"
         )
 

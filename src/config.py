@@ -2,8 +2,6 @@ import logging
 import os
 import yaml
 
-log = logging.getLogger("rasbot")
-
 BASE_CONFIG_PATH = "userdata"
 GLOBAL_CONFIG_FILE = "rasbot.txt"
 
@@ -46,7 +44,6 @@ DEFAULT_CHANNEL = {
 """Default channel config."""
 
 DEFAULT_GLOBAL = {
-    "always_debug": False,
     "default_authfile": "auth.txt",
     "release_branch": "main",
     "telemetry": -1,
@@ -80,7 +77,7 @@ class ConfigHandler:
         # Verify config folder exists
         for folder in folders:
             if not os.path.exists(folder):
-                log.debug(f"creating non-existent searched folder {folder}")
+                logging.debug(f"creating non-existent searched folder {folder}")
                 os.mkdir(folder)
 
     def read(self) -> dict:
@@ -100,7 +97,7 @@ class ConfigHandler:
                     for key in self._default_config:
                         if key in file_data:
                             continue
-                        log.warn(
+                        logging.warn(
                             f"{self._path} - missing default key '{key}', saving default '{self._default_config[key]}'"
                         )
                         file_data[key] = self._default_config[key]
@@ -108,19 +105,19 @@ class ConfigHandler:
                 return self.write(file_data)
 
         except yaml.MarkedYAMLError as err:
-            log.error(f"Failed to read config file at path {self._path}:")
+            logging.error(f"Failed to read config file at path {self._path}:")
             if hasattr(err, "problem_mark"):
                 if err.context:
-                    log.error(f"\n{err.problem_mark}\n{err.problem} {err.context}")
+                    logging.error(f"\n{err.problem_mark}\n{err.problem} {err.context}")
                 else:
-                    log.error(f"\n{err.problem_mark}\n{err.problem}")
-                log.error(
+                    logging.error(f"\n{err.problem_mark}\n{err.problem}")
+                logging.error(
                     "the error may be at or near this mark depending on the issue\n"
                 )
             else:
-                log.error("Unknown error?? Contact raspy..\n")
+                logging.error("Unknown error?? Contact raspy..\n")
 
-            log.critical("rasbot will refuse to start when trying to load this!!")
+            logging.critical("rasbot will refuse to start when trying to load this!!")
 
             if self._default_config:
                 print(
@@ -141,7 +138,7 @@ class ConfigHandler:
             if not self._default_config:
                 return dict()
 
-            log.debug(f"{self._path} not found, writing default;")
+            logging.debug(f"{self._path} not found, writing default;")
             return self.write(self._default_config)
 
     def write(self, cfg: dict):
@@ -150,7 +147,7 @@ class ConfigHandler:
         :param cfg: The `dict` object to convert to json and write
         """
         with open(self._path, "w") as cfgfile:
-            log.debug(f"writing {self._path}")
+            logging.debug(f"writing {self._path}")
             cfgfile.write(yaml.safe_dump(cfg, indent=4))
 
         return cfg

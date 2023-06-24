@@ -9,6 +9,22 @@ import sys
 import time
 import traceback
 
+log_handlers = []
+formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.INFO)
+stdout_handler.setFormatter(formatter)
+log_handlers.append(stdout_handler)
+if not os.path.exists("logs"):
+    os.mkdir("logs")
+file_handler = logging.FileHandler(
+    f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log"
+)
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+log_handlers.append(file_handler)
+logging.basicConfig(handlers=log_handlers, level=logging.DEBUG)
+
 import click
 
 from update import check_manifests
@@ -17,9 +33,6 @@ from src.authentication import TwitchOAuth2Helper
 from src.bot import TwitchBot
 from src.telemetry import report_exception, notify_instance, TelemetryLevel
 
-log = logging.getLogger("rasbot")
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
-
 
 @click.command()
 @click.option("--channel", help="The Twitch channel to target.")
@@ -27,12 +40,7 @@ formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)
     "--authfile",
     help="The path to the auth file. This is relative to the 'userdata' folder.",
 )
-@click.option(
-    "--debug/--normal",
-    help="Have this instance be verbose about actions.",
-    default=False,
-)
-def main(channel=None, authfile=None, debug=False):
+def main(channel=None, authfile=None):
     tb = None
     try:
         # Check for updates/missing files first!
@@ -41,31 +49,6 @@ def main(channel=None, authfile=None, debug=False):
         # read global config
         gcfg_handler = ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL)
         cfg_global = gcfg_handler.read()
-
-        # Set up logging
-        if cfg_global["always_debug"]:
-            debug = True
-
-        loglevel = logging.INFO
-        if debug:
-            loglevel = logging.DEBUG
-
-            if not os.path.exists("logs"):
-                os.mkdir("logs")
-            file_handler = logging.FileHandler(
-                f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log"
-            )
-            file_handler.setLevel(loglevel)
-            file_handler.setFormatter(formatter)
-            log.addHandler(file_handler)
-
-        stdout_handler = logging.StreamHandler(sys.stdout)
-        stdout_handler.setLevel(loglevel)
-        stdout_handler.setFormatter(formatter)
-        log.addHandler(stdout_handler)
-
-        log.setLevel(loglevel)
-        log.info("Startup checks completed")
 
         if not authfile:
             authfile = cfg_global["default_authfile"]

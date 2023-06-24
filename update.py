@@ -1,6 +1,7 @@
 import hashlib
 import io
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -66,7 +67,7 @@ def check_manifests(force=False, l=False):
     if ALWAYS_OPT_OUT:
         return
 
-    print("Checking for updates...")
+    logging.info("Checking for updates...")
 
     updated = check_manifests_for_updates()
     if updated:
@@ -83,12 +84,12 @@ def prompt_update(forced: bool = False, updated: str = None):
     """
     user_wants_update = True
     if not forced:
-        print("--")
-        print(
+        logging.info("--")
+        logging.info(
             "These manifests indicate that updates are available (or files are missing):"
         )
-        print(f"{', '.join(updated)}")
-        print("--\n")
+        logging.info(f"{', '.join(updated)}")
+        logging.info("--\n")
         user_wants_update = (
             input("Would you like to update? (y/Y for yes): ").lower() == "y"
         )
@@ -100,7 +101,7 @@ def prompt_update(forced: bool = False, updated: str = None):
 def update():
     """Updates the rasbot updater first, then updates the rest."""
     do_file(RASBOT_BASE_UPDATER)
-    print("Finished updating updater. Updating rasbot...\n")
+    logging.info("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
     p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER["file"], "-l"])
@@ -257,7 +258,7 @@ def update_from_manifests():
         if not new_manifest or new_manifest == manifest:
             continue
 
-        print(f"Updating from {manifestfile}...")
+        logging.info(f"Updating from {manifestfile}...")
         for item in new_manifest["files"]:
             do_file(item)
 
@@ -291,7 +292,7 @@ def do_file(item: dict, force: bool = False):
     # if the file doesn't exist don't write anything
     req = requests.get(source)
     if req.status_code < 200 or req.status_code >= 300:
-        print("Failed to fetch: ignoring...")
+        logging.info("Failed to fetch: ignoring...")
         return
     remote = req.text
 
@@ -307,7 +308,7 @@ def do_file(item: dict, force: bool = False):
                 return
 
     # if it doesn't or the files aren't identical overwrite with remote
-    print(f"Updating {file}...")
+    logging.info(f"Updating {file}...")
     with io.open(file, "w", encoding="utf8") as localfile:
         localfile.write(remote)
 
