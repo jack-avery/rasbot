@@ -36,10 +36,6 @@
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/admin.py"
         },
         {
-            "file": "modules/admin.py",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/admin.py"
-        },
-        {
             "file": "modules/caller.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/caller.py"
         },
