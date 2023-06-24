@@ -1,29 +1,10 @@
+import sys
+import traceback
+
 from src.definitions import check_dependencies
 
 # Automatically install dependencies listed in manifests
 check_dependencies()
-
-import logging
-import os
-import sys
-import time
-import traceback
-
-log_handlers = []
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(module)s | %(message)s")
-stdout_handler = logging.StreamHandler(sys.stdout)
-stdout_handler.setLevel(logging.INFO)
-stdout_handler.setFormatter(formatter)
-log_handlers.append(stdout_handler)
-if not os.path.exists("logs"):
-    os.mkdir("logs")
-file_handler = logging.FileHandler(
-    f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log"
-)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
-log_handlers.append(file_handler)
-logging.basicConfig(handlers=log_handlers, level=logging.DEBUG)
 
 import click
 
