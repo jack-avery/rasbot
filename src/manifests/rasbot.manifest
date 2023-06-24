@@ -8,10 +8,6 @@
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/main.py"
         },
         {
-            "file": "watchdog.py",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/watchdog.py"
-        },
-        {
             "file": "src/authentication.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/authentication.py"
         },
