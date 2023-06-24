@@ -87,22 +87,28 @@ class ConfigHandler:
         :return: The resulting config
         """
         try:
+            logging.debug(f"reading {self._path}")
             with open(self._path, "r") as cfgfile:
-                file_data = yaml.safe_load(cfgfile.read())
+                data = yaml.safe_load(cfgfile.read())
 
-                if not file_data:
+                if not data:
                     raise FileNotFoundError
 
+                changed = False
                 if self._default_config:
                     for key in self._default_config:
-                        if key in file_data:
+                        if key in data:
                             continue
+                        changed = True
                         logging.warn(
                             f"{self._path} - missing default key '{key}', saving default '{self._default_config[key]}'"
                         )
-                        file_data[key] = self._default_config[key]
+                        data[key] = self._default_config[key]
 
-                return self.write(file_data)
+                if changed:
+                    self.write(data)
+
+                return data
 
         except yaml.MarkedYAMLError as err:
             logging.error(f"Failed to read config file at path {self._path}:")
@@ -131,8 +137,7 @@ class ConfigHandler:
                     == "y"
                 )
                 if overwrite_with_default:
-                    self.write(self._default_config)
-                    return self._default_config
+                    return self.write(self._default_config)
 
         except FileNotFoundError:
             if not self._default_config:
