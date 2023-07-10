@@ -28,7 +28,7 @@ def report_exception(message: str):
     # Remove potential personal information
     message = re.sub(HOME_PATH_WIN_RE, '"~', message)
     message = re.sub(HOME_PATH_LINUX_RE, '"~', message)
-    message = urllib.parse.quote_plus(message)
+    message = urllib.parse.quote(message)
 
     requests.get(f"{URL}/err/{message}")
 
@@ -38,6 +38,6 @@ def notify_instance():
         return
 
     message = f"New instance started with version {get_rasbot_current_version()}"
-    message = urllib.parse.quote_plus(message)
+    message = urllib.parse.quote(message)
 
     requests.get(f"{URL}/info/{message}")
