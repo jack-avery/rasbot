@@ -169,7 +169,9 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         e.tags = {i["key"]: i["value"] for i in e.tags}
 
         # Grab user info
-        name = str.lower(e.tags["display-name"])
+        name = str(e.source)
+        name = str.lower(name[: name.find("!")])
+        display_name = str.lower(e.tags["display-name"])
         uid = int(e.tags["user-id"])
         ismod = dict.get(e.tags, "mod", "0") == "1"
         issub = dict.get(e.tags, "subscriber", "0") == "1"
@@ -181,11 +183,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             ishost = True
 
         # Create author object
-        author = Author(name, uid, ismod, issub, isvip, ishost)
+        author = Author(name, display_name, uid, ismod, issub, isvip, ishost)
 
         # Create message object
         msg = e.arguments[0]
-        message = Message(author, msg)
+        message = Message(author, msg, e)
 
         try:
             # Don't continue if the message doesn't start with the prefix.

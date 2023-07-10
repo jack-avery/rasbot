@@ -58,6 +58,7 @@ def check_dependencies():
 
 class Author:
     name: str
+    display_name: str
     uid: str
     is_mod: bool
     is_sub: bool
@@ -75,6 +76,7 @@ class Author:
     def __init__(
         self,
         name: str,
+        display_name: str,
         uid: str,
         is_mod: bool = False,
         is_sub: bool = False,
@@ -91,6 +93,7 @@ class Author:
         :param is_host: Whether the user is the owner of the Twitch channel.
         """
         self.name = name
+        self.display_name = display_name
         self.uid = uid
         self.is_mod = is_mod
         self.is_sub = is_sub
@@ -151,6 +154,8 @@ def status_from_user_privilege(priv: int) -> int:
 class Message:
     author: Author
     text_raw: str
+    event: dict
+    """The raw message event received by `irc.bot.SingleServerIRCBot.on_pubmsg()`."""
     cmd: str
     """The command used, if applicable, in this message."""
     args: list
@@ -158,7 +163,7 @@ class Message:
     ### Do not modify this directly!! Use `Module.get_args(message)` to get arguments in modules.
     """
 
-    def __init__(self, author: Author, text_raw: str = ""):
+    def __init__(self, author: Author, text_raw: str, event: dict):
         """Create a new `Message`.
 
         :param author: The `Author` of this message.
@@ -166,6 +171,7 @@ class Message:
         """
         self.author = author
         self.text_raw = text_raw
+        self.event = event
         self.cmd = None
         self.args = None
 
