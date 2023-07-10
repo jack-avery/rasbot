@@ -1,14 +1,12 @@
 import re
 
-from discord import SyncWebhook
+import requests
+import urllib.parse
 
 from src.config import read_global
 from update import get_rasbot_current_version
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1106454348172632155/GAT0mrLq-BB651fy4GtxulQuBf6LJgKuUALTmV_C8lXeQgoMrBMCktRJnH-lTiinnMBa"
-# Please don't do anything weird with this! This webhook is for private exception reporting so anyone noted as a developer can take a look.
-
-WEBHOOK = SyncWebhook.from_url(WEBHOOK_URL)
+URL = "https://jackavery.ca/api/rasbot_notify"
 
 HOME_PATH_WIN_RE = r"\"C:\\Users\\\w+"
 HOME_PATH_LINUX_RE = r"\"/home/\w+"
@@ -30,8 +28,9 @@ def report_exception(message: str):
     # Remove potential personal information
     message = re.sub(HOME_PATH_WIN_RE, '"~', message)
     message = re.sub(HOME_PATH_LINUX_RE, '"~', message)
+    message = urllib.parse.quote_plus(message)
 
-    WEBHOOK.send(content=message, username=USERNAME)
+    requests.get(f"{URL}/err/{message}")
 
 
 def notify_instance():
@@ -39,4 +38,6 @@ def notify_instance():
         return
 
     message = f"New instance started with version {get_rasbot_current_version()}"
-    WEBHOOK.send(content=message, username=USERNAME)
+    message = urllib.parse.quote_plus(message)
+
+    requests.get(f"{URL}/info/{message}")
