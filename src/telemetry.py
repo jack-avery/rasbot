@@ -1,4 +1,11 @@
+import random
 import re
+import string
+
+# For identifying logs that coincide with eachother
+footprint = "".join(
+    random.choice(string.ascii_letters + string.digits).lower() for _ in range(8)
+)
 
 import requests
 import urllib.parse
@@ -28,6 +35,8 @@ def report_exception(message: str):
     # Remove potential personal information
     message = re.sub(HOME_PATH_WIN_RE, '"~', message)
     message = re.sub(HOME_PATH_LINUX_RE, '"~', message)
+
+    message += f"\n\n> {footprint}"
     message = urllib.parse.quote(message)
 
     requests.get(f"{URL}/err/{message}")
@@ -38,6 +47,8 @@ def notify_instance():
         return
 
     message = f"New instance started with version {get_rasbot_current_version()}"
+
+    message += f"\n\n> {footprint}"
     message = urllib.parse.quote(message)
 
     requests.get(f"{URL}/info/{message}")
