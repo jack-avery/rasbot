@@ -1,8 +1,55 @@
 import json
+import logging
 import os
 import subprocess
 import sys
 import threading
+import time
+
+log_handlers = []
+formatter = logging.Formatter(
+    "%(asctime)s | %(module)s [%(levelname)s] %(message)s",
+)
+stdout_handler = logging.StreamHandler(sys.stdout)
+stdout_handler.setLevel(logging.INFO)
+stdout_handler.setFormatter(formatter)
+log_handlers.append(stdout_handler)
+if not os.path.exists("logs"):
+    os.mkdir("logs")
+file_handler = logging.FileHandler(
+    f"logs/{time.asctime().replace(':','-').replace(' ','_')}.log"
+)
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(formatter)
+log_handlers.append(file_handler)
+logging.basicConfig(handlers=log_handlers, level=logging.DEBUG)
+
+
+def check_dependencies():
+    logging.info("Checking Python dependencies...")
+    manifests = [
+        manifest
+        for manifest in os.listdir("src/manifests")
+        if manifest.endswith(".manifest")
+    ]
+    for manifest in manifests:
+        with open(f"src/manifests/{manifest}", "r") as manifestfile:
+            manifest = json.loads(manifestfile.read())
+        if "requirements" in manifest:
+            if not manifest["requirements"]:
+                continue
+            subprocess.call(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--disable-pip-version-check",
+                    "-q",
+                    *manifest["requirements"].split(" "),
+                ]
+            )
+
 
 ##
 # Helper classes.
@@ -173,26 +220,3 @@ class RepeatTimer(threading.Timer):
     def run(self):
         while not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
-
-
-def check_all_dependencies():
-    manifests = [
-        manifest
-        for manifest in os.listdir("src/manifests")
-        if manifest.endswith(".manifest")
-    ]
-    for manifest in manifests:
-        with open(f"src/manifests/{manifest}", "r") as manifestfile:
-            manifest = json.loads(manifestfile.read())
-        if "requirements" in manifest:
-            subprocess.call(
-                [
-                    sys.executable,
-                    "-m",
-                    "pip",
-                    "install",
-                    "--disable-pip-version-check",
-                    "-q",
-                    *manifest["requirements"].split(" "),
-                ]
-            )

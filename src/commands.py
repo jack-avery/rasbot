@@ -8,7 +8,6 @@ import traceback
 from src.config import ConfigHandler
 from src.definitions import Author, Message
 
-log = logging.getLogger("rasbot")
 
 MODULE_MENTION_RE = re.compile(r"(%([\/a-z0-9_]+)%)")
 """Regex to search command responses with to apply modules."""
@@ -105,7 +104,7 @@ def command_add(
     :param name: The name of the command.
     :param command: dict representing the command.
     """
-    log.debug(f"adding {name} ({command})")
+    logging.debug(f"adding {name} ({command})")
 
     # Resolve any modules the command mentions and import new ones
     for _, module in MODULE_MENTION_RE.findall(command["response"]):
@@ -125,7 +124,7 @@ def command_mod(name: str, key: str, value):
     :param key: The field of the command to modify.
     :param value: The value to set the field to.
     """
-    log.debug(f"modifying {key} of {name} to {value}")
+    logging.debug(f"modifying {key} of {name} to {value}")
     if key == "cooldown":
         commands[name].cooldown = value
 
@@ -147,7 +146,7 @@ def command_del(name: str):
 
     :param name: The name of the command.
     """
-    log.debug(f"removing {name}")
+    logging.debug(f"removing {name}")
     del commands[name]
 
 
@@ -244,30 +243,30 @@ class BaseModule(threading.Thread):
     def log_e(self, msg: str):
         """Log an error alongside the module's name to the window.
 
-        :param msg: The error to log.
+        :param msg: The error to logging.
         """
-        log.error(f"({self._name}) - {msg}")
+        logging.error(f"({self._name}) - {msg}")
 
     def log_w(self, msg: str):
         """Log a warning alongside the module's name to the window.
 
-        :param msg: The warning to log.
+        :param msg: The warning to logging.
         """
-        log.warning(f"{self._name} - {msg}")
+        logging.warning(f"{self._name} - {msg}")
 
     def log_i(self, msg: str):
         """Log info alongside the module's name to the window.
 
-        :param msg: The message to log.
+        :param msg: The message to logging.
         """
-        log.info(f"({self._name}) - {msg}")
+        logging.info(f"({self._name}) - {msg}")
 
     def log_d(self, msg: str):
         """Log a debug message alongside the module's name to the window.
 
-        :param msg: The debug info to log.
+        :param msg: The debug info to logging.
         """
-        log.debug(f"({self._name}) - {msg}")
+        logging.debug(f"({self._name}) - {msg}")
 
     def get_args(self, message: Message) -> list:
         """Consume `self.consumes` arguments from `message` for use as command arguments.
@@ -294,7 +293,7 @@ def module_add(name: str):
 
     :param name: The path to the module. Path is relative to the `modules` folder.
     """
-    log.debug(f"importing module {name}")
+    logging.debug(f"importing module {name}")
 
     try:
         # Create spec and import from directory.
@@ -312,7 +311,7 @@ def module_add(name: str):
         raise ModuleNotFoundError(name)
 
     except Exception:
-        log.error(f"failed to import module {name} with error trace:")
+        logging.error(f"failed to import module {name} with error trace:")
         traceback.print_exc()
         raise ModuleNotFoundError(name)
 
@@ -322,7 +321,7 @@ def module_del(name: str):
 
     :param name: The name of the module.
     """
-    log.debug(f"unimporting module {name}")
+    logging.debug(f"unimporting module {name}")
 
     if name not in modules:
         return

@@ -2,13 +2,10 @@ import logging
 import os
 import yaml
 
-log = logging.getLogger("rasbot")
-
 BASE_CONFIG_PATH = "userdata"
 GLOBAL_CONFIG_FILE = "rasbot.txt"
 
 DEFAULT_CHANNEL = {
-    "meta": {"prefix": "r!"},
     "commands": {
         "help": {
             "cooldown": 10,
@@ -41,12 +38,12 @@ DEFAULT_CHANNEL = {
             "response": "@%caller% > %admin%",
         },
     },
+    "meta": {"prefix": "r!"},
     "modules": [],
 }
 """Default channel config."""
 
 DEFAULT_GLOBAL = {
-    "always_debug": False,
     "default_authfile": "auth.txt",
     "release_branch": "main",
     "telemetry": -1,
@@ -57,7 +54,7 @@ read_global = lambda: ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL).read()
 
 class ConfigHandler:
     def __init__(self, path: str, default: dict):
-        self._default = default
+        self._default_config = default
 
         if not path.startswith(BASE_CONFIG_PATH):
             path = f"{BASE_CONFIG_PATH}/{path}"
@@ -80,7 +77,7 @@ class ConfigHandler:
         # Verify config folder exists
         for folder in folders:
             if not os.path.exists(folder):
-                log.debug(f"creating non-existent searched folder {folder}")
+                logging.debug(f"creating non-existent searched folder {folder}")
                 os.mkdir(folder)
 
     def read(self) -> dict:
@@ -89,58 +86,65 @@ class ConfigHandler:
 
         :return: The resulting config
         """
-        # Attempt to read config
         try:
+            logging.debug(f"reading {self._path}")
             with open(self._path, "r") as cfgfile:
                 data = yaml.safe_load(cfgfile.read())
 
                 if not data:
                     raise FileNotFoundError
 
-                # add missing keys
-                if self._default:
-                    for key in self._default:
+                changed = False
+                if self._default_config:
+                    for key in self._default_config:
                         if key in data:
                             continue
-                        log.warn(
-                            f"{self._path} - missing default key '{key}', saving default '{self._default[key]}'"
+                        changed = True
+                        logging.warn(
+                            f"{self._path} - missing default key '{key}', saving default '{self._default_config[key]}'"
                         )
-                        data[key] = self._default[key]
+                        data[key] = self._default_config[key]
 
-                return self.write(data)
+                if changed:
+                    self.write(data)
 
-        # If the json fails to load...
-        except yaml.YAMLError as err:
-            log.error(f"\nFailed to read config file at path {self._path}:")
-            log.error(f"{err.msg} (line {err.lineno}, column {err.colno})\n")
-            log.error("The file likely has a formatting error somewhere.")
+                return data
 
-            if not self._default:
-                log.fatal(
-                    "This error is unrecoverable. Fix the error, and relaunch rasbot."
+        except yaml.MarkedYAMLError as err:
+            logging.error(f"Failed to read config file at path {self._path}:")
+            if hasattr(err, "problem_mark"):
+                if err.context:
+                    logging.error(f"\n{err.problem_mark}\n{err.problem} {err.context}")
+                else:
+                    logging.error(f"\n{err.problem_mark}\n{err.problem}")
+                logging.error(
+                    "the error may be at or near this mark depending on the issue\n"
                 )
+            else:
+                logging.error("Unknown error?? Contact raspy..\n")
 
-            log.warn(
-                "The config does have a default, but anything saved will be deleted."
-            )
-            if (
-                input(
-                    "Would you like to overwrite the existing file with the default? (y/n) > "
-                ).lower()
-                == "y"
-            ):
-                self.write(self._default)
-                return self._default
+            logging.critical("rasbot will refuse to start when trying to load this!!")
 
-        # If no config file is found, write the default,
-        # and return a basic config dict.
+            if self._default_config:
+                print(
+                    "\nThe config does have a default, but anything saved will be deleted.\n"
+                    + "You can also optionally attempt to fix the formatting given the error above, then restart rasbot."
+                )
+                overwrite_with_default = (
+                    input(
+                        "Would you like to overwrite the existing file with the default? (y/n) > "
+                    ).lower()
+                    == "y"
+                )
+                if overwrite_with_default:
+                    return self.write(self._default_config)
+
         except FileNotFoundError:
-            if self._default:
-                log.debug(f"{self._path} not found, writing default;")
-                return self.write(self._default)
+            if not self._default_config:
+                return dict()
 
-            # No default; return empty dict to prevent errors
-            return dict()
+            logging.debug(f"{self._path} not found, writing default;")
+            return self.write(self._default_config)
 
     def write(self, cfg: dict):
         """Write `cfg` to `self._path` and return `cfg`.
@@ -148,7 +152,7 @@ class ConfigHandler:
         :param cfg: The `dict` object to convert to json and write
         """
         with open(self._path, "w") as cfgfile:
-            log.debug(f"writing {self._path}")
+            logging.debug(f"writing {self._path}")
             cfgfile.write(yaml.safe_dump(cfg, indent=4))
 
         return cfg

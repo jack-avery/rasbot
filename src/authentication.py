@@ -7,8 +7,6 @@ import webbrowser
 from src.config import ConfigHandler, BASE_CONFIG_PATH
 from src.definitions import Singleton
 
-log = logging.getLogger("rasbot")
-
 
 class OAuth2Handler(Singleton):
     name = ""
@@ -68,7 +66,7 @@ class OAuth2Handler(Singleton):
 
     def setup(self) -> None:
         """Perform a guided setup for this OAuth2. By default just logs an error and does nothing."""
-        log.error(
+        logging.error(
             f"{self.name} - Config missing client_id and client_secret, cannot setup OAuth2."
         )
         return False
@@ -85,10 +83,10 @@ class OAuth2Handler(Singleton):
         webbrowser.open(link, new=2)
 
         auth_code = self.__oauth_grant_listen()
-        log.info("Got the temporary code! Getting your initial OAuth token...")
+        logging.info("Got the temporary code! Getting your initial OAuth token...")
 
         self.__get_initial_token(auth_code)
-        log.info(f"Success! OAuth2 session '{self.name}' set up.")
+        logging.info(f"Success! OAuth2 session '{self.name}' set up.")
 
     def __oauth_grant_listen(self) -> str:
         """Create a local HTTP server on `self.callback_port` (80 if None),
@@ -139,7 +137,7 @@ class OAuth2Handler(Singleton):
         if not self.token:
             return
 
-        log.debug(f"refreshing '{self.name}' OAuth token")
+        logging.debug(f"refreshing '{self.name}' OAuth token")
 
         data = {
             "client_id": self.client_id,
@@ -162,7 +160,7 @@ class OAuth2Handler(Singleton):
         token = post(self.oauth_token_uri, headers=headers, json=data)
 
         if not token.status_code == 200:
-            log.error(f"'{self.name}' OAuth token grab failed! ({token.json()})")
+            logging.error(f"'{self.name}' OAuth token grab failed! ({token.json()})")
             return False
 
         self.token = token.json()
@@ -196,19 +194,19 @@ class OAuth2Handler(Singleton):
             "Accept": "application/json",
         }
 
-        log.debug(f"{method.__name__} {url}")
+        logging.debug(f"{method.__name__} {url}")
 
         if data:
             response = method(url, headers=headers, json=data)
         else:
             response = method(url, headers=headers)
 
-        log.debug(response.status_code, response.json())
+        logging.debug(response.status_code, response.json())
 
-        if str(response.status_code).startswith("2"):
+        if response.status_code >= 200 or response.status_code < 300:
             return response.json()
 
-        log.debug(response.json())
+        logging.debug(response.json())
         return False
 
     def _get(self, endpoint: str = None, data: dict = None) -> bool | dict:

@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0",
+    "requirements": "irc==20.1.0",
+    "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/manifests/osu.manifest",
+    "files": [
+        {
+            "file": "modules/osu/request.py",
+            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/request.py"
+        },
+        {
+            "file": "modules/osu/np.py",
+            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/np.py"
+        },
+        {
+            "file": "modules/osu/helpers/api2.py",
+            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/osu/helpers/api2.py"
+        }
+    ]
+}

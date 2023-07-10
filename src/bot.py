@@ -9,8 +9,6 @@ from src.authentication import TwitchOAuth2Helper
 from src.definitions import Author, Message, status_from_user_privilege
 from src.telemetry import report_exception
 
-log = logging.getLogger("rasbot")
-
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     auth: TwitchOAuth2Helper
@@ -46,7 +44,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
         # Initialize authentication
         self.auth = auth
-        log.info(f"Starting as {self.auth.user_id}...")
+        logging.info(f"Starting as {self.auth.user_id}...")
 
         # Import channel info
         self.channel_id = channel_id
@@ -70,7 +68,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         Wait `CONNECTION_ATTEMPT_TIMER` seconds between attempts, to a maximum of `CONNECTION_ATTEMPT_LIMIT`.
         """
         if self.__connection_tries > self.CONNECTION_ATTEMPT_LIMIT:
-            log.error(
+            logging.error(
                 f"Connection attempts exceeded limit of {self.CONNECTION_ATTEMPT_LIMIT}. Exiting..."
             )
             self.__del__()
@@ -79,7 +77,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             # Create IRC bot connection
             server = "irc.twitch.tv"
             port = 80
-            log.info("Connecting to " + server + " on port " + str(port) + "...")
+            logging.info("Connecting to " + server + " on port " + str(port) + "...")
             irc.bot.SingleServerIRCBot.__init__(
                 self,
                 [(server, port, f"oauth:{self.auth.irc_oauth}")],
@@ -92,11 +90,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
     def reload(self):
         """Reload the config for the current channel."""
-        log.info(f"Reading config from {self.cfg_handler._path}...")
+        logging.info(f"Reading config from {self.cfg_handler._path}...")
         cfg = self.cfg_handler.read()
 
         self.prefix = cfg["meta"]["prefix"]
-        log.info(f"Prefix set as '{self.prefix}'")
+        logging.info(f"Prefix set as '{self.prefix}'")
 
         # Instantiate commands module
         self.commands = commands
@@ -110,11 +108,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                     command=command,
                 )
             except ModuleNotFoundError as mod:
-                log.error(
+                logging.error(
                     f"command '{name}' attempts to use non-existent module '{mod}': ignoring..."
                 )
 
-        log.info(f"Imported {len(cfg['commands'])} command(s)")
+        logging.info(f"Imported {len(cfg['commands'])} command(s)")
 
         # Import additional modules
         self.always_import_list = cfg["modules"]
@@ -126,11 +124,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
                 try:
                     self.commands.module_add(module)
                 except ModuleNotFoundError as mod:
-                    log.error(
+                    logging.error(
                         f"always_import_list ('modules' in config) contains non-existent module '{mod}'"
                     )
 
-            log.info(f"Imported {len(cfg['modules'])} additional module(s)")
+            logging.info(f"Imported {len(cfg['modules'])} additional module(s)")
 
     def save(self):
         """Write this bots' config file. For easy use within modules."""
@@ -163,7 +161,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         c.join(f"{self.channel}")
 
         self.__joined = True
-        log.info(f"Joined {self.channel}! ({self.channel_id})\n")
+        logging.info(f"Joined {self.channel}! ({self.channel_id})\n")
 
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent."""
@@ -206,13 +204,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
 
             # Verify that it's actually a command before continuing.
             if cmd not in self.commands.commands:
-                log.debug(
+                logging.debug(
                     f"Ignoring invalid command call '{cmd}' from {name} ({status_from_user_privilege(author.priv)})"
                 )
                 return
 
             # Run the command and string result message
-            log.info(
+            logging.info(
                 f"Running command call '{cmd}' from {name} ({status_from_user_privilege(author.priv)}) (args:{message.args})"
             )
             cmdresult = self.commands.commands[cmd].run(message)

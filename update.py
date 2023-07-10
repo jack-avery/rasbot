@@ -1,6 +1,7 @@
 import hashlib
 import io
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -25,17 +26,20 @@ except:
 BASE_URL = f"https://raw.githubusercontent.com/jack-avery/rasbot/{rasbot_branch}/"
 """The base URL to get raw text from and download rasbot from."""
 
-RASBOT_BASE_UPDATER = "update.py"
+RASBOT_BASE_UPDATER = {
+    "file": "update.py",
+    "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/update.py",
+}
 """The rasbot updater. This needs to be updated first for the update to work fully."""
 
-RASBOT_BASE_MANIFEST = "src/manifests/rasbot.manifest"
+MANIFEST_DIR = "src/manifests/"
+"""Base directory that should contain all manifests."""
+
+RASBOT_BASE_MANIFEST = f"{MANIFEST_DIR}rasbot.manifest"
 """Manifest of all items to update within rasbot and their source."""
 
 
 @click.command()
-@click.option(
-    "--silent/--loud", help="Whether the update check should be silent.", default=False
-)
 @click.option(
     "--force/--no-force",
     help="Whether or not to force an update. Use if your installation is broken.",
@@ -46,73 +50,61 @@ RASBOT_BASE_MANIFEST = "src/manifests/rasbot.manifest"
     help="For update order. Probably shouldn't manually set this.",
     default=False,
 )
-def main(silent=False, force=False, l=False):
-    check(silent, force, l)
+def main(force=False, l=False):
+    check_manifests(force, l)
 
 
-def check(silent=False, force=False, l=False):
+def check_manifests(force=False, l=False):
     """Checks for updates.
-
-    :param silent: Whether the check should announce itself.
 
     :param force: Whether or not to force an update.
     """
     if force:
-        force_update()
+        prompt_update(forced=True)
     if l:
         update_from_manifests()
 
     if ALWAYS_OPT_OUT:
         return
 
-    with open(RASBOT_BASE_MANIFEST, "r") as file:
-        manifest = json.loads(file.read())
+    logging.info("Checking for updates...")
 
-    if not silent:
-        print("Checking for updates...")
-        print(f"You are running on rasbot version: {manifest['version']}")
+    updated = check_manifests_for_updates()
+    if updated:
+        prompt_update(updated=updated)
 
-    if check_update_ready(manifest):
-        prompt()
-
-    else:
-        if not silent and not l:
-            input()
+    missing = check_manifests_files_exist()
+    if missing:
+        prompt_update(updated=missing)
 
 
-def prompt():
-    """Prompts the user to update rasbot."""
-    print("--")
-    print("HEY! Your version of rasbot is running out of date!")
-    print(
-        "Updating is recommended, but will overwrite any changes you've made to the files rasbot comes with."
-    )
-    print("This does not include anything found in your module config.")
-    print("--\n")
+def prompt_update(forced: bool = False, updated: str = None):
+    """
+    Prompts the user to update rasbot.
+    """
+    user_wants_update = True
+    if not forced:
+        logging.info("--")
+        logging.info(
+            "These manifests indicate that updates are available (or files are missing):"
+        )
+        logging.info(f"{', '.join(updated)}")
+        logging.info("--\n")
+        user_wants_update = (
+            input("Would you like to update? (y/Y for yes): ").lower() == "y"
+        )
 
-    if input("Would you like to update? (y/Y for yes): ").lower() == "y":
+    if user_wants_update:
         update()
-
-
-def force_update():
-    """Update the updater and the rest of rasbot without opening a new instance of the updater."""
-    do_file(RASBOT_BASE_UPDATER)
-    update_from_manifests()
-
-    # Close this process, so we don't use a broken bot.py from autoupdate
-    input(
-        "rasbot has reinstalled. You may need to run the updater again to fully fix your installation."
-    )
-    sys.exit(0)
 
 
 def update():
     """Updates the rasbot updater first, then updates the rest."""
     do_file(RASBOT_BASE_UPDATER)
-    print("Finished updating updater. Updating rasbot...\n")
+    logging.info("Finished updating updater. Updating rasbot...\n")
 
     # Open a new instance of Python to run the updated file
-    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER, "-l"])
+    p = subprocess.Popen([sys.executable, RASBOT_BASE_UPDATER["file"], "-l"])
     p.wait()
 
     # Close this process, so we don't use a broken bot.py from autoupdate
@@ -120,39 +112,75 @@ def update():
         "See what's changed in the #news channel in the Discord https://discord.gg/qpyT4zx.\n"
         + "rasbot is now up to date, and will close to apply changes."
     )
-    sys.exit(0)
+    exit()
+
+
+def get_manifest_list():
+    """
+    Returns all manifests contained in `src/manifests`.
+    """
+    manifests = []
+    for manifestfile in os.listdir(MANIFEST_DIR):
+        if manifestfile.endswith(".manifest"):
+            manifests.append(manifestfile)
+    return manifests
+
+
+def get_manifest(manifest: str):
+    """
+    Returns the `dict` contents of `manifest`.
+
+    :param manifest: The filename of the manifest in `src/manifests`.
+    """
+    try:
+        with open(f"{MANIFEST_DIR}{manifest}", "r") as file:
+            return json.loads(file.read())
+    except json.JSONDecodeError | FileNotFoundError:
+        return False
 
 
 def get_updated_manifest(manifest):
-    # TODO: remove this once most people have updated
-    source = f"{BASE_URL}{RASBOT_BASE_MANIFEST}"
-    if "source" in manifest:
-        source = manifest["source"].replace("$BRANCH", rasbot_branch)
+    """
+    Get the latest version of `manifest`.
+
+    :param manifest: The manifest to get the latest version for.
+    """
+    source = manifest["source"].replace("$BRANCH", rasbot_branch)
 
     request = requests.get(source)
 
-    if not str(request.status_code).startswith("2"):
+    if request.status_code < 200 or request.status_code >= 300:
         return False
 
     return json.loads(request.text)
 
 
-def get_rasbot_current_version():
-    if not os.path.exists(RASBOT_BASE_MANIFEST):
-        # assume old version 2.34 if no manifest
-        return semantic_version.Version("2.34")
+def get_manifest_current_version(manifest: str = "rasbot.manifest"):
+    """
+    Get the current version of `manifest`.
 
-    with open(RASBOT_BASE_MANIFEST, "r") as file:
+    :param manifest: The filename of the manifest in `src/manifests`.
+    """
+    path = f"{MANIFEST_DIR}{manifest}"
+    if not os.path.exists(path):
+        return False
+    with open(path, "r") as file:
         manifest = json.loads(file.read())
+    if "version" in manifest:
+        return manifest["version"]
+    return False
 
-    if "version" not in manifest:
-        # assume old version 2.36 if manifest missing version
-        return semantic_version.Version("2.36")
 
-    return manifest["version"]
+get_rasbot_current_version = lambda: get_manifest_current_version()
 
 
 def check_update_ready(manifest):
+    """
+    Check for if `manifest` has a newer version available.
+    If this fails to grab the latest version, it will mark the manifest as having no update.
+
+    :param manifest: The manifest to check for updates.
+    """
     if "version" not in manifest:
         return True
 
@@ -166,76 +194,123 @@ def check_update_ready(manifest):
     return current < latest
 
 
-def update_from_manifests():
-    for manifestfile in os.listdir("src/manifests"):
-        if not manifestfile.endswith(".manifest"):
+def check_manifests_for_updates():
+    """
+    Using all manifests in `src/manifests`,
+    checks to make see if any manifests have a newer version.
+
+    If one does, that manifest is marked for updating.
+    """
+    updated_manifests = []
+    for manifestfile in get_manifest_list():
+        manifest = get_manifest(manifestfile)
+        if not manifest:
             continue
 
-        with open(f"src/manifests/{manifestfile}", "r") as file:
-            manifest = json.loads(file.read())
+        if check_update_ready(manifest):
+            updated_manifests.append(manifestfile)
 
-            if not check_update_ready(manifest):
-                continue
+    if len(updated_manifests) == 0:
+        return False
 
-            manifest = get_updated_manifest(manifest)
-
-            if not manifest:
-                continue
-
-            print(f"Updating from {manifestfile}...")
-            for item in manifest["files"]:
-                verify_folder_exists(item["file"])
-
-                # get remote file
-                source = item["source"].replace("$BRANCH", rasbot_branch)
-                req = requests.get(source)
-                if req.status_code == 404:
-                    print("Failed to fetch: ignoring...")
-                    continue
-                remote = req.text
-
-                # if the file exists, do nothing if the hashes are identical
-                if os.path.exists(item["file"]):
-                    with io.open(item["file"], "r", encoding="utf8") as localfile:
-                        local = localfile.read()
-
-                    if identical(local, remote):
-                        continue
-
-                # if it doesn't or the files aren't identical overwrite with remote
-                print(f"Updating {item['file']}...")
-                with io.open(item["file"], "w", encoding="utf8") as localfile:
-                    localfile.write(remote)
-
-        with open(f"src/manifests/{manifestfile}", "w") as file:
-            file.write(json.dumps(manifest, indent=4))
+    return updated_manifests
 
 
-def identical(file1: str, file2: str):
-    """Compare the contents of `file1` to `file2` using SHA256."""
-    file1hash = hashlib.sha256(str.encode(file1)).hexdigest()
-    file2hash = hashlib.sha256(str.encode(file2)).hexdigest()
+def check_manifests_files_exist():
+    """
+    Using all manifests in `src/manifests`,
+    checks to make sure all files defined in each manifest exists locally.
 
-    return file1hash == file2hash
+    If a file does not exist, that manifest is marked for updating.
+    """
+    missing_files = []
+    for manifestfile in get_manifest_list():
+        manifest = get_manifest(manifestfile)
+        if not manifest:
+            continue
+
+        for item in manifest["files"]:
+            if not os.path.exists(item["file"]):
+                missing_files.append(manifestfile)
+
+    if len(missing_files) == 0:
+        return False
+
+    return missing_files
 
 
-def do_file(file: str):
+def update_from_manifests():
+    """
+    Using all manifests in `src/manifests`, grabs the latest version of each manifest,
+    then checks to see if the latest version is newer than current.
+
+    If it is, it will update all files defined in the manifest, then the manifest itself.
+
+    Will not overwrite identical files.
+    """
+    for manifestfile in get_manifest_list():
+        manifest = get_manifest(manifestfile)
+        if not manifest:
+            continue
+
+        new_manifest = get_updated_manifest(manifest)
+
+        if not new_manifest or new_manifest == manifest:
+            continue
+
+        logging.info(f"Updating from {manifestfile}...")
+        for item in new_manifest["files"]:
+            do_file(item)
+
+        with open(f"{MANIFEST_DIR}{manifestfile}", "w") as file:
+            file.write(json.dumps(new_manifest, indent=4))
+
+
+def do_file(item: dict, force: bool = False):
     """Update a file.
 
-    :param file: The path to the file to update, including extension.
+    :param item: A `dict` with the file's information.
+
+    :param force: Whether to skip checking if the file is identical before updating.
+
+    See src/manifests/rasbot.manifest for samples:
+    ```
+    item {
+        "file": "relative path to file",
+        "source": "remote source, likely githubusercontent
+    }
+    ```
     """
-    print(f"Updating {file}...")
-    verify_folder_exists(f"{file}")
+    file = item["file"]
+    source = item["source"]
+
+    if "$BRANCH" in source:
+        source = source.replace("$BRANCH", rasbot_branch)
+
+    verify_folder_exists(file)
 
     # if the file doesn't exist don't write anything
-    req = requests.get(f"{BASE_URL}{file}")
-    if req.status_code == 404:
-        print("Failed to fetch: ignoring...")
+    req = requests.get(source)
+    if req.status_code < 200 or req.status_code >= 300:
+        logging.info("Failed to fetch: ignoring...")
         return
+    remote = req.text
 
-    # write the text to file
-    with io.open(f"{file}", "w", encoding="utf8") as local:
-        local.write(req.text)
+    if not force:
+        if os.path.exists(file):
+            with io.open(file, "r", encoding="utf8") as localfile:
+                local = localfile.read()
+
+            shalocal = hashlib.sha256(str.encode(local)).hexdigest()
+            sharemote = hashlib.sha256(str.encode(remote)).hexdigest()
+
+            if shalocal == sharemote:
+                return
+
+    # if it doesn't or the files aren't identical overwrite with remote
+    logging.info(f"Updating {file}...")
+    with io.open(file, "w", encoding="utf8") as localfile:
+        localfile.write(remote)
 
 
 def verify_folder_exists(path: str):
