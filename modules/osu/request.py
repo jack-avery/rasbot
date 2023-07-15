@@ -98,7 +98,9 @@ class OsuRequestsIRCBot(irc.bot.SingleServerIRCBot):
 
 
 class Module(BaseModule):
-    helpmsg = 'Request an osu! beatmap to be played. Usage: request <beatmap link> <+mods?> (mods: "request submode" to toggle submode)'
+    helpmsg = (
+        "Request an osu! beatmap to be played. Usage: request <beatmap link> <+mods?>"
+    )
 
     default_config = {
         # Your osu! ID. Go to your profile on the website and this should be in the URL.
