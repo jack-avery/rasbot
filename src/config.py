@@ -21,7 +21,7 @@ DEFAULT_CHANNEL = {
         },
         "cmd": {
             "cooldown": 0,
-            "privilege": 0,
+            "privilege": 3,
             "hidden": False,
             "response": "@%caller% > %cmd%",
         },
