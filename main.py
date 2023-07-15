@@ -48,7 +48,7 @@ def main(channel=None, authfile=None):
                 ).lower()
                 == "y"
             )
-            if not user_wants_send_errors:
+            if user_wants_send_errors:
                 telemetry_setting = TelemetryLevel.EXCEPTIONS_ONLY
 
                 user_wants_send_usage_data = (
