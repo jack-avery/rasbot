@@ -72,7 +72,7 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
     def send_message(self, target_id: int, message: str):
         """Send `message` to osu! User ID `target`."""
         data = {"target_id": target_id, "message": message, "is_action": False}
-        self._post("/chat/new", data)
+        return self._post("/chat/new", data)
 
     def jsonify(self):
         return {
