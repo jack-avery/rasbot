@@ -15,7 +15,7 @@ from update import get_rasbot_current_version
 
 URL = "https://jackavery.ca/api/rasbot_notify"
 
-HOME_PATH_WIN_RE = r"\"C:\\Users\\\w+"
+HOME_PATH_WIN_RE = r"\"C:[\\/]Users[\\/]\w+"
 HOME_PATH_LINUX_RE = r"\"/home/\w+"
 
 USERNAME = "rasbot"
@@ -28,6 +28,13 @@ class TelemetryLevel:
     USAGE_DATA = 2
 
 
+def send(mode: str, message: str):
+    message += f"\n\n> {footprint}"
+    message = urllib.parse.quote(message)
+
+    requests.get(f"{URL}/{mode}/{message}", timeout=1)
+
+
 def report_exception(message: str):
     if read_global()["telemetry"] < TelemetryLevel.EXCEPTIONS_ONLY:
         return
@@ -36,10 +43,7 @@ def report_exception(message: str):
     message = re.sub(HOME_PATH_WIN_RE, '"~', message)
     message = re.sub(HOME_PATH_LINUX_RE, '"~', message)
 
-    message += f"\n\n> {footprint}"
-    message = urllib.parse.quote(message)
-
-    requests.get(f"{URL}/err/{message}")
+    send("err", message)
 
 
 def notify_instance():
@@ -48,7 +52,4 @@ def notify_instance():
 
     message = f"New instance started with version {get_rasbot_current_version()}"
 
-    message += f"\n\n> {footprint}"
-    message = urllib.parse.quote(message)
-
-    requests.get(f"{URL}/info/{message}")
+    send("info", message)
