@@ -1,3 +1,4 @@
+import logging
 import random
 import re
 import string
@@ -32,7 +33,12 @@ def send(mode: str, message: str):
     message += f"\n\n> {footprint}"
     message = urllib.parse.quote(message)
 
-    requests.get(f"{URL}/{mode}/{message}", timeout=1)
+    try:
+        requests.get(f"{URL}/{mode}/{message}", timeout=1)
+    except requests.exceptions.ReadTimeout:  # allow failed requests to time out quietly
+        logging.warn(
+            "Failed to send telemetry info; jackavery.ca may be down. Ignoring!"
+        )
 
 
 def report_exception(message: str):
