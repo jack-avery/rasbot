@@ -194,14 +194,13 @@ class OAuth2Handler(Singleton):
             "Accept": "application/json",
         }
 
-        logging.debug(f"{method.__name__} {url}")
-
         if data:
             response = method(url, headers=headers, json=data)
         else:
             response = method(url, headers=headers)
 
-        logging.debug(response.status_code, response.json())
+        logging.debug(response.status_code)
+        logging.debug(response.json())
 
         if response.status_code >= 200 or response.status_code < 300:
             return response.json()

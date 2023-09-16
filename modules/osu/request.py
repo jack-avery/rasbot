@@ -82,6 +82,7 @@ MESSAGE_OPTIONS = {
 }
 
 
+# TODO: replace this with modules.osu.helpers.api2.OsuAPIv2Helper.message_self() once supported by osuAPIv2
 class OsuRequestsIRCBot(irc.bot.SingleServerIRCBot):
     def __init__(self, user, server, port=6667, password=None, log_i=None):
         irc.bot.SingleServerIRCBot.__init__(

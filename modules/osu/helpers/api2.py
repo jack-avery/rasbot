@@ -47,31 +47,61 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
 
         return True
 
-    def get_username(self, user_id: int):
-        """Get the username for user with ID `user_id`."""
+    def get_username(self, user_id: int) -> str:
+        """
+        https://osu.ppy.sh/docs/index.html#get-user
+
+        Get the username for user with ID `user_id`.
+        """
         return self._get(f"/users/{user_id}")
 
-    def get_beatmap(self, beatmap_id: int):
-        """Get information for the beatmap with ID `beatmap_id`."""
+    def get_beatmap(self, beatmap_id: int) -> dict:
+        """
+        https://osu.ppy.sh/docs/index.html#get-beatmap
+
+        Get information for the beatmap with ID `beatmap_id`.
+        """
         return self._get(f"/beatmaps/{beatmap_id}")
 
-    def get_beatmapset(self, beatmapset_id: int):
-        """Get maps and information for the beatmap set with ID `beatmapset_id`."""
+    def get_beatmapset(self, beatmapset_id: int) -> dict:
+        """
+        https://osu.ppy.sh/docs/index.html#get-apiv2beatmapsetsbeatmapset
+
+        Get maps and information for the beatmap set with ID `beatmapset_id`.
+        """
         return self._get(f"/beatmapsets/{beatmapset_id}")
 
-    def get_user_top_plays(self, user_id: int):
-        """Get top plays for user with ID `user_id`."""
+    def get_user_top_plays(self, user_id: int) -> list:
+        """
+        https://osu.ppy.sh/docs/index.html#get-user-scores
+
+        Get top plays for user with ID `user_id`.
+        """
         return self._get(f"/users/{user_id}/scores/best")
 
-    def get_user_recent_plays(self, user_id: int, include_fails: bool = True):
-        """Get recent plays for user with ID `user_id`. Includes fails by default."""
+    def get_user_recent_plays(self, user_id: int, include_fails: bool = True) -> list:
+        """
+        https://osu.ppy.sh/docs/index.html#get-user-scores
+
+        Get recent plays for user with ID `user_id`. Includes fails by default.
+        """
         return self._get(
             f"/users/{user_id}/scores/recent?include_fails={'1' if include_fails else '0'}"
         )
 
-    def send_message(self, target_id: int, message: str):
+    def send_message(self, target_id: int, message: str) -> dict:
         """Send `message` to osu! User ID `target`."""
         data = {"target_id": target_id, "message": message, "is_action": False}
+        return self._post("/chat/new", data)
+
+    def message_self(self, message: str) -> dict:
+        """
+        Send `message` to yourself.
+
+        This will eventually replace using IRC in `modules/osu/request.py`,
+        this does not currently work: https://github.com/ppy/osu/discussions/21598
+        """
+        data = {"target_id": self.osu_user_id, "message": message, "is_action": False}
         return self._post("/chat/new", data)
 
     def jsonify(self):
