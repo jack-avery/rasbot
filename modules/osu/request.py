@@ -8,8 +8,13 @@ import re
 from threading import Thread
 import time
 
-from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Author, Message, status_from_user_privilege
+from src.plugins import BaseModule
+from src.definitions import (
+    Author,
+    Message,
+    status_from_user_privilege,
+    NO_MESSAGE_SIGNAL,
+)
 
 from modules.osu.helpers.api2 import OsuAPIv2Helper
 
@@ -257,7 +262,7 @@ class Module(BaseModule):
                 self.log_d(f"user {author.name} requested while still on cd; ignoring")
                 return NO_MESSAGE_SIGNAL
 
-        command = self._bot.commands.find_first_command_using_module(self._name)
+        command = self._bot.commands_handler.find_first_command_using_module(self._name)
 
         # honor privileges
         if command:

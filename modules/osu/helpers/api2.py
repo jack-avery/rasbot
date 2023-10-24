@@ -22,7 +22,7 @@ class OsuAPIv2Helper(src.authentication.OAuth2Handler):
     def set_fields(self):
         super().set_fields()
 
-        self.osu_user_id = dict.get(self.cfg, "osu_user_id", None)
+        self.osu_user_id = self.cfg.get("osu_user_id", None)
 
     def setup(self):
         print("osu! API v2 setup")

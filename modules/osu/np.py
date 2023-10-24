@@ -7,7 +7,7 @@
 # TODO: refactor this to use new osu! APIv2 "Now Playing" once it drops
 # will remove dependency on using StreamCompanion
 
-from src.commands import BaseModule
+from src.plugins import BaseModule
 
 
 class Module(BaseModule):

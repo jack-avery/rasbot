@@ -48,9 +48,9 @@ class OAuth2Handler(Singleton):
 
     def set_fields(self):
         """Set the fields obtained from reading `self.cfgpath` to fields of this `OAuth2Handler`."""
-        self.client_id = dict.get(self.cfg, "client_id", None)
-        self.client_secret = dict.get(self.cfg, "client_secret", None)
-        self.token = dict.get(self.cfg, "token", None)
+        self.client_id = self.cfg.get("client_id", None)
+        self.client_secret = self.cfg.get("client_secret", None)
+        self.token = self.cfg.get("token", None)
 
     def jsonify(self) -> dict:
         """Returns a `dict` ("json-ified") with the fields of this `OAuth2Handler`."""
@@ -182,7 +182,7 @@ class OAuth2Handler(Singleton):
         if not self.token:
             return False
 
-        if time.time() >= dict.get(self.token, "expiry", 0):
+        if time.time() >= self.token.get("expiry", 0):
             self.__refresh_token()
 
         url = self.api + endpoint
@@ -250,8 +250,8 @@ class TwitchOAuth2Helper(OAuth2Handler):
     def set_fields(self):
         super().set_fields()
 
-        self.user_id = dict.get(self.cfg, "user_id", None)
-        self.irc_oauth = dict.get(self.cfg, "irc_oauth", None)
+        self.user_id = self.cfg.get("user_id", None)
+        self.irc_oauth = self.cfg.get("irc_oauth", None)
 
     def jsonify(self):
         return {

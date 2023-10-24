@@ -3,7 +3,8 @@ import logging
 from threading import Timer
 import traceback
 
-import src.commands as commands
+from src.commands import CommandsHandler
+from src.plugins import ModulesHandler
 from src.config import ConfigHandler, DEFAULT_CHANNEL
 from src.authentication import TwitchOAuth2Helper
 from src.definitions import Author, Message, status_from_user_privilege
@@ -15,7 +16,8 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     channel_id: int
     channel_name: str
     channel: str
-    commands: commands
+    commands_handler: CommandsHandler
+    modules_handler: ModulesHandler
     cfgpath: str
     """Path to the currently used channel config file."""
     prefix: str
@@ -96,14 +98,14 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.prefix = cfg["meta"]["prefix"]
         logging.info(f"Prefix set as '{self.prefix}'")
 
-        # Instantiate commands module
-        self.commands = commands
-        self.commands.pass_bot_ref(self)
+        # Instantiate handler modules
+        self.commands_handler = CommandsHandler(self)
+        self.modules_handler = ModulesHandler(self)
 
         # Import commands from config
         for name, command in cfg["commands"].items():
             try:
-                self.commands.command_add(
+                self.commands_handler.add(
                     name,
                     command=command,
                 )
@@ -118,11 +120,11 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         self.always_import_list = cfg["modules"]
         if cfg["modules"]:
             for module in cfg["modules"]:
-                if module in self.commands.modules:
+                if module in self.modules_handler.modules:
                     continue
 
                 try:
-                    self.commands.module_add(module)
+                    self.modules_handler.add(module)
                 except ModuleNotFoundError as mod:
                     logging.error(
                         f"always_import_list ('modules' in config) contains non-existent module '{mod}'"
@@ -140,16 +142,16 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         }
 
         # Adding commands
-        for name, command in self.commands.commands.items():
+        for name, command in self.commands_handler.commands.items():
             data["commands"][name] = command.jsonify()
 
         self.cfg_handler.write(data)
 
     def __del__(self):
         """Teardown all modules in preparation for closing."""
-        modules = [k for k in self.commands.modules.keys()]
+        modules = [k for k in self.modules_handler.modules.keys()]
         for module in modules:
-            self.commands.module_del(module)
+            self.modules_handler.delete(module)
 
         del self
 
@@ -166,16 +168,16 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent."""
         # Recomprehend tags into something usable
-        e.tags = {i["key"]: i["value"] for i in e.tags}
+        e.tags: dict = {i["key"]: i["value"] for i in e.tags}
 
         # Grab user info
         name = str(e.source)
         name = str.lower(name[: name.find("!")])
         display_name = str.lower(e.tags["display-name"])
         uid = int(e.tags["user-id"])
-        ismod = dict.get(e.tags, "mod", "0") == "1"
-        issub = dict.get(e.tags, "subscriber", "0") == "1"
-        isvip = dict.get(e.tags, "vip", "0") == "1"
+        ismod = e.tags.get("mod", "0") == "1"
+        issub = e.tags.get("subscriber", "0") == "1"
+        isvip = e.tags.get("vip", "0") == "1"
         ishost = False
 
         # Gauranteeing broadcaster all traits
@@ -186,13 +188,13 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         author = Author(name, display_name, uid, ismod, issub, isvip, ishost)
 
         # Create message object
-        msg = e.arguments[0]
+        msg: str = e.arguments[0].replace(" \U000e0000", "")
         message = Message(author, msg, e)
 
         try:
             # Don't continue if the message doesn't start with the prefix.
             if not msg.startswith(self.prefix):
-                self.commands.do_on_pubmsg(message)
+                self.modules_handler.do_on_pubmsg(message)
                 return
 
             split = msg.split(" ")
@@ -202,10 +204,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             args = split[1:]
             message.attach_command(cmd, args)
 
-            self.commands.do_on_pubmsg(message)
+            self.modules_handler.do_on_pubmsg(message)
 
             # Verify that it's actually a command before continuing.
-            if cmd not in self.commands.commands:
+            if cmd not in self.commands_handler.commands:
                 logging.debug(
                     f"Ignoring invalid command call '{cmd}' from {name} ({status_from_user_privilege(author.priv)})"
                 )
@@ -215,7 +217,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
             logging.info(
                 f"Running command call '{cmd}' from {name} ({status_from_user_privilege(author.priv)}) (args:{message.args})"
             )
-            cmdresult = self.commands.commands[cmd].run(message)
+            cmdresult = self.commands_handler.run(cmd, message)
 
             # If there is a string result message, print it to chat
             if cmdresult:

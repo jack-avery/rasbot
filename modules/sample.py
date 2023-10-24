@@ -7,7 +7,7 @@
 # You can test out this module by adding it in a command as %sample%
 # e.g. "r!cmd add sample %sample%"
 
-from src.commands import BaseModule
+from src.plugins import BaseModule
 from src.definitions import Message
 
 

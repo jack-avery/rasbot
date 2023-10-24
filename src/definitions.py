@@ -55,6 +55,9 @@ def check_dependencies():
 # Helper classes.
 ##
 
+NO_MESSAGE_SIGNAL = "%NOMSG%"
+"""Signal for a module to return for there to be no message sent no matter what."""
+
 
 class Author:
     name: str

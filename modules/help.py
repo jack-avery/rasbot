@@ -1,7 +1,7 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from src.commands import BaseModule
+from src.plugins import BaseModule
 from src.definitions import Author, Message
 
 
@@ -19,7 +19,7 @@ class Module(BaseModule):
             user_commands_list = ", ".join(
                 [
                     n
-                    for n, c in self._bot.commands.commands.items()
+                    for n, c in self._bot.commands_handler.commands.items()
                     if not c.hidden and not c.privilege > Author.Privilege.VIP
                 ]
             )
@@ -27,7 +27,7 @@ class Module(BaseModule):
             mod_commands_list = ", ".join(
                 [
                     n
-                    for n, c in self._bot.commands.commands.items()
+                    for n, c in self._bot.commands_handler.commands.items()
                     if not c.hidden and c.privilege > Author.Privilege.VIP
                 ]
             )
@@ -39,13 +39,15 @@ class Module(BaseModule):
             name = args[0]
 
             # if the name resolves to a module, give the module's helpmsg
-            if name in self._bot.commands.modules:
-                return self._bot.commands.modules[name].help()
+            if name in self._bot.modules_handler.modules:
+                return self._bot.modules_handler.modules[name].help()
 
             # if not a module and resolves to a command...
-            elif name in self._bot.commands.commands:
+            elif name in self._bot.commands_handler.commands:
                 # see if it mentions any modules
-                command_modules = self._bot.commands.commands[name].get_used_modules()
+                command_modules = self._bot.commands_handler.get(
+                    name
+                ).get_used_modules()
 
                 # if it does, give the modules it mentions
                 if command_modules:

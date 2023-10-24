@@ -2,7 +2,7 @@
 # You can tweak the frequency of granting XP and the ranges to grant in the config file.
 # "Levels" may be implemented eventually, but assume it will be left as-is.
 
-from src.commands import BaseModule
+from src.plugins import BaseModule
 from src.config import BASE_CONFIG_PATH
 from src.definitions import Author, Message, RepeatTimer
 

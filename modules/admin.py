@@ -3,8 +3,8 @@
 
 import json
 
-from src.commands import BaseModule, NO_MESSAGE_SIGNAL
-from src.definitions import Message
+from src.plugins import BaseModule
+from src.definitions import Message, NO_MESSAGE_SIGNAL
 from update import RASBOT_BASE_MANIFEST
 
 
@@ -74,11 +74,11 @@ class Module(BaseModule):
                 return f"removed {uid} from admins"
 
             case "import":
-                self._bot.commands.module_add(args[1])
+                self._bot.modules_handler.add(args[1])
                 return f"imported {args[1]}"
 
             case "unimport":
-                self._bot.commands.module_del(args[1])
+                self._bot.modules_handler.delete(args[1])
                 return f"unimported {args[1]}"
 
             case "alwaysimportadd":

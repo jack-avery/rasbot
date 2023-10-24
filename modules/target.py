@@ -1,7 +1,7 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from src.commands import BaseModule
+from src.plugins import BaseModule
 from src.definitions import Message
 
 

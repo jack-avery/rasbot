@@ -1,7 +1,7 @@
 # This is a built-in function.
 # Please do not modify this unless you really know what you're doing.
 
-from src.commands import BaseModule
+from src.plugins import BaseModule
 import datetime
 import time
 
@@ -9,7 +9,7 @@ import time
 class Module(BaseModule):
     helpmsg = "Returns the current stream uptime. Usage: uptime"
 
-    def main(self, message):
+    def main(self, _):
         # TODO understand what I was doing when I wrote this and document it better...
 
         r = self._bot.auth.get_stream(self._bot.channel_id)
