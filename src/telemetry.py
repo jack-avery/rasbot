@@ -9,7 +9,6 @@ footprint = "".join(
 )
 
 import requests
-import urllib.parse
 
 from src.config import read_global
 from update import get_rasbot_current_version
@@ -31,13 +30,26 @@ class TelemetryLevel:
 
 def send(mode: str, message: str):
     message += f"\n\n> {footprint}"
-    message = urllib.parse.quote(message)
+
+    headers = {
+        "Content-Type": "application/json"
+    }
+
+    data = {
+        "mode": mode,
+        "message": message
+    }
 
     try:
-        requests.get(f"{URL}/{mode}/{message}", timeout=1)
+        requests.post(
+            f"{URL}",
+            headers=headers,
+            json=data,
+            timeout=2
+        )
     except requests.exceptions.ReadTimeout:  # allow failed requests to time out quietly
         logging.warn(
-            "Failed to send telemetry info; jackavery.ca may be down. Ignoring!"
+            "Telemetry ping to jackavery.ca/api/rasbot_notify timed out. Is jackavery.ca down?"
         )
 
 
