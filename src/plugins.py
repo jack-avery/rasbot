@@ -1,4 +1,5 @@
 from importlib.util import spec_from_file_location, module_from_spec
+import os
 import logging
 import threading
 import traceback
@@ -20,7 +21,8 @@ class BaseModule(threading.Thread):
     """Default configuration to save to-file."""
 
     consumes = 0
-    """How many message arguments to consume. Any negative value for all remaining."""
+    """How many message arguments to consume.
+    Any negative value for all remaining."""
 
     def __init__(self, bot, name: str):
         """Initialize a module. If a `cfgdefault` is given,
@@ -31,7 +33,7 @@ class BaseModule(threading.Thread):
         self._name = name
 
         self._cfghandler = ConfigHandler(
-            f"{self._bot.channel_id}/modules/{name}.txt", self.default_config
+            f"{self._bot.channel_id}/plugins/{name}.txt", self.default_config
         )
 
         self.reload_config()
@@ -48,11 +50,13 @@ class BaseModule(threading.Thread):
         self._cfg = self._cfghandler.read()
 
     def save_config(self):
-        """Save the current form of this module's `self.cfg` attribute to file."""
+        """Save the current form of this module's `self.cfg` attribute to file.
+        """
         self._cfghandler.write(self._cfg)
 
     def cfg_get(self, key: str):
-        """Read the given config dict key. If it fails to read it will fill it in with the default.
+        """Read the given config dict key.
+        If it fails to read it will fill it in with the default.
 
         :param key: The key to grab the value of
 
@@ -84,7 +88,7 @@ class BaseModule(threading.Thread):
     def help(self):
         """The help message when used with the `help` module.
 
-        :return: The message to show when used as an argument for the `help` module.
+        :return: The message to show when used as an argument for `help`.
         """
         return self.helpmsg
 
@@ -124,16 +128,20 @@ class BaseModule(threading.Thread):
         logging.debug(f"({self._name}) - {msg}")
 
     def get_args(self, message: Message) -> list:
-        """Consume `self.consumes` arguments from `message` for use as command arguments.
+        """Consume `self.consumes` arguments from `message`
+        for use as command arguments.
 
-        :return: A list of every argument consumed, as `str`, or `None` if there's nothing to consume.
+        :return: A list of every argument consumed, as `str`,
+        or `None` if there's nothing to consume.
         """
         return message.consume(self.consumes)
 
     def get_args_lower(self, message: Message) -> list:
-        """Consume `self.consumes` arguments from `message` for use as command arguments.
+        """Consume `self.consumes` arguments from `message`
+        for use as command arguments.
 
-        :return: A list of every argument consumed (in lowercase), or False if there's nothing to consume.
+        :return: A list of every argument consumed (in lowercase),
+        or False if there's nothing to consume.
         """
         args = self.get_args(message)
 
@@ -157,27 +165,34 @@ class ModulesHandler:
     def add(self, name: str):
         """Imports a new module and appends it to the modules dict.
 
-        :param name: The path to the module. Path is relative to the `modules` folder.
+        :param name: The path to the module.
+        Path is relative to the `modules` folder.
         """
         logging.debug(f"importing module {name}")
 
         try:
-            # Create spec and import from directory.
-            spec = spec_from_file_location(f"{name}", f"modules/{name}.py")
-            module = module_from_spec(spec)
-            spec.loader.exec_module(module)
+            for prefix in ["", "base/"]:
+                # Create spec and import from directory.
+                spec = spec_from_file_location(
+                    f"{name}",
+                    f"plugins/{prefix}{name}.py"
+                )
+                if not spec:
+                    continue
+                module = module_from_spec(spec)
+                spec.loader.exec_module(module)
 
-            # Give it its' own thread and start it up
-            self.modules[name] = module.Module(self.bot, name)
-            self.modules[name].start()
-
-        except FileNotFoundError:
-            raise ModuleNotFoundError(name)
+                # Give it its' own thread and start it up
+                self.modules[name] = module.Module(self.bot, name)
+                self.modules[name].start()
+                return
 
         except Exception:
             logging.error(f"failed to import module {name} with error trace:")
             traceback.print_exc()
             raise ModuleNotFoundError(name)
+
+        raise ModuleNotFoundError(name)
 
     def delete(self, name: str):
         """Call `module.__del__()` and remove it from `modules`.

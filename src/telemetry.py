@@ -47,9 +47,10 @@ def send(mode: str, message: str):
             json=data,
             timeout=2
         )
-    except requests.exceptions.ReadTimeout:  # allow failed requests to time out quietly
+    # allow failed requests to time out quietly
+    except requests.exceptions.ReadTimeout:
         logging.warn(
-            "Telemetry ping to jackavery.ca/api/rasbot_notify timed out. Is jackavery.ca down?"
+            "Telemetry ping to jackavery.ca/api/rasbot_notify timed out."
         )
 
 

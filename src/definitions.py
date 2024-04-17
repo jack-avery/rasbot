@@ -26,17 +26,18 @@ logging.basicConfig(handlers=log_handlers, level=logging.DEBUG)
 
 
 def check_dependencies():
+    # TODO: support Linux package managers appropriately
     logging.info("Checking Python dependencies...")
     manifests = [
         manifest
-        for manifest in os.listdir("src/manifests")
+        for manifest in os.listdir("plugins")
         if manifest.endswith(".manifest")
     ]
     for manifest in manifests:
-        with open(f"src/manifests/{manifest}", "r") as manifestfile:
+        with open(f"plugins/{manifest}", "r") as manifestfile:
             manifest = json.loads(manifestfile.read())
         if "requirements" in manifest:
-            if not manifest["requirements"]:
+            if "requirements" not in manifest:
                 continue
             subprocess.call(
                 [
@@ -56,7 +57,9 @@ def check_dependencies():
 ##
 
 NO_MESSAGE_SIGNAL = "%NOMSG%"
-"""Signal for a module to return for there to be no message sent no matter what."""
+"""
+Signal for a module to return for there to be no message sent no matter what.
+"""
 
 
 class Author:
@@ -158,12 +161,14 @@ class Message:
     author: Author
     text_raw: str
     event: dict
-    """The raw message event received by `irc.bot.SingleServerIRCBot.on_pubmsg()`."""
+    """The raw message event received by
+    `irc.bot.SingleServerIRCBot.on_pubmsg()`."""
     cmd: str
     """The command used, if applicable, in this message."""
     args: list
     """The list of arguments in the message.\n
-    ### Do not modify this directly!! Use `Module.get_args(message)` to get arguments in modules.
+    ### Do not modify this directly!! Use `Module.get_args(message)`
+    to get arguments in modules.
     """
 
     def __init__(self, author: Author, text_raw: str, event: dict):
@@ -188,7 +193,8 @@ class Message:
         self.args = args
 
     def consume(self, amount: int = 0):
-        """Consume `amount` arguments, removing them from `self.args` and returning them.
+        """Consume `amount` arguments,
+        removing them from `self.args` and returning them.
 
         :param amount: The amount of arguments to consume from `self.args`.
         :return: The args consumed for use.
