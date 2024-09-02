@@ -46,7 +46,6 @@ DEFAULT_CHANNEL = {
 DEFAULT_GLOBAL = {
     "default_authfile": "auth.txt",
     "release_branch": "main",
-    "telemetry": -1,
 }
 
 read_global = lambda: ConfigHandler(GLOBAL_CONFIG_FILE, DEFAULT_GLOBAL).read()

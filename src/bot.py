@@ -8,8 +8,6 @@ from src.plugins import ModulesHandler
 from src.config import ConfigHandler, DEFAULT_CHANNEL
 from src.authentication import TwitchOAuth2Helper
 from src.definitions import Author, Message, status_from_user_privilege
-from src.telemetry import report_exception
-
 
 class TwitchBot(irc.bot.SingleServerIRCBot):
     auth: TwitchOAuth2Helper
@@ -168,7 +166,7 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
     def on_pubmsg(self, c, e):
         """Code to be run when a message is sent."""
         # Recomprehend tags into something usable
-        e.tags: dict = {i["key"]: i["value"] for i in e.tags}
+        e.tags = {i["key"]: i["value"] for i in e.tags}
 
         # Grab user info
         name = str(e.source)
@@ -226,11 +224,10 @@ class TwitchBot(irc.bot.SingleServerIRCBot):
         except Exception as err:
             self.send_message(
                 f"An error occurred in the processing of your request: {str(err)}. "
-                + "A full stack trace has been output to the command window."
+                + "A full stack trace has been output to the command window and log file."
             )
-            traceback.print_exc()
-            # report the error to the webhook as well for debugging
-            report_exception(traceback.format_exc())
+            err_str = traceback.format_exc()
+            logging.error(err_str)
 
     def send_message(self, msg: str):
         """Sends a message to the public chat. For easy use within modules.

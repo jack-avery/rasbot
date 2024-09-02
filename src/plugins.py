@@ -175,8 +175,9 @@ class ModulesHandler:
             raise ModuleNotFoundError(name)
 
         except Exception:
+            err_str = traceback.format_exc()
             logging.error(f"failed to import module {name} with error trace:")
-            traceback.print_exc()
+            logging.error(err_str)
             raise ModuleNotFoundError(name)
 
     def delete(self, name: str):

@@ -32,10 +32,6 @@
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/definitions.py"
         },
         {
-            "file": "src/telemetry.py",
-            "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/src/telemetry.py"
-        },
-        {
             "file": "modules/admin.py",
             "source": "https://raw.githubusercontent.com/jack-avery/rasbot/$BRANCH/modules/admin.py"
         },
