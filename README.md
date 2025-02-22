@@ -4,20 +4,20 @@
 
 </div>
 
+## This project is end-of-life; I am no longer maintaining this project, pending an eventual rewrite from the ground-up. Thank you to all of the users who enjoyed using this while it was actively updated. It should continue to work for the foreseeable future.
+
 **rasbot** is a self-hosted Twitch bot that provides an easy-to-use interface for extending your bot with custom Python code.<br/>
 
-rasbot is intended to run locally, so it has access to your Twitch emotes, and companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion):
-
-![image](https://cdn.discordapp.com/attachments/488850419301220352/1063993678575714335/image.png)
+rasbot is intended to run locally, so it has access to your Twitch emotes, and companion applications, such as [osu!StreamCompanion](https://github.com/Piotrekol/StreamCompanion).
 
 Find rasbot useful? [Buy me a coffee ☕](https://ko-fi.com/raspy)!
 
 # How to Use ✍️
 
-rasbot is an old project, and some of its' functionality depends on pip being easily usable.
+rasbot is an old project, and its' functionality depends on pip being easily usable.
 **As a result, rasbot only works on Windows.**
 
-1. Download and install [Python version 3.11.0+](https://www.python.org/downloads/), ensuring you tick "Add python.exe to PATH" at the bottom of the first screen.
+1. Download and install [Python version 3.12.0+](https://www.python.org/downloads/), ensuring you tick "Add python.exe to PATH" at the bottom of the first screen.
 2. Download the Source Code:
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/jack-avery/rasbot` <br/>
 > Or, click on **Code** at the top right and **Download ZIP**.
@@ -57,12 +57,3 @@ r!cmd add np %osu/np%
 ```
 
 *For documentation on configuring modules or creating your own, see [this](https://github.com/jack-avery/rasbot/blob/master/modules/README.md).*
-
-# Bug reports & feature suggestions 🐛
-Has something gone **horribly** wrong? *Or do you just think something's missing?*
-
-Feel free to [create a new issue](https://github.com/jack-avery/rasbot/issues), join the [Discord](https://discord.gg/qpyT4zx), or message me directly on Discord about it: `raspy#0292`.
-
-> If you're reporting a bug, it's most useful to me if you can get what the console outputs for me.<br/>
-> If rasbot is crashing instantly on launch, you'll need to start it from Command Prompt / another terminal:<br/>
-> You can use the command `main.py --debug` for rasbot to show more information during startup.
