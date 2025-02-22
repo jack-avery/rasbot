@@ -13,6 +13,10 @@ rasbot is intended to run locally, so it has access to your Twitch emotes, and c
 Find rasbot useful? [Buy me a coffee ☕](https://ko-fi.com/raspy)!
 
 # How to Use ✍️
+
+rasbot is an old project, and some of its' functionality depends on pip being easily usable.
+**As a result, rasbot only works on Windows.**
+
 1. Download and install [Python version 3.11.0+](https://www.python.org/downloads/), ensuring you tick "Add python.exe to PATH" at the bottom of the first screen.
 2. Download the Source Code:
 > Using [git](https://git-scm.com/downloads): `git clone https://github.com/jack-avery/rasbot` <br/>
@@ -23,9 +27,6 @@ Find rasbot useful? [Buy me a coffee ☕](https://ko-fi.com/raspy)!
 ```
 Joined #raspy_on_osu! (57511738)
 ```
-
-> You will be asked about telemetry when you first start rasbot. I would appreciate at least error reporting. <br/>
-> **All telemetry is completely anonymous.** You can see exactly what is sent [here](https://github.com/jack-avery/rasbot/blob/main/src/telemetry.py).
 
 > rasbot checks for and performs updates automatically with each start and will let you know if one is ready! <br/>
 > You can disable auto-update checking and notifications **entirely** in `update.py`.
